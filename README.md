@@ -2,6 +2,8 @@
 
 This is a Chrome extention which notifies the tester there is new work to be done. It does this by polling the API using their tester ID.
 
+**NOTE:** This will not work for most testers unless you work at Rainforest OR are part of the alpha/beta program 
+
 ## Installing from store
 
 https://chrome.google.com/webstore/detail/immdjpjbcikbffjifkbncgfbohbjicpo
@@ -10,6 +12,7 @@ https://chrome.google.com/webstore/detail/immdjpjbcikbffjifkbncgfbohbjicpo
 ## Developing
 
 ### 1. Clone repo
+
 Clone this repo
 
 ### 2. Install the extension
