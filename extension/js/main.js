@@ -10,7 +10,8 @@ info_hash = {tester_state: 'active', email: '', id: '', version: manifest.versio
 
 // Set polling interval in milliseconds (note, this is rate limted,
 // so if you change agressively, it will error)
-check_for_work_interval = 2 * 1000;
+default_check_for_work_interval = 2 * 1000;
+check_for_work_interval = default_check_for_work_interval;
 
 
 
@@ -197,8 +198,8 @@ chrome.idle.onStateChanged.addListener(function(state){
   console.log('tester info:', info_hash);
 
   if (state == 'idle') {
-    check_for_work_interval = 15000;
+    check_for_work_interval = default_check_for_work_interval * 10;
   } else if (state == 'active') {
-    check_for_work_interval = 5000;
+    check_for_work_interval = default_check_for_work_interval;
   }
 })
