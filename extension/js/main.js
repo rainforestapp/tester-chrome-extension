@@ -3,11 +3,13 @@ BASE_URL = 'https://portal.rainforestqa.com';
 var manifest = chrome.runtime.getManifest();
 console.log("Starting:", manifest.name, manifest.version, BASE_URL);
 
-// Start disabled
+// Start disabled: require the tester to enable if they want to
+// work when the browser starts
 _checking_active = false
 info_hash = {tester_state: 'active', email: '', id: '', version: manifest.version}
 
-// 2 second polling
+// Set polling interval in milliseconds (note, this is rate limted,
+// so if you change agressively, it will error)
 check_for_work_interval = 2 * 1000;
 
 
@@ -79,7 +81,7 @@ function set_checking(state) {
 
 
 //
-// open or focus the main work tab
+// Open or focus the main work tab
 //
 work_tab = null
 function open_or_focus_tab(url) {
@@ -93,7 +95,7 @@ function open_or_focus_tab(url) {
 
 
 //
-// make sure the work tab is open and front and centre
+// Make sure the work tab is open and in focus
 //
 function refresh_tab_info() {
   chrome.tabs.get(work_tab.id, function (t) {
@@ -186,7 +188,8 @@ chrome.identity.getProfileUserInfo(function(info) {
 
 
 //
-// Get idle checking - this drops the polling rate for inactive users
+// Get idle checking - this drops the polling rate
+// for "inactive" users (i.e. when AFK)
 // 
 chrome.idle.setDetectionInterval(15);
 chrome.idle.onStateChanged.addListener(function(state){
