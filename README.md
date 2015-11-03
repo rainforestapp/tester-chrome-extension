@@ -50,7 +50,7 @@ Worker.where(uuid: uuids).not_blocked.each do |w|
 Thanks for signing up via the portal to get beta access. Congratulations, you've been invited to the beta (i.e. it's been tested, but might still have bugs) of the Rainforest Chrome Plugin. This will become the easiest way to get notified of new work.
 
 Some things:
-1. if it breaks or you have feedback, please let me know by email - russ@rainforestqa.com (include the url, plus any error message)
+1. if it breaks or you have feedback, please let me know by reporting an issue here: https://github.com/rainforestapp/tester-chrome-extension/issues (include the url, plus any error message)
 2. this is enabled for your account and a few others - it will not work for other testers, so sharing it won't work
 3. to use it:
   1. install with the button on your profile
