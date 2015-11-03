@@ -31,9 +31,9 @@ Clone this repo
 4. Click publish
 
 
-## Alpha testers
+## Beta-tester testers
 
-A list of people who requested early access is here: https://docs.google.com/spreadsheets/d/1Fs9CgJSoz0O4d3kwGxECaiR9m6pDXyuoXbEYKlrofaM/edit#gid=2004031407
+If you wish to be an early tester, please fill in this form: https://docs.google.com/forms/d/1k2tLZRBuLtTi1yHMNVd7PmifQRnKKg3tWSD-N286SAU/viewform. A list of people who requested early access is here for Rainforest staff: https://docs.google.com/spreadsheets/d/1Fs9CgJSoz0O4d3kwGxECaiR9m6pDXyuoXbEYKlrofaM/edit#gid=2004031407 (please do not request access, it will not be granted)
 
 ### Allowing access
 
