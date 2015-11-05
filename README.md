@@ -2,12 +2,13 @@
 
 This is a Chrome extention which notifies the tester there is new work to be done. It does this by polling the API using their tester ID.
 
-**NOTE:** This will not work for most testers unless you work at Rainforest OR are part of the alpha/beta program 
+## Installing from the portal
 
-## Installing from store
+Note: to use this extension you MUST have done at least one job for us before. This is as we pay you via either Mechancial Turk, or Crowd Flower as normal, against an older job you did.
 
-https://chrome.google.com/webstore/detail/immdjpjbcikbffjifkbncgfbohbjicpo
-
+1. Go to https://portal.rainforestqa.com/login (register from any email from us)
+2. Login
+3. Click on "Get Chrome Extension"
 
 ## Developing
 
@@ -29,42 +30,6 @@ Clone this repo
 2. Go to https://chrome.google.com/webstore/developer/dashboard/g11410347157364884499
 3. Upload the new version
 4. Click publish
-
-
-## Beta-tester testers
-
-If you wish to be an early tester, please fill in this form: https://docs.google.com/forms/d/1k2tLZRBuLtTi1yHMNVd7PmifQRnKKg3tWSD-N286SAU/viewform. A list of people who requested early access is here for Rainforest staff: https://docs.google.com/spreadsheets/d/1Fs9CgJSoz0O4d3kwGxECaiR9m6pDXyuoXbEYKlrofaM/edit#gid=2004031407 (please do not request access, it will not be granted)
-
-### Allowing access
-
-```ruby
-uuids = %w{
-    ...put uuid's here..
-}
-
-Worker.where(uuid: uuids).not_blocked.each do |w|
-  w.add_feature!(:portal_api_access)
-  w.add_feature!(:chrome_extension)
-  Jobs::Workers::Notify.do([w.id], "Welcome to the Rainforest Chrome Plugin Beta", "Hey #{w.name},
-
-Thanks for signing up via the portal to get beta access. Congratulations, you've been invited to the beta (i.e. it's been tested, but might still have bugs) of the Rainforest Chrome Plugin. This will become the easiest way to get notified of new work.
-
-Some things:
-1. if it breaks or you have feedback, please let me know by reporting an issue here: https://github.com/rainforestapp/tester-chrome-extension/issues (include the url, plus any error message)
-2. this is enabled for your account and a few others - it will not work for other testers, so sharing it won't work
-3. to use it:
-  1. install with the button on your profile
-  2. it will redirect to your profile in order to get it's authorization
-  3. it should show 'off' when you aren't working
-  4. click the icon when you want to start. 'no' means there is no work. 'yes' will appear and a tab will open taking you direct to the job if there is work.
-
-Any feedback would be awesome!
-
-Russ
-Rainforest QA
-")
-end
-```
 
 ## Internal 
 
