@@ -10,7 +10,7 @@ info_hash = {tester_state: 'active', email: '', id: '', version: manifest.versio
 
 // Set polling interval in milliseconds (note, this is rate limted,
 // so if you change agressively, it will error)
-default_check_for_work_interval = 2 * 1000;
+default_check_for_work_interval = 8 * 1000;
 check_for_work_interval = default_check_for_work_interval;
 
 
