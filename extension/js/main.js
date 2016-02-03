@@ -1,4 +1,5 @@
 BASE_URL = 'https://portal.rainforestqa.com';
+BOUNCER_URL = 'http://bouncer.rainforestqa.com';
 
 var manifest = chrome.runtime.getManifest();
 console.log("Starting:", manifest.name, manifest.version, BASE_URL);
@@ -148,7 +149,7 @@ function check_for_work() {
   }
 
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", BASE_URL + "/api/1/testers/" + info_hash["uuid"] + "/work_available?info=" + JSON.stringify(info_hash), true);
+  xhr.open("GET", BOUNCER_URL + "/1/testers/" + info_hash["uuid"] + "/work_available?info=" + JSON.stringify(info_hash), true);
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4 && _checking_active) {
       var resp = JSON.parse(xhr.responseText);
