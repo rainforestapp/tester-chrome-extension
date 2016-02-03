@@ -21,7 +21,7 @@
     "default_icon": "icons/icon19.png"
   },
   "externally_connectable": {
-    "matches": ["*://portal.rainforest.dev/*"]
+    "matches": ["*://portal.rainforest.dev/*", "*://bouncer.rainforestqa.com/*"]
   },
   "permissions": [
     "cookies",
