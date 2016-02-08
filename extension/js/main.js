@@ -1,20 +1,23 @@
 BASE_URL = 'https://portal.rainforestqa.com';
-BOUNCER_URL = 'http://bouncer.rainforestqa.com';
 
 var manifest = chrome.runtime.getManifest();
 console.log("Starting:", manifest.name, manifest.version, BASE_URL);
 
 // Start disabled: require the tester to enable if they want to
 // work when the browser starts
-_checking_active = false
-info_hash = {tester_state: 'active', email: '', id: '', version: manifest.version}
+_checking_active = false;
+info_hash = {
+  tester_state: 'active',
+  work_avaialble_endpoint: BASE_URL + '/api/1/testers/',
+  email: '',
+  id: '',
+  version: manifest.version
+};
 
 // Set polling interval in milliseconds (note, this is rate limted,
 // so if you change agressively, it will error)
 default_check_for_work_interval = 8 * 1000;
 check_for_work_interval = default_check_for_work_interval;
-
-
 
 //
 // Load the initial id value from storage
@@ -31,6 +34,20 @@ chrome.storage.sync.get("worker_uuid", function(data) {
   }
 });
 
+//
+// Load the initial api endpoint value from storage
+//
+chrome.storage.sync.get("work_available_endpoint", function(data) {
+  // Notify that we saved.
+  console.log("Data loaded", data);
+  if (data['work_available_endpoint'] != undefined) {
+    info_hash["work_available_endpoint"] = data["work_available_endpoint"];
+    console.log("Updated info hash:", info_hash);
+    set_checking(_checking_active);
+  } else {
+    sync_tab_make_new();
+  }
+});
 
 
 // Handle the icon being clicked
@@ -42,7 +59,7 @@ chrome.browserAction.onClicked.addListener(function (event) {
   console.log("browserAction", event);
   console.log("Checking is now:", _checking_active);
   set_checking(_checking_active);
-})
+});
 
 
 
@@ -53,15 +70,22 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
   if (request.data) {
     console.log("incoming data", request);
 
-    if (request.data['worker_uuid']) {
-      info_hash["uuid"] = request.data["worker_uuid"]
+    if (request.data['worker_uuid'] && request.data['work_available_endpoint']) {
+      info_hash["uuid"] = request.data["worker_uuid"];
+      info_hash["work_available_endpoint"] = request.data["work_available_endpoint"];
       set_checking(_checking_active);
       sendResponse({ok: true});
 
-      chrome.storage.sync.set({'worker_uuid': request.data["worker_uuid"]}, function() {
-        // Notify that we saved.
-        console.log('Worker ID saved');
-      });
+      chrome.storage.sync.set(
+        {
+          'worker_uuid': request.data["worker_uuid"],
+          'work_available_endpoint': request.data["work_available_endpoint"]
+        },
+        function() {
+          // Notify that we saved.
+          console.log('Worker ID and API endpoint saved');
+        }
+      );
     }
   }
 });
@@ -144,12 +168,12 @@ function sync_tab_make_new() {
 //
 function check_for_work() {
   if (info_hash["uuid"] == "" || info_hash["uuid"] === undefined) {
-    console.log("Info hash not set", info_hash)
+    console.log("Info hash not set", info_hash);
     return false;
   }
 
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", BOUNCER_URL + "/1/testers/" + info_hash["uuid"] + "/work_available?info=" + JSON.stringify(info_hash), true);
+  xhr.open("GET", info_hash["work_available_endpoint"] + info_hash["uuid"] + "/work_available?info=" + JSON.stringify(info_hash), true);
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4 && _checking_active) {
       var resp = JSON.parse(xhr.responseText);

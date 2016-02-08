@@ -1,6 +1,6 @@
 {
   "name": "Rainforest Tester Notifier",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "manifest_version": 2,
   "description": "Notifies Rainforest Testers when there is new work to be done.",
   "homepage_url": "https://portal.rainforestqa.com",
@@ -21,7 +21,7 @@
     "default_icon": "icons/icon19.png"
   },
   "externally_connectable": {
-    "matches": ["*://portal.rainforest.dev/*", "*://bouncer.rainforestqa.com/*"]
+    "matches": ["*://portal.rainforest.dev/*"]
   },
   "permissions": [
     "cookies",
