@@ -5,8 +5,8 @@ console.log("Starting:", manifest.name, manifest.version, BASE_URL);
 
 // Start disabled: require the tester to enable if they want to
 // work when the browser starts
-_checking_active = false;
-info_hash = {
+var _checking_active = false;
+var info_hash = {
   tester_state: 'active',
   work_available_endpoint: BASE_URL + '/api/1/testers/',
   email: '',
@@ -39,10 +39,8 @@ chrome.storage.sync.get("worker_uuid", function(data) {
 //
 chrome.storage.sync.get("work_available_endpoint", function(data) {
   // Notify that we saved.
-  console.log("Data loaded", data);
-  if (data['work_available_endpoint'] != undefined) {
+  if (data['work_available_endpoint'] !== undefined) {
     info_hash["work_available_endpoint"] = data["work_available_endpoint"];
-    console.log("Updated info hash:", info_hash);
     set_checking(_checking_active);
   } else {
     sync_tab_make_new();
@@ -56,8 +54,6 @@ chrome.storage.sync.get("work_available_endpoint", function(data) {
 //
 chrome.browserAction.onClicked.addListener(function (event) {
   _checking_active = !_checking_active;
-  console.log("browserAction", event);
-  console.log("Checking is now:", _checking_active);
   set_checking(_checking_active);
 });
 
@@ -68,23 +64,18 @@ chrome.browserAction.onClicked.addListener(function (event) {
 // 
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
   if (request.data) {
-    console.log("incoming data", request);
-
     if (request.data['worker_uuid'] && request.data['work_available_endpoint']) {
-      info_hash["uuid"] = request.data["worker_uuid"];
-      info_hash["work_available_endpoint"] = request.data["work_available_endpoint"];
+      info_hash.uuid = request.data.worker_uuid;
+      info_hash.work_available_endpoint = request.data.work_available_endpoint;
       set_checking(_checking_active);
       sendResponse({ok: true});
 
       chrome.storage.sync.set(
         {
-          'worker_uuid': request.data["worker_uuid"],
-          'work_available_endpoint': request.data["work_available_endpoint"]
+          worker_uuid: request.data["worker_uuid"],
+          work_available_endpoint: request.data["work_available_endpoint"]
         },
-        function() {
-          // Notify that we saved.
-          console.log('Worker ID and API endpoint saved');
-        }
+        function() {}
       );
     }
   }
