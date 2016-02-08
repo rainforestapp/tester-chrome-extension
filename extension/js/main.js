@@ -8,7 +8,7 @@ console.log("Starting:", manifest.name, manifest.version, BASE_URL);
 _checking_active = false;
 info_hash = {
   tester_state: 'active',
-  work_avaialble_endpoint: BASE_URL + '/api/1/testers/',
+  work_available_endpoint: BASE_URL + '/api/1/testers/',
   email: '',
   id: '',
   version: manifest.version
