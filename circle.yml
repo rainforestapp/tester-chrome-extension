@@ -1,11 +1,6 @@
-dependencies:
-  pre:
-    - chmod +x deploy.sh
-  override:
-    - gpg --yes --batch --passphrase=$KEY_PEM_PASSWORD key.pem.gpg
-
 test:
   override:
+    - gpg --yes --batch --passphrase=$KEY_PEM_PASSWORD key.pem.gpg
     - mv key.pem extension/
 
 deployment:
