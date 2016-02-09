@@ -3,21 +3,20 @@ dependencies:
     - chmod +x deploy.sh
   override:
     - gpg --yes --batch --passphrase=$KEY_PEM_PASSWORD key.pem.gpg
-    - mv key.pem extension/
-    - mv production_manifest.json extension/manifest.json
-    - cd extension && zip -r $CIRCLE_ARTIFACTS/extension.zip . -x *.git* -x circle.yml -x *.DS_Store*
 
 test:
   override:
-    - ls $CIRCLE_ARTIFACTS
+    - mv key.pem extension/
 
 deployment:
   staging:
     branch: develop
     commands:
-      - ./deploy.sh staging
+      - mv staging_manifest.json extension/manifest.json
+      - cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
   production:
     branch: master
     commands:
-      - ./deploy.sh production
+      - mv production_manifest.json extension/manifest.json
+      - cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
 
