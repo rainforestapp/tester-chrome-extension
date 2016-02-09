@@ -1,35 +1,48 @@
 BASE_URL = 'https://portal.rainforestqa.com';
 
 var manifest = chrome.runtime.getManifest();
-console.log("Starting:", manifest.name, manifest.version, BASE_URL);
 
 // Start disabled: require the tester to enable if they want to
 // work when the browser starts
-_checking_active = false
-info_hash = {tester_state: 'active', email: '', id: '', version: manifest.version}
+var _checking_active = false;
+var info_hash = {
+  tester_state: 'active',
+  work_available_endpoint: BASE_URL + '/api/1/testers/',
+  email: '',
+  id: '',
+  version: manifest.version
+};
 
 // Set polling interval in milliseconds (note, this is rate limted,
 // so if you change agressively, it will error)
 default_check_for_work_interval = 8 * 1000;
 check_for_work_interval = default_check_for_work_interval;
 
-
-
 //
 // Load the initial id value from storage
 //
 chrome.storage.sync.get("worker_uuid", function(data) {
   // Notify that we saved.
-  console.log("Data loaded", data);
-  if (data['worker_uuid'] != undefined) {
-    info_hash["uuid"] = data["worker_uuid"];
-    console.log("Updated info hash:", info_hash);
+  if (data.worker_uuid != undefined) {
+    info_hash.uuid = data.worker_uuid;
     set_checking(_checking_active);
   } else {
     sync_tab_make_new();
   }
 });
 
+//
+// Load the initial api endpoint value from storage
+//
+chrome.storage.sync.get("work_available_endpoint", function(data) {
+  // Notify that we saved.
+  if (data.work_available_endpoint !== undefined) {
+    info_hash.work_available_endpoint = data.work_available_endpoint;
+    set_checking(_checking_active);
+  } else {
+    sync_tab_make_new();
+  }
+});
 
 
 // Handle the icon being clicked
@@ -38,10 +51,8 @@ chrome.storage.sync.get("worker_uuid", function(data) {
 //
 chrome.browserAction.onClicked.addListener(function (event) {
   _checking_active = !_checking_active;
-  console.log("browserAction", event);
-  console.log("Checking is now:", _checking_active);
   set_checking(_checking_active);
-})
+});
 
 
 
@@ -50,17 +61,19 @@ chrome.browserAction.onClicked.addListener(function (event) {
 // 
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
   if (request.data) {
-    console.log("incoming data", request);
-
-    if (request.data['worker_uuid']) {
-      info_hash["uuid"] = request.data["worker_uuid"]
+    if (request.data.worker_uuid && request.data.work_available_endpoint) {
+      info_hash.uuid = request.data.worker_uuid;
+      info_hash.work_available_endpoint = request.data.work_available_endpoint;
       set_checking(_checking_active);
       sendResponse({ok: true});
 
-      chrome.storage.sync.set({'worker_uuid': request.data["worker_uuid"]}, function() {
-        // Notify that we saved.
-        console.log('Worker ID saved');
-      });
+      chrome.storage.sync.set(
+        {
+          worker_uuid: request.data.worker_uuid,
+          work_available_endpoint: request.data.work_available_endpoint
+        },
+        function() {}
+      );
     }
   }
 });
@@ -102,10 +115,8 @@ function refresh_tab_info() {
   chrome.tabs.get(work_tab.id, function (t) {
     if (chrome.runtime.lastError) {
       work_tab = null;
-      console.log(chrome.runtime.lastError.message);
     } else {
       work_tab = t;
-      console.log('checking work tab', work_tab);
 
       // force selection
       if (!work_tab.selected) {
@@ -122,7 +133,6 @@ function refresh_tab_info() {
 function work_tab_make_new(url) {
   // make a new tab
   chrome.tabs.create({ url: url }, function (t) {
-    console.log('made new work tab', t);
     work_tab = t;
   });
 }
@@ -133,7 +143,6 @@ function work_tab_make_new(url) {
 function sync_tab_make_new() {
   // make a new tab
   chrome.tabs.create({ url: BASE_URL + '/profile?version=' + manifest.version }, function (t) {
-    console.log('made new sync tab', t);
   });
 }
 
@@ -142,17 +151,15 @@ function sync_tab_make_new() {
 // Poll for new work
 //
 function check_for_work() {
-  if (info_hash["uuid"] == "" || info_hash["uuid"] === undefined) {
-    console.log("Info hash not set", info_hash)
+  if (info_hash.uuid == "" || info_hash.uuid === undefined) {
     return false;
   }
 
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", BASE_URL + "/api/1/testers/" + info_hash["uuid"] + "/work_available?info=" + JSON.stringify(info_hash), true);
+  xhr.open("GET", info_hash.work_available_endpoint + info_hash.uuid + "/work_available?info=" + JSON.stringify(info_hash), true);
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4 && _checking_active) {
       var resp = JSON.parse(xhr.responseText);
-      console.log("RESP:", resp);
       if (resp.work_available) {
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 255, 0, 230]});
         chrome.browserAction.setBadgeText({text:"YES"});
@@ -182,8 +189,6 @@ function check_for_work() {
 chrome.identity.getProfileUserInfo(function(info) {
   info_hash.email = info.email
   info_hash.id = info.id
-
-  console.log('tester info:', info_hash);
 })
 
 
@@ -195,7 +200,6 @@ chrome.identity.getProfileUserInfo(function(info) {
 chrome.idle.setDetectionInterval(15);
 chrome.idle.onStateChanged.addListener(function(state){
   info_hash.tester_state = state;
-  console.log('tester info:', info_hash);
 
   if (state == 'idle') {
     check_for_work_interval = default_check_for_work_interval * 10;
