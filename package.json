@@ -1,6 +1,6 @@
 {
-  "name": "rf-chrome-extension",
-  "version": "0.0.1",
+  "name": "tester-chrome-extension",
+  "version": "1.1.0",
   "description": "The Rainforest Chrome Extension for Testers",
   "main": "extension/js/main.js",
   "scripts": {
