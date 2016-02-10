@@ -208,7 +208,7 @@ chrome.idle.onStateChanged.addListener(function(state){
         _checking_active = false;
         set_checking(_checking_active);        
       }
-    },default_check_for_work_interval * 100);
+    },default_check_for_work_interval * 45);
   } else if (state === 'active') {
     clearTimeout(shut_off_timer);
     check_for_work_interval = default_check_for_work_interval;
