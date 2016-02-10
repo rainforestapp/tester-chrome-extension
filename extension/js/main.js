@@ -197,13 +197,20 @@ chrome.identity.getProfileUserInfo(function(info) {
 // Get idle checking - this drops the polling rate
 // for "inactive" users (i.e. when AFK)
 // 
-chrome.idle.setDetectionInterval(15);
+var shut_off_timer = '';
+chrome.idle.setDetectionInterval(default_check_for_work_interval * 3 / 1000);
 chrome.idle.onStateChanged.addListener(function(state){
   info_hash.tester_state = state;
-
-  if (state == 'idle') {
+  if (state === 'idle') {
     check_for_work_interval = default_check_for_work_interval * 10;
-  } else if (state == 'active') {
+    shut_off_timer = setTimeout(function() {
+      if (info_hash.tester_state === 'idle') {
+        _checking_active = false;
+        set_checking(_checking_active);        
+      }
+    },default_check_for_work_interval * 100);
+  } else if (state === 'active') {
+    clearTimeout(shut_off_timer);
     check_for_work_interval = default_check_for_work_interval;
   }
-})
+});
