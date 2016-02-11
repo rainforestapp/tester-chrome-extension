@@ -26,10 +26,11 @@ Clone this repo
 
 ## Deploying
 
-1. Build on circle and download the extension.zip
-2. Go to https://chrome.google.com/webstore/developer/dashboard/g11410347157364884499
-3. Upload the new version
-4. Click publish
+1. Bump the version in ``production_manifest.json``, ``staging_manifest.json`` and ``extension/manifest.json``
+2. Build on circle and download the extension.zip
+3. Go to https://chrome.google.com/webstore/developer/dashboard/g11410347157364884499
+4. Upload the new version
+5. Click publish
 
 ## Internal 
 
