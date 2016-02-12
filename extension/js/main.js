@@ -163,8 +163,11 @@ function check_for_work() {
       if (resp.work_available) {
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 255, 0, 230]});
         chrome.browserAction.setBadgeText({text:"YES"});
-
-        open_or_focus_tab(resp.url);
+        if (info_hash.tester_state === 'idle') {
+          confirm_user_active(resp.url);
+        } else {
+          open_or_focus_tab(resp.url);
+        }
       } else {
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 0, 230]});
         chrome.browserAction.setBadgeText({text:"NO"});
@@ -197,12 +200,14 @@ chrome.identity.getProfileUserInfo(function(info) {
 function confirm_user_active(url) {
   _checking_active = false;
   notification_responded = false;
+  pending_url = url;
   chrome.notifications.create("verify_user",{type: "basic", iconUrl: "icons/original.png", title: "Job found!", message: 'A Rainforest job has been found!', contextMessage: 'Accept or refuse this job.', buttons: [{title: "Accept"},{title: "Decline"}]});
 }
 
+var pending_url = '';
 var notification_responded = false;
-chrome.notifications.onClosed.addListener(function(id) {
-  if (id === 'verify_user' && info_hash.tester_state === 'idle' || id === 'HIT_decline_warn' && !notification_responded) {
+chrome.notifications.onClosed.addListener(function(id, user) {
+  if (id === 'verify_user' && info_hash.tester_state === 'idle' || id === 'HIT_decline_warn' && !notification_responded || user) {
     // user is idle
     set_checking(_checking_active);             
   } else if (id === 'verify_user' && info_hash.tester_state === 'active' && !notification_responded) {
@@ -216,7 +221,7 @@ chrome.notifications.onButtonClicked.addListener(function(id,button_id) {
   if (button_id === 0) {
     // user wants HIT
     _checking_active = true;
-    open_or_focus_tab(url);
+    open_or_focus_tab(pending_url);
   } else if (id === 'verify_user' && button_id === 1) {
     // user didn't want HIT
     set_checking(_checking_active);   
