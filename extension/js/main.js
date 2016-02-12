@@ -163,8 +163,11 @@ function check_for_work() {
       if (resp.work_available) {
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 255, 0, 230]});
         chrome.browserAction.setBadgeText({text:"YES"});
-
-        open_or_focus_tab(resp.url);
+        if (info_hash.tester_state === 'idle') {
+          confirm_user_active(resp.url);
+        } else {
+          open_or_focus_tab(resp.url);
+        }
       } else {
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 0, 230]});
         chrome.browserAction.setBadgeText({text:"NO"});
@@ -192,25 +195,53 @@ chrome.identity.getProfileUserInfo(function(info) {
 })
 
 
+// confirm user is active if a HIT is gotten when idle
+function confirm_user_active(url) {
+  _checking_active = false;
+  notification_responded = false;
+  pending_url = url;
+  chrome.notifications.create("verify_user",{type: "basic", iconUrl: "icons/original.png", title: "Job found!", message: 'A Rainforest job has been found!', contextMessage: 'Accept or refuse this job.', buttons: [{title: "Accept"},{title: "Decline"}]});
+}
+
+var pending_url = '';
+var notification_responded = false;
+chrome.notifications.onClosed.addListener(function(id) {
+  if (id === 'verify_user' && info_hash.tester_state === 'idle' || id === 'HIT_decline_warn' && !notification_responded) {
+    // user is idle
+    set_checking(_checking_active);             
+  } else if (id === 'verify_user' && info_hash.tester_state === 'active' && !notification_responded) {
+    chrome.notifications.create("HIT_decline_warn",{type: "basic", iconUrl: "icons/original.png", title: "HIT will be declined!", message: 'You gave no response so the HIT will be auto-declined.', contextMessage: 'Accept or do nothing to decline.', buttons: [{title: "Accept"}]});
+  }
+});
+chrome.notifications.onButtonClicked.addListener(function(id,button_id) {
+  notification_responded = true;
+  chrome.notifications.clear("verify_user");
+  chrome.notifications.clear("HIT_decline_warn");
+  if (button_id === 0) {
+    // user wants HIT
+    _checking_active = true;
+    open_or_focus_tab(pending_url);
+  } else if (id === 'verify_user' && button_id === 1) {
+    // user didn't want HIT
+    set_checking(_checking_active);   
+    chrome.notifications.create("HIT_declined",{type: "basic", iconUrl: "icons/original.png", title: "HIT declined.", message: 'The extension has been turned off as you indicated you do not want a HIT at this time.'});
+  }
+});
 
 //
 // Get idle checking - this drops the polling rate
 // for "inactive" users (i.e. when AFK)
 // 
-var shut_off_timer = '';
 chrome.idle.setDetectionInterval(default_check_for_work_interval * 3 / 1000);
 chrome.idle.onStateChanged.addListener(function(state){
   info_hash.tester_state = state;
   if (state === 'idle') {
     check_for_work_interval = default_check_for_work_interval * 10;
-    shut_off_timer = setTimeout(function() {
-      if (info_hash.tester_state === 'idle') {
-        _checking_active = false;
-        set_checking(_checking_active);        
-      }
-    },default_check_for_work_interval * 45);
   } else if (state === 'active') {
-    clearTimeout(shut_off_timer);
     check_for_work_interval = default_check_for_work_interval;
+  } else if (state === 'locked') {
+    // turn off the extension if the user logs off
+    _checking_active = false;
+    set_checking(_checking_active);          
   }
 });
