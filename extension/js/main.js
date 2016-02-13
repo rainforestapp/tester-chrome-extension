@@ -205,8 +205,8 @@ function confirm_user_active(url) {
 
 var pending_url = '';
 var notification_responded = false;
-chrome.notifications.onClosed.addListener(function(id) {
-  if (id === 'verify_user' && info_hash.tester_state === 'idle' || id === 'HIT_decline_warn' && !notification_responded) {
+chrome.notifications.onClosed.addListener(function(id, user) {
+  if (id === 'verify_user' && info_hash.tester_state === 'idle' || id === 'HIT_decline_warn' && !notification_responded || user) {
     // user is idle
     set_checking(_checking_active);             
   } else if (id === 'verify_user' && info_hash.tester_state === 'active' && !notification_responded) {
