@@ -206,10 +206,10 @@ function confirm_user_active(url) {
 var pending_url = '';
 var notification_responded = false;
 chrome.notifications.onClosed.addListener(function(id, user) {
-  if (id === 'verify_user' && info_hash.tester_state === 'idle' || id === 'HIT_decline_warn' && !notification_responded || user) {
+  if (id === 'HIT_decline_warn' && !notification_responded || user) {
     // user is idle
     set_checking(_checking_active);             
-  } else if (id === 'verify_user' && info_hash.tester_state === 'active' && !notification_responded) {
+  } else if (id === 'verify_user' && !notification_responded) {
     chrome.notifications.create("HIT_decline_warn",{type: "basic", iconUrl: "icons/original.png", title: "HIT will be declined!", message: 'You gave no response so the HIT will be auto-declined.', contextMessage: 'Accept or do nothing to decline.', buttons: [{title: "Accept"}]});
   }
 });
