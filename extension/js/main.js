@@ -54,14 +54,14 @@ chrome.browserAction.onClicked.addListener(function (event) {
   set_checking(_checking_active);
 });
 
-
-
 //
 // Handle data coming from the main site
-// 
+//
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
   if (request.data) {
-    if (request.data.worker_uuid && request.data.work_available_endpoint) {
+    if (request.data.push) {
+      startSocket(request.data);
+    } else if (request.data.worker_uuid && request.data.work_available_endpoint) {
       info_hash.uuid = request.data.worker_uuid;
       info_hash.work_available_endpoint = request.data.work_available_endpoint;
       set_checking(_checking_active);
@@ -185,7 +185,7 @@ function check_for_work() {
 
 //
 // Get user information
-// 
+//
 chrome.identity.getProfileUserInfo(function(info) {
   info_hash.email = info.email
   info_hash.id = info.id
@@ -196,7 +196,7 @@ chrome.identity.getProfileUserInfo(function(info) {
 //
 // Get idle checking - this drops the polling rate
 // for "inactive" users (i.e. when AFK)
-// 
+//
 var shut_off_timer = '';
 chrome.idle.setDetectionInterval(default_check_for_work_interval * 3 / 1000);
 chrome.idle.onStateChanged.addListener(function(state){
@@ -206,7 +206,7 @@ chrome.idle.onStateChanged.addListener(function(state){
     shut_off_timer = setTimeout(function() {
       if (info_hash.tester_state === 'idle') {
         _checking_active = false;
-        set_checking(_checking_active);        
+        set_checking(_checking_active);
       }
     },default_check_for_work_interval * 45);
   } else if (state === 'active') {
@@ -214,3 +214,26 @@ chrome.idle.onStateChanged.addListener(function(state){
     check_for_work_interval = default_check_for_work_interval;
   }
 });
+
+// NEW WEBSOCKETS STUFF!!!!!
+
+function startSocket(data) {
+  console.log("HEEEERE", data);
+  chrome.storage.sync.set(data);
+  var socket = new Phoenix.Socket("ws://0.0.0.0:4000/socket", {
+    params: data,
+    logger: (kind, msg, data) => { console.log(`${kind}: ${msg}`, data); }
+  });
+  socket.connect();
+
+  var channel = socket.channel("workers:" + data.worker_uuid, data);
+  channel.join()
+    .receive("ok", function(resp) { console.log("Joined successfully", resp); })
+    .receive("error", function(resp) { console.log("Unable to join", resp); });
+
+  channel.on("new_message", function(data) {
+    var message = data.message;
+
+    console.log("GOT MESSAGE:", message);
+  });
+}
