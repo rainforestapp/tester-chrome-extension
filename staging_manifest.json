@@ -13,6 +13,7 @@
   },
   "background": {
     "scripts": [
+      "js/phoenix.js",
       "js/main.js"
     ],
     "persistent": true
