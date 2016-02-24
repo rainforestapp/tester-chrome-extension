@@ -21,5 +21,6 @@
     "babel"
   ],
   "globals": {
+    "chrome": true
   }
 }

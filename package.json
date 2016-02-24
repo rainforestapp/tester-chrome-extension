@@ -8,6 +8,7 @@
     "test:lint": "eslint src",
     "test": "npm run test:mocha && npm run test:lint",
     "testDebug": "mocha debug --require mocha-compiler",
+    "lint:fix": "eslint --fix src",
     "build": "babel src/index.js --out-file extension/js/main.js",
     "watchTest": "mocha -w --require mocha-compiler",
     "watchTestDebug": "mocha -w debug --require mocha-compiler",
