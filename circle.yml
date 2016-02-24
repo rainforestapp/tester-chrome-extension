@@ -1,5 +1,5 @@
-test:
-  override:
+checkout:
+  post:
     - gpg --yes --batch --passphrase=$KEY_PEM_PASSWORD key.pem.gpg
     - mv key.pem extension/
 
