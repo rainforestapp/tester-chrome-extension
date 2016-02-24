@@ -3,6 +3,10 @@ checkout:
     - gpg --yes --batch --passphrase=$KEY_PEM_PASSWORD key.pem.gpg
     - mv key.pem extension/
 
+test:
+  override:
+    - npm run test
+
 deployment:
   staging:
     branch: develop

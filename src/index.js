@@ -1,8 +1,4 @@
-'use strict';
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
-var BASE_URL = 'https://portal.rainforestqa.com';
+const BASE_URL = 'https://portal.rainforestqa.com';
 
 var manifest = chrome.runtime.getManifest();
 
@@ -25,7 +21,7 @@ check_for_work_interval = default_check_for_work_interval;
 //
 // Load the initial id value from storage
 //
-chrome.storage.sync.get("worker_uuid", function (data) {
+chrome.storage.sync.get("worker_uuid", function(data) {
   // Notify that we saved.
   if (data.worker_uuid != undefined) {
     info_hash.uuid = data.worker_uuid;
@@ -38,7 +34,7 @@ chrome.storage.sync.get("worker_uuid", function (data) {
 //
 // Load the initial api endpoint value from storage
 //
-chrome.storage.sync.get("work_available_endpoint", function (data) {
+chrome.storage.sync.get("work_available_endpoint", function(data) {
   // Notify that we saved.
   if (data.work_available_endpoint !== undefined) {
     info_hash.work_available_endpoint = data.work_available_endpoint;
@@ -47,6 +43,7 @@ chrome.storage.sync.get("work_available_endpoint", function (data) {
     sync_tab_make_new();
   }
 });
+
 
 // Handle the icon being clicked
 //
@@ -57,48 +54,59 @@ chrome.browserAction.onClicked.addListener(function (event) {
   set_checking(_checking_active);
 });
 
+
+
 //
 // Handle data coming from the main site
-//
-chrome.runtime.onMessageExternal.addListener(function (request, sender, sendResponse) {
+// 
+chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
   if (request.data) {
     if (request.data.worker_uuid && request.data.work_available_endpoint) {
       info_hash.uuid = request.data.worker_uuid;
       info_hash.work_available_endpoint = request.data.work_available_endpoint;
       set_checking(_checking_active);
-      sendResponse({ ok: true });
+      sendResponse({ok: true});
 
-      chrome.storage.sync.set({
-        worker_uuid: request.data.worker_uuid,
-        work_available_endpoint: request.data.work_available_endpoint
-      }, function () {});
+      chrome.storage.sync.set(
+        {
+          worker_uuid: request.data.worker_uuid,
+          work_available_endpoint: request.data.work_available_endpoint
+        },
+        function() {}
+      );
     }
   }
 });
+
+
 
 //
 // Set checking state
 //
 function set_checking(state) {
   if (!state) {
-    chrome.browserAction.setBadgeBackgroundColor({ color: [255, 0, 0, 230] });
-    chrome.browserAction.setBadgeText({ text: "OFF" });
+    chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 230]});
+    chrome.browserAction.setBadgeText({text:"OFF"});
   } else {
     check_for_work();
   }
 }
 
+
+
 //
 // Open or focus the main work tab
 //
-work_tab = null;
+work_tab = null
 function open_or_focus_tab(url) {
-  if (work_tab === null && (typeof work_tab === 'undefined' ? 'undefined' : _typeof(work_tab)) === "object") {
+  if (work_tab === null && typeof work_tab === "object" ) {
     work_tab_make_new(url);
   } else {
     refresh_tab_info();
   }
 }
+
+
 
 //
 // Make sure the work tab is open and in focus
@@ -112,11 +120,12 @@ function refresh_tab_info() {
 
       // force selection
       if (!work_tab.selected) {
-        chrome.tabs.update(work_tab.id, { selected: true });
+        chrome.tabs.update(work_tab.id, {selected: true});
       }
     }
   });
 }
+
 
 //
 // Open a new work tab
@@ -133,8 +142,10 @@ function work_tab_make_new(url) {
 //
 function sync_tab_make_new() {
   // make a new tab
-  chrome.tabs.create({ url: BASE_URL + '/profile?version=' + manifest.version }, function (t) {});
+  chrome.tabs.create({ url: BASE_URL + '/profile?version=' + manifest.version }, function (t) {
+  });
 }
+
 
 //
 // Poll for new work
@@ -146,54 +157,58 @@ function check_for_work() {
 
   var xhr = new XMLHttpRequest();
   xhr.open("GET", info_hash.work_available_endpoint + info_hash.uuid + "/work_available?info=" + JSON.stringify(info_hash), true);
-  xhr.onreadystatechange = function () {
+  xhr.onreadystatechange = function() {
     if (xhr.readyState == 4 && _checking_active) {
       var resp = JSON.parse(xhr.responseText);
       if (resp.work_available) {
-        chrome.browserAction.setBadgeBackgroundColor({ color: [0, 255, 0, 230] });
-        chrome.browserAction.setBadgeText({ text: "YES" });
+        chrome.browserAction.setBadgeBackgroundColor({color:[0, 255, 0, 230]});
+        chrome.browserAction.setBadgeText({text:"YES"});
 
         open_or_focus_tab(resp.url);
       } else {
-        chrome.browserAction.setBadgeBackgroundColor({ color: [0, 0, 0, 230] });
-        chrome.browserAction.setBadgeText({ text: "NO" });
+        chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 0, 230]});
+        chrome.browserAction.setBadgeText({text:"NO"});
       }
     }
-  };
+  }
   xhr.send();
 
   if (_checking_active) {
-    setTimeout(function () {
+    setTimeout(function() {
       xhr.abort();
       check_for_work();
     }, check_for_work_interval);
   }
 }
 
+
+
 //
 // Get user information
-//
-chrome.identity.getProfileUserInfo(function (info) {
-  info_hash.email = info.email;
-  info_hash.id = info.id;
-});
+// 
+chrome.identity.getProfileUserInfo(function(info) {
+  info_hash.email = info.email
+  info_hash.id = info.id
+})
+
+
 
 //
 // Get idle checking - this drops the polling rate
 // for "inactive" users (i.e. when AFK)
-//
+// 
 var shut_off_timer = '';
 chrome.idle.setDetectionInterval(default_check_for_work_interval * 3 / 1000);
-chrome.idle.onStateChanged.addListener(function (state) {
+chrome.idle.onStateChanged.addListener(function(state){
   info_hash.tester_state = state;
   if (state === 'idle') {
     check_for_work_interval = default_check_for_work_interval * 10;
-    shut_off_timer = setTimeout(function () {
+    shut_off_timer = setTimeout(function() {
       if (info_hash.tester_state === 'idle') {
         _checking_active = false;
-        set_checking(_checking_active);
+        set_checking(_checking_active);        
       }
-    }, default_check_for_work_interval * 45);
+    },default_check_for_work_interval * 45);
   } else if (state === 'active') {
     clearTimeout(shut_off_timer);
     check_for_work_interval = default_check_for_work_interval;
