@@ -72,10 +72,11 @@ function auth(request, sendResponse) {
   }, function () {});
 }
 
-auth({
-  data: {
-    worker_uuid: '0aeb2399-7ee5-469d-8b83-ed48cc210d96',
-    work_available_endpoint: 'https://bouncer.rainforestqa.com/1/testers/' } });
+// Use in dev mode
+// auth({
+//   data: {
+//     worker_uuid: 'your-worker-id',
+//     work_available_endpoint: 'bouncer-url'}});
 
 // Handle data coming from the main site
 chrome.runtime.onMessageExternal.addListener(function (request, sender, sendResponse) {
