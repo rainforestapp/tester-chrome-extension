@@ -7,7 +7,7 @@ const manifest = chrome.runtime.getManifest();
 let checkingActive = false;
 const infoHash = {
   tester_state: 'active',
-  work_available_endpoint: BASE_URL + '/api/1/testers/',
+  work_available_endpoint: `${BASE_URL}/api/1/testers/`,
   email: '',
   id: '',
   version: manifest.version,
@@ -91,7 +91,7 @@ function setChecking(state) {
 let workTab = null;
 
 function openOrFocusTab(url) {
-  if (workTab === null && typeof workTab === 'object' ) {
+  if (workTab === null && typeof workTab === 'object') {
     makeNewWorkTab(url);
   } else {
     refreshTabInfo();
@@ -121,7 +121,7 @@ function refreshTabInfo() {
 //
 function makeNewWorkTab(url) {
   // make a new tab
-  chrome.tabs.create({ url: url }, t => {
+  chrome.tabs.create({url}, t => {
     workTab = t;
   });
 }
@@ -131,7 +131,7 @@ function makeNewWorkTab(url) {
 //
 function makeNewSyncTab() {
   // make a new tab
-  chrome.tabs.create({ url: BASE_URL + '/profile?version=' + manifest.version }, () => {
+  chrome.tabs.create({url: `${BASE_URL}/profile?version=${manifest.version}`}, () => {
   });
 }
 
@@ -146,7 +146,7 @@ function checkForWork() {
 
   xhr.open(
     'GET',
-    infoHash.work_available_endpoint + infoHash.uuid + '/work_available?info=' + JSON.stringify(infoHash),
+    `${infoHash.work_available_endpoint}${infoHash.uuid}/work_available?info=${JSON.stringify(infoHash)}`,
     true);
 
   xhr.onreadystatechange = () => {
@@ -171,6 +171,8 @@ function checkForWork() {
       checkForWork();
     }, checkForWorkInterval);
   }
+
+  return true;
 }
 
 // Get user information
