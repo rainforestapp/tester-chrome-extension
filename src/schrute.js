@@ -1,7 +1,7 @@
-import {Socket} from 'phoenix';
+import {Socket} from './phoenix';
 
 export class SchruteConn {
-  constructer(endpoint, workerUUID, authParams) {
+  constructor(endpoint, workerUUID, authParams) {
     this.workerUUID = workerUUID;
     this.socket = new Socket(endpoint, {
       params: authParams,
