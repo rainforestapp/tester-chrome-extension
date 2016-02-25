@@ -103,7 +103,7 @@ function togglePolling(enabled) {
 let workTab = null;
 
 function openOrFocusTab(url) {
-  if (workTab === null && typeof workTab === 'object') {
+  if (workTab === null) {
     makeNewWorkTab(url);
   } else {
     refreshTabInfo();
@@ -113,11 +113,11 @@ function openOrFocusTab(url) {
 // Make sure the work tab is open and in focus
 
 function refreshTabInfo() {
-  chrome.tabs.get(workTab.id, t => {
+  chrome.tabs.get(workTab.id, tab => {
     if (chrome.runtime.lastError) {
       workTab = null;
     } else {
-      workTab = t;
+      workTab = tab;
 
       // force selection
       if (!workTab.selected) {
