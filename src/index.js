@@ -1,6 +1,6 @@
 import {SchruteConn} from './schrute';
 
-const BASE_URL = 'https://portal.rainforest.dev';
+const BASE_URL = 'https://portal.rainforestqa.com';
 
 const manifest = chrome.runtime.getManifest();
 
@@ -47,6 +47,10 @@ chrome.storage.sync.get('work_available_endpoint', data => {
   }
 });
 
+chrome.storage.sync.get(['worker_uuid', 'websocket_endpoint', 'websocket_auth'], data => {
+  startWebsocket(data);
+})
+
 
 // Handle the icon being clicked
 //
@@ -70,20 +74,25 @@ function startApp(request, sendResponse) {
     {
       worker_uuid: request.data.worker_uuid,
       work_available_endpoint: request.data.work_available_endpoint,
+      websocket_endpoint: request.data.websocket_endpoint,
+      websocket_auth: request.data.websocket_auth,
     },
     () => {}
   );
 
-  if (request.data.websocket_endpoint != undefined) {
-    startWebsocket(request.data);
-  }
+  startWebsocket(request.data);
 }
 
 function startWebsocket(data) {
-  if (websocketConn == undefined) {
-    websocketConn = new SchruteConn(data.websocket_endpoint, data.worker_uuid, data.websocket_auth);
-    websocketConn.start();
+  if (data.websocket_endpoint == undefined ||
+      data.worker_uuid == undefined ||
+      data.websocket_auth == undefined ||
+      websocketConn != undefined) {
+    return;
   }
+
+  websocketConn = new SchruteConn(data.websocket_endpoint, data.worker_uuid, data.websocket_auth);
+  websocketConn.start();
 }
 
 // Use in dev mode
