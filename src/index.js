@@ -1,4 +1,6 @@
-const BASE_URL = 'https://portal.rainforestqa.com';
+import {SchruteConn} from 'schrute';
+
+const BASE_URL = 'https://portal.rainforest.dev';
 
 const manifest = chrome.runtime.getManifest();
 
@@ -12,6 +14,7 @@ const infoHash = {
   id: '',
   version: manifest.version,
 };
+let websocketConn;
 
 // Set polling interval in milliseconds (note, this is rate limted,
 // so if you change agressively, it will error)
@@ -70,6 +73,17 @@ function startApp(request, sendResponse) {
     },
     () => {}
   );
+
+  if (request.data.websocket_endpoint != undefined) {
+    startWebsocket(request.data);
+  }
+}
+
+function startWebsocket(data) {
+  if (websocketConn == undefined) {
+    websocketConn = new SchruteConn(data.websocket_endpoint, data.worker_uuid, data.websocket_auth);
+    websocketConn.start();
+  }
 }
 
 // Use in dev mode

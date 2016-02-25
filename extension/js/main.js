@@ -1,7 +1,7 @@
-(function () {
+(function (schrute) {
   'use strict';
 
-  var BASE_URL = 'https://portal.rainforestqa.com';
+  var BASE_URL = 'https://portal.rainforest.dev';
 
   var manifest = chrome.runtime.getManifest();
 
@@ -15,6 +15,7 @@
     id: '',
     version: manifest.version
   };
+  var websocketConn = undefined;
 
   // Set polling interval in milliseconds (note, this is rate limted,
   // so if you change agressively, it will error)
@@ -69,6 +70,17 @@
       worker_uuid: request.data.worker_uuid,
       work_available_endpoint: request.data.work_available_endpoint
     }, function () {});
+
+    if (request.data.websocket_endpoint != undefined) {
+      startWebsocket(request.data);
+    }
+  }
+
+  function startWebsocket(data) {
+    if (websocketConn == undefined) {
+      websocketConn = new schrute.SchruteConn(data.websocket_endpoint, data.worker_uuid, data.websocket_auth);
+      websocketConn.start();
+    }
   }
 
   // Use in dev mode
@@ -208,4 +220,4 @@
     }
   });
 
-}());
+}(schrute));
