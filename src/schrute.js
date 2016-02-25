@@ -1,3 +1,4 @@
+/* eslint no-console: 0 */
 import {Socket} from './phoenix';
 
 export class SchruteConn {
@@ -13,7 +14,7 @@ export class SchruteConn {
     this.socket.connect();
     this.channel = this.socket.channel(`workers:${this.workerUUID}`);
     this.channel.join()
-      .receive("ok", resp => { console.log("Joined successfully", resp); })
-      .receive("error", resp => { console.log("Unable to join", resp); });
+      .receive('ok', resp => { console.log('Joined successfully', resp); })
+      .receive('error', resp => { console.log('Unable to join', resp); });
   }
-};
+}
