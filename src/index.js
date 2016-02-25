@@ -25,7 +25,7 @@ chrome.storage.sync.get('worker_uuid', data => {
   // Notify that we saved.
   if (data.worker_uuid !== undefined) {
     infoHash.uuid = data.worker_uuid;
-    setChecking(checkingActive);
+    togglePolling(checkingActive);
   } else {
     makeNewSyncTab();
   }
@@ -38,7 +38,7 @@ chrome.storage.sync.get('work_available_endpoint', data => {
   // Notify that we saved.
   if (data.work_available_endpoint !== undefined) {
     infoHash.work_available_endpoint = data.work_available_endpoint;
-    setChecking(checkingActive);
+    togglePolling(checkingActive);
   } else {
     makeNewSyncTab();
   }
@@ -51,17 +51,17 @@ chrome.storage.sync.get('work_available_endpoint', data => {
 //
 chrome.browserAction.onClicked.addListener(() => {
   checkingActive = !checkingActive;
-  setChecking(checkingActive);
+  togglePolling(checkingActive);
 });
 
-function auth(request, sendResponse) {
+function startApp(request, sendResponse) {
   infoHash.uuid = request.data.worker_uuid;
   infoHash.work_available_endpoint = request.data.work_available_endpoint;
-  setChecking(checkingActive);
 
-  if (sendResponse) {
-    sendResponse({ok: true});
-  }
+  togglePolling(checkingActive);
+
+  // comment this out in dev mode
+  sendResponse({ok: true});
 
   chrome.storage.sync.set(
     {
@@ -73,22 +73,24 @@ function auth(request, sendResponse) {
 }
 
 // Use in dev mode
-// auth({
+// startApp({
 //   data: {
 //     worker_uuid: 'your-worker-id',
 //     work_available_endpoint: 'bouncer-url'}});
 
 // Handle data coming from the main site
 chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-  if (request.data && request.data.worker_uuid && request.data.work_available_endpoint) {
-    auth(request, sendResponse);
+  if (request.data &&
+      request.data.worker_uuid &&
+      request.data.work_available_endpoint) {
+    startApp(request, sendResponse);
   }
 });
 
 // Set checking state
 
-function setChecking(state) {
-  if (!state) {
+function togglePolling(enabled) {
+  if (!enabled) {
     chrome.browserAction.setBadgeBackgroundColor({color: [255, 0, 0, 230]});
     chrome.browserAction.setBadgeText({text: 'OFF'});
   } else {
@@ -173,6 +175,7 @@ function checkForWork() {
       }
     }
   };
+
   xhr.send();
 
   if (checkingActive) {
@@ -204,7 +207,7 @@ chrome.idle.onStateChanged.addListener(state => {
     shutOffTimer = setTimeout(() => {
       if (infoHash.tester_state === 'idle') {
         checkingActive = false;
-        setChecking(checkingActive);
+        togglePolling(checkingActive);
       }
     }, defaultCheckForWorkInterval * 45);
   } else if (state === 'active') {
