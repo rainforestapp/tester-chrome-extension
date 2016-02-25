@@ -1,4 +1,4 @@
-import {SchruteConn} from 'schrute';
+import {SchruteConn} from './schrute';
 
 const BASE_URL = 'https://portal.rainforest.dev';
 

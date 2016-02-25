@@ -1,5 +1,64 @@
-(function (schrute) {
+(function (phoenix) {
   'use strict';
+
+  var babelHelpers = {};
+
+  babelHelpers.classCallCheck = function (instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  };
+
+  babelHelpers.createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  babelHelpers;
+
+  var SchruteConn = function () {
+    function SchruteConn() {
+      babelHelpers.classCallCheck(this, SchruteConn);
+    }
+
+    babelHelpers.createClass(SchruteConn, [{
+      key: "constructer",
+      value: function constructer(endpoint, workerUUID, authParams) {
+        this.workerUUID = workerUUID;
+        this.socket = new phoenix.Socket(endpoint, {
+          params: authParams,
+          logger: function logger(kind, msg, data) {
+            console.log(kind + ": " + msg, data);
+          }
+        });
+      }
+    }, {
+      key: "start",
+      value: function start() {
+        this.socket.connect();
+        this.channel = this.socket.channel("workers:" + this.workerUUID);
+        this.channel.join().receive("ok", function (resp) {
+          console.log("Joined successfully", resp);
+        }).receive("error", function (resp) {
+          console.log("Unable to join", resp);
+        });
+      }
+    }]);
+    return SchruteConn;
+  }();;
 
   var BASE_URL = 'https://portal.rainforest.dev';
 
@@ -78,7 +137,7 @@
 
   function startWebsocket(data) {
     if (websocketConn == undefined) {
-      websocketConn = new schrute.SchruteConn(data.websocket_endpoint, data.worker_uuid, data.websocket_auth);
+      websocketConn = new SchruteConn(data.websocket_endpoint, data.worker_uuid, data.websocket_auth);
       websocketConn.start();
     }
   }
@@ -220,4 +279,4 @@
     }
   });
 
-}(schrute));
+}(phoenix));
