@@ -54,24 +54,33 @@ chrome.browserAction.onClicked.addListener(() => {
   setChecking(checkingActive);
 });
 
+function auth(request, sendResponse) {
+  infoHash.uuid = request.data.worker_uuid;
+  infoHash.work_available_endpoint = request.data.work_available_endpoint;
+  setChecking(checkingActive);
+
+  if (sendResponse) {
+    sendResponse({ok: true});
+  }
+
+  chrome.storage.sync.set(
+    {
+      worker_uuid: request.data.worker_uuid,
+      work_available_endpoint: request.data.work_available_endpoint,
+    },
+    () => {}
+  );
+}
+
+auth({
+  data: {
+    worker_uuid: '0aeb2399-7ee5-469d-8b83-ed48cc210d96',
+    work_available_endpoint: 'https://bouncer.rainforestqa.com/1/testers/'}});
+
 // Handle data coming from the main site
-
 chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-  if (request.data) {
-    if (request.data.worker_uuid && request.data.work_available_endpoint) {
-      infoHash.uuid = request.data.worker_uuid;
-      infoHash.work_available_endpoint = request.data.work_available_endpoint;
-      setChecking(checkingActive);
-      sendResponse({ok: true});
-
-      chrome.storage.sync.set(
-        {
-          worker_uuid: request.data.worker_uuid,
-          work_available_endpoint: request.data.work_available_endpoint,
-        },
-        () => {}
-      );
-    }
+  if (request.data && request.data.worker_uuid && request.data.work_available_endpoint) {
+    auth(request, sendResponse);
   }
 });
 
