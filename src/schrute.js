@@ -1,5 +1,5 @@
 /* eslint no-console: 0 */
-import {Socket} from './phoenix';
+import {Socket} from '../vendor/phoenix';
 
 export class SchruteConn {
   constructor(endpoint, workerUUID, authParams) {

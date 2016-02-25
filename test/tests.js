@@ -3,7 +3,7 @@
 import expect, {createSpy, spyOn} from 'expect';
 import app from '../src/app';
 import chrome from './chromeMock';
-import * as phoenix from '../src/phoenix';
+import * as phoenix from '../vendor/phoenix';
 import Socket from './socketMock';
 import {RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL} from '../src/constants';
 

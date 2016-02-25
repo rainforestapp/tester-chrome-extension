@@ -27,7 +27,7 @@ const notifications = {
     isClickable: true,
     type: 'basic',
     title: "You're not logged in",
-    message: `You don't seem to be logged in to rainforest, click here to go to your profile and log in`,
+    message: "You don't seem to be logged in to Rainforest, click here to go to your profile and log in.",
   },
 };
 
@@ -215,7 +215,7 @@ function makeNewSyncTab() {
 }
 
 function pingServer(url) {
-  return new Promise(function resolvePromise(resolve) {
+  return new Promise(resolve => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
 

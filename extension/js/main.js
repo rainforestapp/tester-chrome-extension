@@ -1069,7 +1069,7 @@
   var RED = [255, 0, 0, 230];
   var GREEN = [0, 255, 0, 230];
   var GREY = [0, 0, 0, 230];
-  var BASE_URL = 'https://portal.rainforestqa.com';
+  var BASE_URL = 'https://portal.rnfrst.com';
   var WORK_AVAILABLE_URL = BASE_URL + '/api/1/testers/';
   var DEFAULT_INTERVAL = 8 * 1000;
 
@@ -1098,7 +1098,7 @@
       isClickable: true,
       type: 'basic',
       title: "You're not logged in",
-      message: 'You don\'t seem to be logged in to rainforest, click here to go to your profile and log in'
+      message: "You don't seem to be logged in to rainforest, click here to go to your profile and log in"
     }
   };
 
@@ -1278,7 +1278,7 @@
   }
 
   function pingServer(url) {
-    return new Promise(function resolvePromise(resolve) {
+    return new Promise(function (resolve) {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', url, true);
 
