@@ -74,13 +74,13 @@ function startApp(request, sendResponse) {
     () => {}
   );
 
-  if (request.data.websocket_endpoint != undefined) {
+  if (request.data.websocket_endpoint !== undefined) {
     startWebsocket(request.data);
   }
 }
 
 function startWebsocket(data) {
-  if (websocketConn == undefined) {
+  if (websocketConn === undefined) {
     websocketConn = new SchruteConn(data.websocket_endpoint, data.worker_uuid, data.websocket_auth);
     websocketConn.start();
   }
@@ -161,45 +161,41 @@ function makeNewSyncTab() {
   });
 }
 
-// Poll for new work
+function request(url) {
+  return new Promise(function(resolve, reject){
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
 
-function checkForWork() {
-  if (infoHash.uuid === '' || infoHash.uuid === undefined) {
-    return false;
-  }
-
-  const xhr = new XMLHttpRequest();
-
-  xhr.open(
-    'GET',
-    `${infoHash.work_available_endpoint}${infoHash.uuid}/work_available?info=${JSON.stringify(infoHash)}`,
-    true);
-
-  xhr.onreadystatechange = () => {
-    if (xhr.readyState === 4 && checkingActive) {
-      const resp = JSON.parse(xhr.responseText);
-      if (resp.work_available) {
-        chrome.browserAction.setBadgeBackgroundColor({color: [0, 255, 0, 230]});
-        chrome.browserAction.setBadgeText({text: 'YES'});
-
-        openOrFocusTab(resp.url);
-      } else {
-        chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 230]});
-        chrome.browserAction.setBadgeText({text: 'NO'});
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4 && checkingActive) {
+        resolve(JSON.parse(xhr.responseText));
       }
     }
-  };
 
-  xhr.send();
+    xhr.send();
+  });
+}
 
-  if (checkingActive) {
-    setTimeout(() => {
-      xhr.abort();
-      checkForWork();
-    }, checkForWorkInterval);
-  }
+// Poll for new work
+function checkForWork() {
+  request(`${infoHash.work_available_endpoint}${infoHash.uuid}/work_available?info=${JSON.stringify(infoHash)}`)
+  .then(resp => {
+    if (resp.work_available) {
+      chrome.browserAction.setBadgeBackgroundColor({color: [0, 255, 0, 230]});
+      chrome.browserAction.setBadgeText({text: 'YES'});
 
-  return true;
+      openOrFocusTab(resp.url);
+    } else {
+      chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 230]});
+      chrome.browserAction.setBadgeText({text: 'NO'});
+    }
+
+    if (checkingActive) {
+      setTimeout(() => {
+        checkForWork();
+      }, checkForWorkInterval);
+    }
+  });
 }
 
 // Get user information
