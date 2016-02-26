@@ -124,7 +124,7 @@ function startApp(request, sendResponse) {
   appState.uuid = request.data.worker_uuid;
   appState.work_available_endpoint = request.data.work_available_endpoint;
 
-  appState.isPolling = true;
+  appState.isPolling = false;
   app.togglePolling(appState.isPolling);
 
   // comment this out in dev mode
