@@ -9,7 +9,7 @@
     "test": "npm run test:mocha && npm run test:lint",
     "lint:fix": "eslint --fix src",
     "watchTest": "mocha -w --require mocha_babel",
-    "build": "browserify src/index.js -o extension/js/main.js -t [ babelify --presets [ es2015 ] ]"
+    "build": "mkdir -p extension/js && browserify src/index.js -o extension/js/main.js -t [ babelify --presets [ es2015 ] ]"
   },
   "repository": {
     "type": "git",
