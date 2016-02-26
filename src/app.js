@@ -235,7 +235,12 @@ function pingServer(url) {
 
 // Poll for new work
 function checkForWork() {
-  const userInfo = {uuid: appState.uuid, email: appState.email, id: appState.id};
+  const userInfo = {
+    uuid: appState.uuid,
+    email: appState.email,
+    id: appState.id,
+    version: appState.version,
+    tester_state: appState.tester_state};
   app.pingServer(
     `${appState.work_available_endpoint}${appState.uuid}/work_available?info=${JSON.stringify({userInfo})}`
   ).then(resp => {

@@ -1,6 +1,6 @@
 {
   "name": "Rainforest Tester Notifier",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "manifest_version": 2,
   "description": "Notifies Rainforest Testers when there is new work to be done.",
   "homepage_url": "https://portal.rainforestqa.com",
@@ -31,7 +31,7 @@
     "storage",
     "identity",
     "identity.email",
-    "*://*.getsentry.com/*",
+    "https://*.getsentry.com/*",
     "https://*.rainforestqa.com/*"
   ]
 }

@@ -129,7 +129,13 @@ describe('tester chrome extension ', () => {
     describe('checkForWork', () => {
       it('pings the server with the right url', () => {
         app.checkForWork();
-        expect(app.pingServer).toHaveBeenCalled();
+        const userInfo = {
+          uuid: app.appState.uuid,
+          email: app.appState.email,
+          id: app.appState.id,
+          version: app.appState.version,
+          tester_state: app.appState.tester_state};
+        expect(app.pingServer).toHaveBeenCalledWith(`${app.appState.work_available_endpoint}${app.appState.uuid}/work_available?info=${JSON.stringify({userInfo})}`);
       });
 
       it('sets the badge color to green and "YES" if work is available', () => {
