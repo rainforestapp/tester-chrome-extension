@@ -24,6 +24,11 @@ Clone this repo
 4. Load unpacked extention
 5. Select the folder you cloned
 
+### 3. Run tests
+
+1. ``npm install``
+2. ``npm test``
+
 ## Deploying
 
 1. Bump the version in ``production_manifest.json``, ``staging_manifest.json`` and ``extension/manifest.json``
