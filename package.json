@@ -1,0 +1,43 @@
+{
+  "name": "tester-chrome-extension",
+  "version": "1.2.0",
+  "description": "The Rainforest Chrome Extension for Testers",
+  "main": "extension/js/main.js",
+  "scripts": {
+    "test:mocha": "mocha test/tests.js --require mocha_babel",
+    "test:lint": "eslint src",
+    "test": "npm run test:mocha && npm run test:lint",
+    "lint:fix": "eslint --fix src",
+    "watchTest": "mocha -w --require mocha_babel",
+    "build": "browserify src/index.js -o extension/js/main.js -t [ babelify --presets [ es2015 ] ]"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rainforestapp/tester-chrome-extension.git"
+  },
+  "keywords": [
+    "rainforest",
+    "chrome-extension"
+  ],
+  "author": "Russell Smith",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rainforestapp/tester-chrome-extension/issues"
+  },
+  "homepage": "https://github.com/rainforestapp/tester-chrome-extension#readme",
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.5.1",
+    "babel-core": "^6.5.2",
+    "babel-preset-es2015": "^6.5.0",
+    "babelify": "7.2.0",
+    "browserify": "13.0.0",
+    "eslint": "^2.2.0",
+    "eslint-config-airbnb": "^6.0.2",
+    "eslint-plugin-babel": "^3.1.0",
+    "expect": "^1.14.0",
+    "mocha": "^2.4.5",
+    "pubsub": "1.0.2",
+    "raven-js": "2.1.1"
+  }
+}
