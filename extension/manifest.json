@@ -30,7 +30,9 @@
     "tabs",
     "storage",
     "identity",
+    "*://*.getsentry.com/*",
     "identity.email",
+    "*://*.rnfrst.com/*",
     "*://*.rainforest.dev/*",
     "*://*.rainforestqa.com/*"
   ]

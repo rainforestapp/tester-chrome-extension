@@ -1,7 +1,7 @@
 import {SchruteConn} from './schrute';
-import {RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL} from './constants';
+import {RAVEN_URL, RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL} from './constants';
+import Raven from 'raven-js';
 
-let websocketConn;
 let timeout;
 
 // Set polling interval in milliseconds (note, this is rate limted,
@@ -12,6 +12,7 @@ let checkForWorkInterval = DEFAULT_INTERVAL;
 // work when the browser starts
 const appState = {
   tester_state: 'active',
+  webSocketConnection: undefined,
   work_available_endpoint: WORK_AVAILABLE_URL,
   email: '',
   profileUrl: '',
@@ -19,7 +20,6 @@ const appState = {
   workTab: null,
   isPolling: false,
 };
-
 
 const notifications = {
   notLoggedIn: {
@@ -32,9 +32,10 @@ const notifications = {
 };
 
 function setupChromeEvents() {
+  Raven.config(RAVEN_URL).install();
   const manifest = chrome.runtime.getManifest();
-  app.appState.version = manifest.version;
-  app.appState.profileUrl = `${BASE_URL}/profile?version=${manifest.version}`;
+  appState.version = manifest.version;
+  appState.profileUrl = `${BASE_URL}/profile?version=${manifest.version}`;
 
   chrome.notifications.onClicked.addListener(notificationId => {
     if (notificationId === 'not_logged_in') {
@@ -47,8 +48,9 @@ function setupChromeEvents() {
   chrome.storage.sync.get('worker_uuid', data => {
     // Notify that we saved.
     if (data.worker_uuid !== undefined) {
-      app.appState.uuid = data.worker_uuid;
-      app.togglePolling(app.appState.isPolling);
+      appState.uuid = data.worker_uuid;
+      appState.isPolling = true;
+      app.togglePolling(appState.isPolling);
     } else {
       notifyNotLoggedIn();
     }
@@ -60,15 +62,16 @@ function setupChromeEvents() {
   chrome.storage.sync.get('work_available_endpoint', data => {
     // Notify that we saved.
     if (data.work_available_endpoint !== undefined) {
-      app.appState.work_available_endpoint = data.work_available_endpoint;
-      app.togglePolling(app.appState.isPolling);
+      appState.work_available_endpoint = data.work_available_endpoint;
+      appState.isPolling = true;
+      app.togglePolling(appState.isPolling);
     } else {
       notifyNotLoggedIn();
     }
   });
 
   chrome.storage.sync.get(['worker_uuid', 'websocket_endpoint', 'websocket_auth'], data => {
-    startWebsocket(data);
+    app.startWebsocket(data);
   });
 
   // Handle the icon being clicked
@@ -76,8 +79,8 @@ function setupChromeEvents() {
   // this enables or disables checking for new work
   //
   chrome.browserAction.onClicked.addListener(() => {
-    app.appState.isPolling = !app.appState.isPolling;
-    app.togglePolling(app.appState.isPolling);
+    appState.isPolling = !appState.isPolling;
+    app.togglePolling(appState.isPolling);
   });
 
   // Handle data coming from the main site
@@ -91,8 +94,8 @@ function setupChromeEvents() {
 
   // Get user information
   chrome.identity.getProfileUserInfo(info => {
-    app.appState.email = info.email;
-    app.appState.id = info.id;
+    appState.email = info.email;
+    appState.id = info.id;
   });
 
   // Get idle checking - this drops the polling rate
@@ -101,13 +104,13 @@ function setupChromeEvents() {
   let shutOffTimer;
   chrome.idle.setDetectionInterval(DEFAULT_INTERVAL * 3 / 1000);
   chrome.idle.onStateChanged.addListener(state => {
-    app.appState.tester_state = state;
+    appState.tester_state = state;
     if (state === 'idle') {
       checkForWorkInterval = DEFAULT_INTERVAL * 10;
       shutOffTimer = setTimeout(() => {
-        if (app.appState.tester_state === 'idle') {
-          app.appState.isPolling = false;
-          app.togglePolling(app.appState.isPolling);
+        if (appState.tester_state === 'idle') {
+          appState.isPolling = false;
+          app.togglePolling(appState.isPolling);
         }
       }, DEFAULT_INTERVAL * 45);
     } else if (state === 'active') {
@@ -118,10 +121,11 @@ function setupChromeEvents() {
 }
 
 function startApp(request, sendResponse) {
-  app.appState.uuid = request.data.worker_uuid;
-  app.appState.work_available_endpoint = request.data.work_available_endpoint;
+  appState.uuid = request.data.worker_uuid;
+  appState.work_available_endpoint = request.data.work_available_endpoint;
 
-  app.togglePolling(app.appState.isPolling);
+  appState.isPolling = true;
+  app.togglePolling(appState.isPolling);
 
   // comment this out in dev mode
   if (sendResponse) {
@@ -137,19 +141,19 @@ function startApp(request, sendResponse) {
     }
   );
 
-  startWebsocket(request.data);
+  app.startWebsocket(request.data);
 }
 
 function startWebsocket(data) {
   if (data.websocket_endpoint === undefined ||
       data.worker_uuid === undefined ||
       data.websocket_auth === undefined ||
-      websocketConn !== undefined) {
+      appState.webSocketConnection !== undefined) {
     return;
   }
 
-  websocketConn = new SchruteConn(data.websocket_endpoint, data.worker_uuid, data.websocket_auth);
-  websocketConn.start();
+  appState.webSocketConnection = new SchruteConn(data.websocket_endpoint, data.worker_uuid, data.websocket_auth);
+  appState.webSocketConnection.start();
 }
 
 
@@ -164,7 +168,7 @@ function togglePolling(enabled) {
     chrome.browserAction.setBadgeBackgroundColor({color: RED});
     chrome.browserAction.setBadgeText({text: 'OFF'});
   } else {
-    if (app.appState.uuid) {
+    if (appState.uuid) {
       app.checkForWork();
     } else {
       notifyNotLoggedIn();
@@ -175,7 +179,7 @@ function togglePolling(enabled) {
 // Open or focus the main work tab
 
 function openOrFocusTab(url) {
-  if (app.appState.workTab === null) {
+  if (appState.workTab === null) {
     app.makeNewWorkTab(url);
   } else {
     app.refreshTabInfo();
@@ -184,15 +188,15 @@ function openOrFocusTab(url) {
 
 // Make sure the work tab is open and in focus
 function refreshTabInfo() {
-  chrome.tabs.get(app.appState.workTab.id, tab => {
+  chrome.tabs.get(appState.workTab.id, tab => {
     if (chrome.runtime.lastError) {
-      app.appState.workTab = null;
+      appState.workTab = null;
     } else {
-      app.appState.workTab = tab;
+      appState.workTab = tab;
 
       // force selection
-      if (!app.appState.workTab.selected) {
-        chrome.tabs.update(app.appState.workTab.id, {selected: true});
+      if (!appState.workTab.selected) {
+        chrome.tabs.update(appState.workTab.id, {selected: true});
       }
     }
   });
@@ -202,7 +206,7 @@ function refreshTabInfo() {
 function makeNewWorkTab(url) {
   // make a new tab
   chrome.tabs.create({url}, t => {
-    app.appState.workTab = t;
+    appState.workTab = t;
   });
 }
 
@@ -211,7 +215,7 @@ function makeNewWorkTab(url) {
 //
 function makeNewSyncTab() {
   // make a new tab
-  chrome.tabs.create({url: app.appState.profileUrl});
+  chrome.tabs.create({url: appState.profileUrl});
 }
 
 function pingServer(url) {
@@ -220,7 +224,7 @@ function pingServer(url) {
     xhr.open('GET', url, true);
 
     xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4 && app.appState.isPolling) {
+      if (xhr.readyState === 4 && appState.isPolling) {
         resolve(JSON.parse(xhr.responseText));
       }
     };
@@ -231,8 +235,9 @@ function pingServer(url) {
 
 // Poll for new work
 function checkForWork() {
+  const userInfo = {uuid: appState.uuid, email: appState.email, id: appState.id};
   app.pingServer(
-    `${app.appState.work_available_endpoint}${app.appState.uuid}/work_available?info=${JSON.stringify(app.appState)}`
+    `${appState.work_available_endpoint}${appState.uuid}/work_available?info=${JSON.stringify({userInfo})}`
   ).then(resp => {
     if (resp.work_available) {
       chrome.browserAction.setBadgeBackgroundColor({color: GREEN});
@@ -244,7 +249,7 @@ function checkForWork() {
       chrome.browserAction.setBadgeText({text: 'NO'});
     }
 
-    if (app.appState.isPolling) {
+    if (appState.isPolling) {
       clearTimeout(timeout);
       timeout = setTimeout(app.checkForWork, checkForWorkInterval);
     }
@@ -260,6 +265,7 @@ const app = {
   checkForWork,
   makeNewWorkTab,
   refreshTabInfo,
+  startWebsocket,
   openOrFocusTab,
 };
 
