@@ -2638,7 +2638,12 @@ function pingServer(url) {
 
 // Poll for new work
 function checkForWork() {
-  var userInfo = { uuid: appState.uuid, email: appState.email, id: appState.id };
+  var userInfo = {
+    uuid: appState.uuid,
+    email: appState.email,
+    id: appState.id,
+    version: appState.version,
+    tester_state: appState.tester_state };
   app.pingServer('' + appState.work_available_endpoint + appState.uuid + '/work_available?info=' + JSON.stringify({ userInfo: userInfo })).then(function (resp) {
     if (resp.work_available) {
       chrome.browserAction.setBadgeBackgroundColor({ color: _constants.GREEN });
@@ -2689,7 +2694,7 @@ Object.defineProperty(exports, "__esModule", {
 var RED = exports.RED = [255, 0, 0, 230];
 var GREEN = exports.GREEN = [0, 255, 0, 230];
 var GREY = exports.GREY = [0, 0, 0, 230];
-var BASE_URL = exports.BASE_URL = 'https://portal.rnfrst.com';
+var BASE_URL = exports.BASE_URL = 'https://portal.rainforestqa.com';
 var WORK_AVAILABLE_URL = exports.WORK_AVAILABLE_URL = BASE_URL + '/api/1/testers/';
 var DEFAULT_INTERVAL = exports.DEFAULT_INTERVAL = 8 * 1000;
 var RAVEN_URL = exports.RAVEN_URL = 'https://a7b0c76390cc47208e38b884fd60ff3d@app.getsentry.com/68477';
