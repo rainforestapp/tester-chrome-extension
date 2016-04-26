@@ -35,7 +35,7 @@
     "eslint": "^2.2.0",
     "eslint-config-airbnb": "^6.0.2",
     "eslint-plugin-babel": "^3.1.0",
-    "eslint-plugin-react": "4.1.0",
+    "eslint-plugin-react": "4.2.3",
     "expect": "^1.14.0",
     "mocha": "^2.4.5",
     "pubsub": "1.0.2",

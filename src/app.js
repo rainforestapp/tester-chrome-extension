@@ -225,7 +225,12 @@ function pingServer(url) {
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4 && appState.isPolling) {
-        resolve(JSON.parse(xhr.responseText));
+        const responseText = xhr.responseText;
+        try {
+          resolve(JSON.parse(responseText));
+        } catch (error) {
+          Raven.captureMessage('Unexpected JSON', { extra: { error: String(error), responseText } });
+        }
       }
     };
 
