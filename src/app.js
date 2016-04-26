@@ -49,7 +49,7 @@ function setupChromeEvents() {
     // Notify that we saved.
     if (data.worker_uuid !== undefined) {
       appState.uuid = data.worker_uuid;
-      appState.isPolling = true;
+      appState.isPolling = false;
       app.togglePolling(appState.isPolling);
     } else {
       notifyNotLoggedIn();
@@ -63,7 +63,7 @@ function setupChromeEvents() {
     // Notify that we saved.
     if (data.work_available_endpoint !== undefined) {
       appState.work_available_endpoint = data.work_available_endpoint;
-      appState.isPolling = true;
+      appState.isPolling = false;
       app.togglePolling(appState.isPolling);
     } else {
       notifyNotLoggedIn();
@@ -124,7 +124,7 @@ function startApp(request, sendResponse) {
   appState.uuid = request.data.worker_uuid;
   appState.work_available_endpoint = request.data.work_available_endpoint;
 
-  appState.isPolling = true;
+  appState.isPolling = false;
   app.togglePolling(appState.isPolling);
 
   // comment this out in dev mode
