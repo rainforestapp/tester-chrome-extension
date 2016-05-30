@@ -229,7 +229,16 @@ function pingServer(url) {
         try {
           resolve(JSON.parse(responseText));
         } catch (error) {
-          Raven.captureMessage('Unexpected JSON', { extra: { error: String(error), responseText } });
+          if (responseText[0] === '<' && responseText.indexOf('CAPTCHA') > -1) {
+            chrome.tabs.create({ url });
+          }
+          Raven.captureMessage('Unexpected JSON', {
+            extra: {
+              error: String(error),
+              statusCode: xhr.status,
+              responseText,
+            },
+          });
         }
       }
     };
