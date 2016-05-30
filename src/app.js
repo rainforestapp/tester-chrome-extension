@@ -59,6 +59,8 @@ function setupChromeEvents() {
   const manifest = chrome.runtime.getManifest();
   appState.version = manifest.version;
   appState.profileUrl = `${BASE_URL}/profile?version=${manifest.version}`;
+  appState.isPolling = false;
+  app.togglePolling(appState.isPolling);
 
   chrome.notifications.onClicked.addListener(notificationId => {
     if (notificationId === 'not_logged_in') {
@@ -75,8 +77,6 @@ function setupChromeEvents() {
     // Notify that we saved.
     if (data.worker_uuid !== undefined) {
       appState.uuid = data.worker_uuid;
-      appState.isPolling = true;
-      app.togglePolling(appState.isPolling);
     } else {
       notifyNotLoggedIn();
     }
@@ -89,8 +89,6 @@ function setupChromeEvents() {
     // Notify that we saved.
     if (data.work_available_endpoint !== undefined) {
       appState.work_available_endpoint = data.work_available_endpoint;
-      appState.isPolling = true;
-      app.togglePolling(appState.isPolling);
     } else {
       notifyNotLoggedIn();
     }
@@ -150,7 +148,7 @@ function startApp(request, sendResponse) {
   appState.uuid = request.data.worker_uuid;
   appState.work_available_endpoint = request.data.work_available_endpoint;
 
-  appState.isPolling = true;
+  appState.isPolling = false;
   app.togglePolling(appState.isPolling);
 
   // comment this out in dev mode
@@ -263,6 +261,7 @@ function pingServer(url) {
             appState.isPolling = false;
             window.setTimeout(() => {
               notifyCaptcha();
+              appState.isPolling = false;
               app.togglePolling(appState.isPolling);
             }, checkForWorkInterval); // protect against too many requests
           }
@@ -283,6 +282,9 @@ function pingServer(url) {
 
 // Poll for new work
 function checkForWork() {
+  chrome.browserAction.setBadgeBackgroundColor({color: GREY});
+  chrome.browserAction.setBadgeText({text: 'NO'});
+
   app.pingServer(getWorkUrl()).then(resp => {
     if (resp.work_available) {
       chrome.browserAction.setBadgeBackgroundColor({color: GREEN});
