@@ -29,7 +29,30 @@ const notifications = {
     title: "You're not logged in",
     message: "You don't seem to be logged in to Rainforest, click here to go to your profile and log in.",
   },
+  captcha: {
+    iconUrl: 'icons/icon_notification.png',
+    isClickable: true,
+    type: 'basic',
+    title: 'There was a problem with the request',
+    message: 'You may need to fill out a captcha. Click here to test the work endpoint.',
+  },
 };
+
+function getWorkUrl() {
+  const userInfo = {
+    uuid: appState.uuid,
+    email: appState.email,
+    id: appState.id,
+    version: appState.version,
+    tester_state: appState.tester_state,
+  };
+
+  return `${appState.work_available_endpoint}${appState.uuid}/work_available?info=${JSON.stringify({userInfo})}`;
+}
+
+function notifyCaptcha() {
+  chrome.notifications.create('captcha', notifications.captcha);
+}
 
 function setupChromeEvents() {
   Raven.config(RAVEN_URL).install();
@@ -41,6 +64,9 @@ function setupChromeEvents() {
     if (notificationId === 'not_logged_in') {
       makeNewSyncTab();
       chrome.notifications.clear('not_logged_in');
+    } else if (notificationId === 'captcha') {
+      makeNewTab(getWorkUrl());
+      chrome.notifications.clear('captcha');
     }
   });
 
@@ -218,6 +244,10 @@ function makeNewSyncTab() {
   chrome.tabs.create({url: appState.profileUrl});
 }
 
+function makeNewTab(url) {
+  chrome.tabs.create({ url });
+}
+
 function pingServer(url) {
   return new Promise(resolve => {
     const xhr = new XMLHttpRequest();
@@ -232,10 +262,9 @@ function pingServer(url) {
           if (responseText[0] === '<' && responseText.indexOf('CAPTCHA') > -1) {
             appState.isPolling = false;
             window.setTimeout(() => {
-              // protect against too many requests
-              chrome.tabs.create({ url });
+              notifyCaptcha();
               app.togglePolling(appState.isPolling);
-            }, checkForWorkInterval);
+            }, checkForWorkInterval); // protect against too many requests
           }
           Raven.captureMessage('Unexpected JSON', {
             extra: {
@@ -254,15 +283,7 @@ function pingServer(url) {
 
 // Poll for new work
 function checkForWork() {
-  const userInfo = {
-    uuid: appState.uuid,
-    email: appState.email,
-    id: appState.id,
-    version: appState.version,
-    tester_state: appState.tester_state};
-  app.pingServer(
-    `${appState.work_available_endpoint}${appState.uuid}/work_available?info=${JSON.stringify({userInfo})}`
-  ).then(resp => {
+  app.pingServer(getWorkUrl()).then(resp => {
     if (resp.work_available) {
       chrome.browserAction.setBadgeBackgroundColor({color: GREEN});
       chrome.browserAction.setBadgeText({text: 'YES'});
