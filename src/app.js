@@ -230,7 +230,12 @@ function pingServer(url) {
           resolve(JSON.parse(responseText));
         } catch (error) {
           if (responseText[0] === '<' && responseText.indexOf('CAPTCHA') > -1) {
-            chrome.tabs.create({ url });
+            appState.isPolling = false;
+            window.setTimeout(() => {
+              // protect against too many requests
+              chrome.tabs.create({ url });
+              app.togglePolling(appState.isPolling);
+            }, checkForWorkInterval);
           }
           Raven.captureMessage('Unexpected JSON', {
             extra: {
