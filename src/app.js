@@ -257,7 +257,9 @@ function pingServer(url) {
         try {
           resolve(JSON.parse(responseText));
         } catch (error) {
+          let errorMessage = 'Unexpected JSON';
           if (responseText[0] === '<' && responseText.indexOf('CAPTCHA') > -1) {
+            errorMessage = 'Captcha Required';
             appState.isPolling = false;
             window.setTimeout(() => {
               notifyCaptcha();
@@ -265,9 +267,12 @@ function pingServer(url) {
               app.togglePolling(appState.isPolling);
             }, checkForWorkInterval); // protect against too many requests
           }
-          Raven.captureMessage('Unexpected JSON', {
+          Raven.captureMessage(errorMessage, {
             extra: {
               error: String(error),
+              workerId: appState.uuid,
+              testerState: appState.tester_state,
+              workUrl: getWorkUrl(),
               statusCode: xhr.status,
               responseText,
             },
