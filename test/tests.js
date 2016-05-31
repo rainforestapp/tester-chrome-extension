@@ -80,7 +80,7 @@ describe('tester chrome extension ', () => {
       expect(installSpy).toHaveBeenCalled();
     });
 
-    describe('startApp', ()=> {
+    describe('startApp', () => {
       it('fires when chrome extension gets message with worker uuid and endpoint', () => {
         spyOn(app, 'startApp');
         chrome.runtime.onMessageExternal.trigger(requestData);
@@ -99,10 +99,10 @@ describe('tester chrome extension ', () => {
         expect(spy).toHaveBeenCalledWith({ok: true});
       });
 
-      it('fires togglePolling with true', () => {
+      it('fires togglePolling with false', () => {
         const spy = spyOn(app, 'togglePolling');
         app.startApp(requestData, spy);
-        expect(spy).toHaveBeenCalledWith(true);
+        expect(spy).toHaveBeenCalledWith(false);
       });
 
       it('saves user info in chrome storage', () => {
