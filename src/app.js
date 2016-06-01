@@ -59,7 +59,6 @@ function setupChromeEvents() {
   const manifest = chrome.runtime.getManifest();
   appState.version = manifest.version;
   appState.profileUrl = `${BASE_URL}/profile?version=${manifest.version}`;
-  appState.isPolling = false;
   app.togglePolling(appState.isPolling);
 
   chrome.notifications.onClicked.addListener(notificationId => {
@@ -147,8 +146,6 @@ function setupChromeEvents() {
 function startApp(request, sendResponse) {
   appState.uuid = request.data.worker_uuid;
   appState.work_available_endpoint = request.data.work_available_endpoint;
-
-  appState.isPolling = false;
   app.togglePolling(appState.isPolling);
 
   // comment this out in dev mode
@@ -287,9 +284,6 @@ function pingServer(url) {
 
 // Poll for new work
 function checkForWork() {
-  chrome.browserAction.setBadgeBackgroundColor({color: GREY});
-  chrome.browserAction.setBadgeText({text: 'NO'});
-
   app.pingServer(getWorkUrl()).then(resp => {
     if (resp.work_available) {
       chrome.browserAction.setBadgeBackgroundColor({color: GREEN});
