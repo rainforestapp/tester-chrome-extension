@@ -125,11 +125,12 @@ function setupChromeEvents() {
   // for "inactive" users (i.e. when AFK)
 
   let shutOffTimer;
-  chrome.idle.setDetectionInterval(DEFAULT_INTERVAL * 5 / 1000);
+  chrome.idle.setDetectionInterval(DEFAULT_INTERVAL * 3 / 1000);
   chrome.idle.onStateChanged.addListener(state => {
     appState.tester_state = state;
     if (state !== 'active') {
       checkForWorkInterval = DEFAULT_INTERVAL * 10;
+      const TEN_MINUTES = (60 * 10) * 1000;
       shutOffTimer = setTimeout(() => {
         if (appState.tester_state !== 'active') {
           appState.isPolling = false;
@@ -146,7 +147,7 @@ function setupChromeEvents() {
             }, 3000);
           }
         }
-      }, DEFAULT_INTERVAL * 50);
+      }, TEN_MINUTES);
     } else {
       clearTimeout(shutOffTimer);
       checkForWorkInterval = DEFAULT_INTERVAL;
