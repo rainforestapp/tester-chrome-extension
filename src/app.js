@@ -1,5 +1,5 @@
 import {SchruteConn} from './schrute';
-import {RAVEN_URL, RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL} from './constants';
+import {RAVEN_URL, RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL, ABANDONED_URL} from './constants';
 import Raven from 'raven-js';
 
 let timeout;
@@ -134,11 +134,31 @@ function setupChromeEvents() {
         if (appState.tester_state === 'idle') {
           appState.isPolling = false;
           app.togglePolling(appState.isPolling);
+          const ONE_MINUTE = 60 * 1000;
+          if (appState.lastRefresh > Date.now() - ONE_MINUTE) { // confirm tab recently was refreshed
+            chrome.tabs.update(appState.workTab.id, {url: ABANDONED_URL});
+            setTimeout(() => { // make sure the job was actually abandoned
+              chrome.tabs.get(appState.workTab.id, tab => {
+                if (tab.url !== ABANDONED_URL) {
+                  chrome.tabs.update(tab.id, {url: ABANDONED_URL});
+                }
+              });
+            }, 3000);
+          }
         }
       }, DEFAULT_INTERVAL * 45);
     } else if (state === 'active') {
       clearTimeout(shutOffTimer);
       checkForWorkInterval = DEFAULT_INTERVAL;
+    }
+  });
+
+  chrome.tabs.onUpdated.addListener((id, changed) => {
+    if (appState.workTab && id === appState.workTab.id) { // check if our tab
+      if (changed.status !== undefined && Object.keys(changed).length === 1 &&
+      changed.status === 'loading') { // check for refresh
+        appState.lastRefresh = Date.now();
+      }
     }
   });
 }
