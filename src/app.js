@@ -19,6 +19,7 @@ const appState = {
   id: '',
   workTab: null,
   isPolling: false,
+  lastRefresh: 0,
 };
 
 const notifications = {
@@ -155,7 +156,7 @@ function setupChromeEvents() {
   });
 
   chrome.tabs.onUpdated.addListener((id, changed) => {
-    if (appState.workTab && id === appState.workTab.id) { // check if our tab
+    if (appState.workTab !== null && id === appState.workTab.id) { // check if our tab
       if (changed.status !== undefined && Object.keys(changed).length === 1 &&
       changed.status === 'loading') { // check for refresh
         appState.lastRefresh = Date.now();
