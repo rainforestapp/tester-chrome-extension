@@ -136,7 +136,7 @@ function setupChromeEvents() {
   chrome.idle.setDetectionInterval(DEFAULT_INTERVAL * 3 / 1000);
   chrome.idle.onStateChanged.addListener(state => {
     appState.tester_state = state;
-    app.pushState()
+    app.pushState();
     if (state === 'idle') {
       checkForWorkInterval = DEFAULT_INTERVAL * 10;
       shutOffTimer = setTimeout(() => {
