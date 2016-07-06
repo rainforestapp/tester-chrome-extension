@@ -3,4 +3,5 @@ export default class Socket {
   channel() { return this; }
   join() { return this; }
   receive() { return this; }
+  push() { return this; }
 }
