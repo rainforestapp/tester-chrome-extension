@@ -214,21 +214,29 @@ function openOrFocusTab(url) {
   if (appState.workTab === null) {
     app.makeNewWorkTab(url);
   } else {
-    app.refreshTabInfo();
+    app.refreshTabInfo(url);
   }
 }
 
-// Make sure the work tab is open and in focus
-function refreshTabInfo() {
+// Make sure the work tab is open and in focus also to ensure that new job is opened ASAP.
+function refreshTabInfo(url) {
   chrome.tabs.get(appState.workTab.id, tab => {
     if (chrome.runtime.lastError) {
       appState.workTab = null;
+      // no tab here, let start over with new tab.
+      app.makeNewWorkTab(url);
     } else {
       appState.workTab = tab;
+      
+      // check url on current tab and if not match, let start over w/ new tab
+      var re = /tester\.rainforestqa\.com\/tester\//;
+      if (!re.test(tab.url)) {
+        app.makeNewWorkTab(url);
+      }
 
-      // force selection
-      if (!appState.workTab.selected) {
-        chrome.tabs.update(appState.workTab.id, {selected: true});
+      // force focus on workTab
+      if (!appState.workTab.highlighted) {
+        chrome.tabs.update(appState.workTab.id, {highlighted: true});
       }
     }
   });
