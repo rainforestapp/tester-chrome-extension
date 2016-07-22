@@ -211,10 +211,25 @@ function togglePolling(enabled) {
 // Open or focus the main work tab
 
 function openOrFocusTab(url) {
-  if (appState.workTab === null) {
+ if (appState.workTab === null) {
     app.makeNewWorkTab(url);
   } else {
-    app.refreshTabInfo();
+       // checking the tab to see if rainforest job URL is still there, if not then create new tab.
+     chrome.tabs.get(appState.workTab.id, function (tab) {
+        if (chrome.runtime.lastError) {
+          appState.workTab = null;
+          app.makeNewWorkTab(url); // new tab because of error, tab already closed
+        } else {
+           appState.workTab = tab;  // tab updated, don't need refreshTabInfo() anymore.
+           var re = /tester\.rainforestqa\.com\/tester\//;  // regex check for rainforest job page
+           if (!re.test(tab.url)) {
+               app.makeNewWorkTab(url); // go ahead new tab because old tab isn't on rainforest job page
+           } else {
+               // highlighted tab (selected)
+	          	 if (!appState.workTab.highlighted) chrome.tabs.update(appState.workTab.id, { highlighted: true });
+           }
+        }
+     });
   }
 }
 
@@ -227,8 +242,8 @@ function refreshTabInfo() {
       appState.workTab = tab;
 
       // force selection
-      if (!appState.workTab.selected) {
-        chrome.tabs.update(appState.workTab.id, {selected: true});
+      if (!appState.workTab.highlighted) {
+        chrome.tabs.update(appState.workTab.id, {highlighted: true});
       }
     }
   });
