@@ -200,28 +200,25 @@ function togglePolling(enabled) {
 // Open or focus the main work tab
 
 function openOrFocusTab(url) {
-  if (appState.workTab === null) {
+
+ if (appState.workTab === null) {
     app.makeNewWorkTab(url);
-  } else {
-    app.refreshTabInfo();
+  } else { 
+    chrome.tabs.get(appState.workTab.id, tab => {
+        if (chrome.runtime.lastError) {
+          appState.workTab = null;
+          app.makeNewWorkTab(url);
+        } else {
+          appState.workTab = tab;
+          var re = /tester\.rainforestqa\.com\/tester\//;
+          if (!re.test(tab.url)) {
+            app.makeNewWorkTab(url);
+           } 
+        }
+     });
   }
 }
 
-// Make sure the work tab is open and in focus
-function refreshTabInfo() {
-  chrome.tabs.get(appState.workTab.id, tab => {
-    if (chrome.runtime.lastError) {
-      appState.workTab = null;
-    } else {
-      appState.workTab = tab;
-
-      // force selection
-      if (!appState.workTab.selected) {
-        chrome.tabs.update(appState.workTab.id, {selected: true});
-      }
-    }
-  });
-}
 
 // Open a new work tab
 function makeNewWorkTab(url) {
@@ -310,7 +307,6 @@ const app = {
   pingServer,
   checkForWork,
   makeNewWorkTab,
-  refreshTabInfo,
   startWebsocket,
   openOrFocusTab,
 };
