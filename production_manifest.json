@@ -1,6 +1,6 @@
 {
   "name": "Rainforest Tester Notifier",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "manifest_version": 2,
   "description": "Notifies Rainforest Testers when there is new work to be done.",
   "homepage_url": "https://portal.rainforestqa.com",
