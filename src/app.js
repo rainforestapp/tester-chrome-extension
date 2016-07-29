@@ -203,21 +203,28 @@ function openOrFocusTab(url) {
 
  if (appState.workTab === null) {
     app.makeNewWorkTab(url);
-  } else { 
-    chrome.tabs.get(appState.workTab.id, tab => {
+  } else {
+    app.checkAndOpenTab(url);
+  }
+}
+
+// check to see if tab is valid to decide to open new tab or not
+
+function checkAndOpenTab(url) {
+  chrome.tabs.get(appState.workTab.id, tab => {
         if (chrome.runtime.lastError) {
           appState.workTab = null;
           app.makeNewWorkTab(url);
         } else {
           appState.workTab = tab;
-          var re = /tester\.rainforestqa\.com\/tester\//;
+          var re = /tester\.rainforestqa\.com\/tester\//;  // test tab if worker is still working on the job
           if (!re.test(tab.url)) {
             app.makeNewWorkTab(url);
            } 
         }
      });
-  }
 }
+
 
 
 // Open a new work tab
@@ -309,6 +316,7 @@ const app = {
   makeNewWorkTab,
   startWebsocket,
   openOrFocusTab,
+  checkAndOpenTab
 };
 
 // exposing this for dev mode
