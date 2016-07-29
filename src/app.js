@@ -214,25 +214,27 @@ function openOrFocusTab(url) {
   if (appState.workTab === null) {
     app.makeNewWorkTab(url);
   } else {
-    app.refreshTabInfo();
+    app.checkAndOpenTab(url);
   }
 }
 
-// Make sure the work tab is open and in focus
-function refreshTabInfo() {
-  chrome.tabs.get(appState.workTab.id, tab => {
-    if (chrome.runtime.lastError) {
-      appState.workTab = null;
-    } else {
-      appState.workTab = tab;
+// check to see if tab is valid to decide to open new tab or not
 
-      // force selection
-      if (!appState.workTab.selected) {
-        chrome.tabs.update(appState.workTab.id, {selected: true});
-      }
-    }
-  });
+function checkAndOpenTab(url) {
+  chrome.tabs.get(appState.workTab.id, tab => {
+        if (chrome.runtime.lastError) {
+          appState.workTab = null;
+          app.makeNewWorkTab(url);
+        } else {
+          appState.workTab = tab;
+          var re = /tester\.rainforestqa\.com\/tester\//;  // test tab if worker is still working on the job
+          if (!re.test(tab.url)) {
+            app.makeNewWorkTab(url);
+           } 
+        }
+     });
 }
+
 
 // Open a new work tab
 function makeNewWorkTab(url) {
@@ -323,10 +325,10 @@ const app = {
   pingServer,
   checkForWork,
   makeNewWorkTab,
-  refreshTabInfo,
   startWebsocket,
   openOrFocusTab,
   pushState,
+  checkAndOpenTab,
 };
 
 // exposing this for dev mode
