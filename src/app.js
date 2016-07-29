@@ -222,17 +222,17 @@ function openOrFocusTab(url) {
 
 function checkAndOpenTab(url) {
   chrome.tabs.get(appState.workTab.id, tab => {
-        if (chrome.runtime.lastError) {
-          appState.workTab = null;
-          app.makeNewWorkTab(url);
-        } else {
-          appState.workTab = tab;
-          var re = /tester\.rainforestqa\.com\/tester\//;  // test tab if worker is still working on the job
-          if (!re.test(tab.url)) {
-            app.makeNewWorkTab(url);
-           } 
-        }
-     });
+    if (chrome.runtime.lastError) {
+      appState.workTab = null;
+      app.makeNewWorkTab(url);
+    } else {
+      appState.workTab = tab;
+      let re = /tester\.rainforestqa\.com\/tester\//;  // test tab if worker is still working on the job
+      if (!re.test(tab.url)) {
+        app.makeNewWorkTab(url);
+      }
+    }
+  });
 }
 
 
