@@ -229,7 +229,7 @@ function checkAndOpenTab(url) {
       appState.workTab = tab;
       const re = /tester\.rainforestqa\.com\/tester\//;  // test tab if worker is still working on the job
       if (re.test(tab.url)) {
-        chrome.tabs.update( tab.id, { highlighted: true }); // focus the tab
+        chrome.tabs.update(tab.id, {highlighted: true}); // focus the tab
       } else {
         app.makeNewWorkTab(url); // new tab because it's not on job url.
       }
