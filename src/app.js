@@ -227,7 +227,7 @@ function checkAndOpenTab(url) {
       app.makeNewWorkTab(url);
     } else {
       appState.workTab = tab;
-      let re = /tester\.rainforestqa\.com\/tester\//;  // test tab if worker is still working on the job
+      const re = /tester\.rainforestqa\.com\/tester\//;  // test tab if worker is still working on the job
       if (!re.test(tab.url)) {
         app.makeNewWorkTab(url);
       }
