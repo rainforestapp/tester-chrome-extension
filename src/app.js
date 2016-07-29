@@ -50,6 +50,12 @@ function getWorkUrl() {
   return `${appState.work_available_endpoint}${appState.uuid}/work_available?info=${JSON.stringify({userInfo})}`;
 }
 
+function pushState() {
+  if (appState.webSocketConnection !== undefined) {
+    appState.webSocketConnection.updateState(appState);
+  }
+}
+
 function notifyCaptcha() {
   chrome.notifications.create('captcha', notifications.captcha);
 }
@@ -95,6 +101,7 @@ function setupChromeEvents() {
 
   chrome.storage.sync.get(['worker_uuid', 'websocket_endpoint', 'websocket_auth'], data => {
     app.startWebsocket(data);
+    app.pushState();
   });
 
   // Handle the icon being clicked
@@ -104,6 +111,7 @@ function setupChromeEvents() {
   chrome.browserAction.onClicked.addListener(() => {
     appState.isPolling = !appState.isPolling;
     app.togglePolling(appState.isPolling);
+    app.pushState();
   });
 
   // Handle data coming from the main site
@@ -128,12 +136,14 @@ function setupChromeEvents() {
   chrome.idle.setDetectionInterval(DEFAULT_INTERVAL * 3 / 1000);
   chrome.idle.onStateChanged.addListener(state => {
     appState.tester_state = state;
+    app.pushState();
     if (state === 'idle') {
       checkForWorkInterval = DEFAULT_INTERVAL * 10;
       shutOffTimer = setTimeout(() => {
         if (appState.tester_state === 'idle') {
           appState.isPolling = false;
           app.togglePolling(appState.isPolling);
+          app.pushState();
         }
       }, DEFAULT_INTERVAL * 45);
     } else if (state === 'active') {
@@ -163,6 +173,7 @@ function startApp(request, sendResponse) {
   );
 
   app.startWebsocket(request.data);
+  app.pushState();
 }
 
 function startWebsocket(data) {
@@ -258,10 +269,12 @@ function pingServer(url) {
           if (responseText[0] === '<' && responseText.indexOf('CAPTCHA') > -1) {
             errorMessage = 'Captcha Required';
             appState.isPolling = false;
+            app.pushState();
             window.setTimeout(() => {
               notifyCaptcha();
               appState.isPolling = false;
               app.togglePolling(appState.isPolling);
+              app.pushState();
             }, checkForWorkInterval); // protect against too many requests
           }
           Raven.captureMessage(errorMessage, {
@@ -313,6 +326,7 @@ const app = {
   refreshTabInfo,
   startWebsocket,
   openOrFocusTab,
+  pushState,
 };
 
 // exposing this for dev mode
