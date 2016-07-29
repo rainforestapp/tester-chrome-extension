@@ -170,13 +170,14 @@ describe('tester chrome extension ', () => {
         app.openOrFocusTab('google.com');
         expect(app.makeNewWorkTab).toHaveBeenCalledWith('google.com');
       });
-
-      it('fires refreshTabInfo if there is a workTab', () => {
+      
+      it('fires checkAndOpenTab if there is a workTab', () => {
         app.appState.workTab = {};
-        spyOn(app, 'refreshTabInfo');
+        spyOn(app, 'checkAndOpenTab');
         app.openOrFocusTab('google.com');
-        expect(app.refreshTabInfo).toHaveBeenCalledWith();
+        expect(app.checkAndOpenTab).toHaveBeenCalledWith('google.com');
       });
+      
     });
   });
 
