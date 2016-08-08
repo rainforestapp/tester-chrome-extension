@@ -1,3 +1,5 @@
 node_modules
 extension/js/main.js
 .DS_Store
+/build
+/lib

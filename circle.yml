@@ -5,7 +5,7 @@ checkout:
 
 machine:
   node:
-    version: 5.5.0
+    version: 6.3.0
 
 test:
   override:
@@ -23,4 +23,3 @@ deployment:
       - npm run build
       - mv production_manifest.json extension/manifest.json
       - cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
-

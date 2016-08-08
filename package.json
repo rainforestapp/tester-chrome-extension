@@ -1,15 +1,18 @@
 {
   "name": "tester-chrome-extension",
-  "version": "1.2.10",
-  "description": "The Rainforest Chrome Extension for Testers",
-  "main": "extension/js/main.js",
+  "version": "2.0.0",
+  "description": "The Rainforest Chrome Extension for Testers (internal JS)",
+  "main": "lib/index.js",
   "scripts": {
-    "test:mocha": "mocha test/tests.js --require mocha_babel",
+    "test:mocha": "mocha --require jsdom-global/register --compilers js:babel-register src/\\*\\*/__tests__/\\*.js",
     "test:lint": "eslint src",
     "test": "npm run test:mocha && npm run test:lint",
     "lint:fix": "eslint --fix src",
-    "watchTest": "mocha -w --require mocha_babel",
-    "build": "mkdir -p extension/js && browserify src/index.js -o extension/js/main.js -t [ babelify --presets [ es2015 ] ]"
+    "build:browser": "mkdir -p build && browserify src/bootstrap.js -d -o build/main.js -t [ babelify --presets [ es2015 ] ] -p [ minifyify --map main.js.map --output build/main.js.map ]",
+    "build:module": "mkdir -p lib && babel src --out-dir lib",
+    "build": "npm run build:browser && npm run build:module",
+    "postinstall": "rm -rf lib && npm run build:module",
+    "devServer": "cd build && ws -p 8123"
   },
   "repository": {
     "type": "git",
@@ -26,19 +29,37 @@
   },
   "homepage": "https://github.com/rainforestapp/tester-chrome-extension#readme",
   "devDependencies": {
-    "babel": "^6.5.2",
-    "babel-cli": "^6.5.1",
+    "babel": "6.5.2",
     "babel-core": "^6.5.2",
+    "babel-eslint": "6.0.4",
     "babel-preset-es2015": "^6.5.0",
+    "babel-register": "6.11.6",
     "babelify": "7.2.0",
     "browserify": "13.0.0",
-    "eslint": "^2.2.0",
-    "eslint-config-airbnb": "^6.0.2",
-    "eslint-plugin-babel": "^3.1.0",
-    "eslint-plugin-react": "4.2.3",
-    "expect": "^1.14.0",
-    "mocha": "^2.4.5",
-    "pubsub": "1.0.2",
-    "raven-js": "2.1.1"
+    "chai": "3.5.0",
+    "chai-immutable": "1.6.0",
+    "eslint": "3.1.1",
+    "eslint-config-rainforest": "0.1.2",
+    "eslint-plugin-babel": "2.2.0",
+    "eslint-plugin-flow-vars": "0.5.0",
+    "eslint-plugin-import": "1.12.0",
+    "eslint-plugin-jsx-a11y": "2.0.1",
+    "eslint-plugin-react": "5.2.2",
+    "jsdom": "9.4.1",
+    "jsdom-global": "2.0.0",
+    "local-web-server": "1.2.6",
+    "minifyify": "7.3.3",
+    "mocha": "2.5.3",
+    "raven-js": "2.1.1",
+    "sinon": "1.17.5",
+    "sinon-chai": "2.8.0"
+  },
+  "dependencies": {
+    "babel-cli": "^6.5.1",
+    "immutable": "3.8.1",
+    "phoenix": "1.2.0",
+    "raven-js": "3.2.1",
+    "redux": "3.5.2",
+    "redux-actions": "0.10.1"
   }
 }
