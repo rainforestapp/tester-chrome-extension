@@ -151,7 +151,7 @@ function setupChromeEvents() {
             chrome.tabs.update(appState.workTab.id, {url: ABANDONED_URL});
             setTimeout(() => { // make sure the job was actually abandoned
               chrome.tabs.get(appState.workTab.id, tab => {
-                if (tab.url !== ABANDONED_URL) {
+                if (appState.tester_state !== 'active' && tab.url !== ABANDONED_URL) {
                   chrome.tabs.update(tab.id, {url: ABANDONED_URL});
                 }
               });
