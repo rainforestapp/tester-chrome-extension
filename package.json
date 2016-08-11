@@ -4,9 +4,8 @@
   "description": "The Rainforest Chrome Extension for Testers (internal JS)",
   "main": "lib/index.js",
   "scripts": {
-    "test:mocha": "mocha --require jsdom-global/register --compilers js:babel-register src/\\*\\*/__tests__/\\*.js",
-    "test:lint": "eslint src",
-    "test": "npm run test:mocha && npm run test:lint",
+    "test": "mocha --require jsdom-global/register --compilers js:babel-register src/\\*\\*/__tests__/\\*.js",
+    "lint": "eslint src",
     "lint:fix": "eslint --fix src",
     "build:browser": "mkdir -p build && browserify src/bootstrap.js -d -o build/main.js -t [ babelify --presets [ es2015 ] ] -p [ minifyify --map main.js.map --output build/main.js.map ]",
     "build:module": "mkdir -p lib && babel src --out-dir lib",
@@ -50,6 +49,7 @@
     "local-web-server": "1.2.6",
     "minifyify": "7.3.3",
     "mocha": "2.5.3",
+    "mocha-junit-reporter": "1.12.0",
     "raven-js": "2.1.1",
     "sinon": "1.17.5",
     "sinon-chai": "2.8.0"

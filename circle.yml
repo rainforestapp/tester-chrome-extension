@@ -6,10 +6,14 @@ checkout:
 machine:
   node:
     version: 6.3.0
+  environment:
+    MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
 
 test:
   override:
-    - npm run test
+    - npm run lint
+    - npm run test -- --reporter mocha-junit-reporter
+
 
 deployment:
   staging:
