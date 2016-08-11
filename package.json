@@ -10,6 +10,7 @@
     "build:browser": "mkdir -p build && browserify src/bootstrap.js -d -o build/main.js -t [ babelify --presets [ es2015 ] ] -p [ minifyify --map main.js.map --output build/main.js.map ]",
     "build:module": "mkdir -p lib && babel src --out-dir lib",
     "build": "npm run build:browser && npm run build:module",
+    "watch": "mkdir -p build && watchify src/bootstrap.js -d -o build/main.js -t [ babelify ]",
     "postinstall": "rm -rf lib && npm run build:module",
     "devServer": "cd build && ws -p 8123"
   },
@@ -52,7 +53,8 @@
     "mocha-junit-reporter": "1.12.0",
     "raven-js": "2.1.1",
     "sinon": "1.17.5",
-    "sinon-chai": "2.8.0"
+    "sinon-chai": "2.8.0",
+    "watchify": "3.7.0"
   },
   "dependencies": {
     "babel-cli": "^6.5.1",

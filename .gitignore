@@ -1,5 +1,6 @@
 node_modules
 extension/js/main.js
 .DS_Store
-/build
+/build/*.js
+/build/*.js.map
 /lib
