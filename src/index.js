@@ -1,5 +1,5 @@
 import startPlugin from './startPlugin';
-import actions from './actions';
+import * as actions from './actions';
 
 export {
   startPlugin,

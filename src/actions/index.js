@@ -23,15 +23,3 @@ export const updateWorkerState = state => {
     payload: state,
   };
 };
-
-export default {
-  assignWork,
-  authenticate,
-  connect,
-  logMessage,
-  connectionClosed,
-  authFailed,
-  iconClicked,
-  workFinished,
-  setPluginVersion,
-};
