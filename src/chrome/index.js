@@ -23,8 +23,10 @@ export const startChromePlugin = (auth, chrome, enhancer, socketConstructor = So
     // redux dev tools don't work with the plugin, so we have a dumb
     // replacement.
     store.subscribe(() => {
-      const { worker, socket } = store.getState();
-      console.log('Worker:', worker.toJS(), 'Socket:', socket.toJS());
+      const { worker, socket, plugin: pluginState } = store.getState();
+      console.log('Worker:', worker.toJS(),
+                  'Socket:', socket.toJS(),
+                  'Plugin:', pluginState.toJS());
     });
   }
 
