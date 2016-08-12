@@ -10,6 +10,7 @@ import startIdleChecking from '../startIdleChecking';
 import pluginApp from '../../reducers';
 import { createStore } from 'redux';
 import { updateWorkerState } from '../../actions';
+import { workerIdle } from '../notifications';
 
 describe('startIdleChecking', function() {
   it("changes the worker state to inactive after they're idle", function() {
@@ -37,9 +38,9 @@ describe('startIdleChecking', function() {
 
     chrome.stateChanged('idle');
 
-    expect(chrome.getCurrentNotifications()).to.have.property('workerIdle');
+    expect(chrome.getCurrentNotifications()).to.have.property(workerIdle);
 
-    chrome.clickNotification('workerIdle');
+    chrome.clickNotification(workerIdle);
 
     expect(store.getState().worker.get('state')).to.equal('ready');
   });
@@ -55,6 +56,6 @@ describe('startIdleChecking', function() {
 
     store.dispatch(updateWorkerState('ready'));
 
-    expect(chrome.getCurrentNotifications()).to.not.have.property('workerIdle');
+    expect(chrome.getCurrentNotifications()).to.not.have.property(workerIdle);
   });
 });

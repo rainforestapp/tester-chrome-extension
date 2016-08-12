@@ -1,20 +1,8 @@
+import { notifications, notLoggedIn } from './notifications';
 import { CONFIG } from '../constants';
 import listenStoreChanges from '../listenStoreChanges';
 
-export const notLoggedIn = 'notLoggedIn';
-
-const handleNotifications = (store, chrome) => {
-  const notifications = {
-    [notLoggedIn]: {
-      iconUrl: CONFIG.chrome.notificationIconUrl,
-      isClickable: true,
-      type: 'basic',
-      title: "You're not logged in",
-      message:
-      "You don't seem to be logged in to Rainforest, click here to go to your profile and log in.",
-    },
-  };
-
+const handleWorkerStateNotifications = (store, chrome) => {
   const shouldSendAuthNotifications = (
     { socket: prevSocket, worker: prevWorker }, { socket: curSocket, worker: curWorker }
   ) => (
@@ -36,8 +24,6 @@ const handleNotifications = (store, chrome) => {
     handleAuthNotification(previousState, currentState);
   };
 
-  listenStoreChanges(store, handleUpdate);
-
   chrome.notifications.onClicked.addListener(notificationId => {
     switch (notificationId) {
       case notLoggedIn:
@@ -46,6 +32,8 @@ const handleNotifications = (store, chrome) => {
       default:
     }
   });
+
+  listenStoreChanges(store, handleUpdate);
 };
 
-export default handleNotifications;
+export default handleWorkerStateNotifications;

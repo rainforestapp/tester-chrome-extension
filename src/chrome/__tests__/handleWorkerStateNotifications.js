@@ -10,9 +10,10 @@ import { createStore } from 'redux';
 import { authFailed, connect, updateWorkerState } from '../../actions';
 import { mockChrome } from '../__mocks__/chrome';
 import { CONFIG } from '../../constants';
-import handleNotifications, { notLoggedIn } from '../handleNotifications';
+import handleWorkerStateNotifications from '../handleWorkerStateNotifications';
+import { notLoggedIn } from '../notifications';
 
-describe('handleNotifications', function() {
+describe('handleWorkerStateNotifications', function() {
   describe('when the user is unauthenticated', function() {
     describe('when the user was already unauthenticated', function() {
       it("doesn't show a notification", function() {
@@ -20,7 +21,7 @@ describe('handleNotifications', function() {
         const store = createStore(pluginApp);
         store.dispatch(authFailed()); // already failed
 
-        handleNotifications(store, chrome);
+        handleWorkerStateNotifications(store, chrome);
 
         store.dispatch(authFailed());
 
@@ -34,7 +35,7 @@ describe('handleNotifications', function() {
         const store = createStore(pluginApp);
         store.dispatch(authFailed());
 
-        handleNotifications(store, chrome);
+        handleWorkerStateNotifications(store, chrome);
 
         store.dispatch(updateWorkerState('ready'));
 
@@ -47,7 +48,7 @@ describe('handleNotifications', function() {
         const chrome = mockChrome();
         const store = createStore(pluginApp);
 
-        handleNotifications(store, chrome);
+        handleWorkerStateNotifications(store, chrome);
 
         store.dispatch(authFailed());
 
@@ -61,7 +62,7 @@ describe('handleNotifications', function() {
       const chrome = mockChrome();
       const store = createStore(pluginApp);
 
-      handleNotifications(store, chrome);
+      handleWorkerStateNotifications(store, chrome);
 
       store.dispatch(authFailed());
 
@@ -76,7 +77,7 @@ describe('handleNotifications', function() {
       const chrome = mockChrome();
       const store = createStore(pluginApp);
 
-      handleNotifications(store, chrome);
+      handleWorkerStateNotifications(store, chrome);
       store.dispatch(authFailed());
 
       chrome.clickNotification(notLoggedIn);

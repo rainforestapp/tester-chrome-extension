@@ -3,7 +3,7 @@ import { CONFIG } from '../constants';
 import { Socket } from 'phoenix';
 import { startPlugin } from '..';
 import listenAuth from './listenAuth';
-import handleNotifications from './handleNotifications';
+import handleWorkerStateNotifications from './handleWorkerStateNotifications';
 import handleWork from './handleWork';
 import renderIcon from './renderIcon';
 import startIdleChecking from './startIdleChecking';
@@ -16,7 +16,7 @@ export const startChromePlugin = (auth, chrome, enhancer, socketConstructor = So
   const getStore = () => store;
 
   listenAuth(store, chrome);
-  handleNotifications(store, chrome);
+  handleWorkerStateNotifications(store, chrome);
   renderIcon(store, chrome);
   handleWork(store, chrome);
   startIdleChecking(store, chrome);
