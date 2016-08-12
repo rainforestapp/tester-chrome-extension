@@ -23,11 +23,13 @@ const renderIcon = (store, chrome) => {
   };
 
   const renderIconImage = ({ socket }) => {
+    let icon;
     if (socket.get('state') === 'connected') {
-      chrome.browserAction.setIcon(CONFIG.chrome.colorIcon);
+      icon = Object.assign({}, CONFIG.chrome.colorIcon);
     } else {
-      chrome.browserAction.setIcon(CONFIG.chrome.greyIcon);
+      icon = Object.assign({}, CONFIG.chrome.greyIcon);
     }
+    chrome.browserAction.setIcon(icon);
   };
 
   const render = (state) => {

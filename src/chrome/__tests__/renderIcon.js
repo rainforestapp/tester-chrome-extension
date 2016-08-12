@@ -69,7 +69,7 @@ describe('renderIcon', function() {
 
         store.dispatch(authFailed());
 
-        expect(chrome.getIcon()).to.equal(CONFIG.chrome.greyIcon);
+        expect(chrome.getIcon().path).to.equal(CONFIG.chrome.greyIcon.path);
       });
     });
 
@@ -82,7 +82,7 @@ describe('renderIcon', function() {
 
         store.dispatch(connect());
 
-        expect(chrome.getIcon()).to.equal(CONFIG.chrome.colorIcon);
+        expect(chrome.getIcon().path).to.equal(CONFIG.chrome.colorIcon.path);
       });
     });
   });

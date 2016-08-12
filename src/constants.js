@@ -1,4 +1,6 @@
-export const actions = Object.freeze({
+import deepFreeze from 'deep-freeze';
+
+export const actions = deepFreeze({
   ASSIGN_WORK: 'ASSIGN_WORK',
   AUTHENTICATE: 'AUTHENTICATE',
   AUTH_FAILED: 'AUTH_FAILED',
@@ -11,20 +13,20 @@ export const actions = Object.freeze({
   SET_PLUGIN_VERSION: 'SET_PLUGIN_VERSION',
 });
 
-export const colors = Object.freeze({
+export const colors = deepFreeze({
   RED: [255, 0, 0, 230],
   GREEN: [0, 255, 0, 230],
   GREY: [0, 0, 0, 230],
 });
 
-export const REDUCERS = Object.freeze(['worker', 'socket', 'plugin']);
+export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin']);
 
 const getChromeConfig = () => (
-  Object.freeze({
+  {
     notificationIconUrl: window.CHROME_NOTIFICATION_ICON_URL,
     greyIcon: window.CHROME_GREY_ICON,
     colorIcon: window.CHROME_COLOR_ICON,
-  })
+  }
 );
 
 const getConfig = () => {
@@ -52,12 +54,12 @@ const getConfig = () => {
         profileUrl: 'http://portal.rainforest.dev/profile',
         chrome: {
           notificationIconUrl: 'bogusNotifications.png',
-          greyIcon: 'GREY',
-          colorIcon: 'COLOR',
+          greyIcon: { path: 'GREY' },
+          colorIcon: { path: 'COLOR' },
         },
         ravenURL: 'BOGUS',
       };
   }
 };
 
-export const CONFIG = Object.freeze(getConfig());
+export const CONFIG = deepFreeze(getConfig());

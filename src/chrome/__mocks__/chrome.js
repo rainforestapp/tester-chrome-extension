@@ -51,6 +51,8 @@ export const mockChrome = (opts = {}) => {
       badge.text = text;
     },
     setIcon: (icon) => {
+      // bizarrely, setIcon mutates the object
+      Object.assign(icon, { imageData: 'FOO' });
       currentIcon = icon;
     },
     onClicked: {
