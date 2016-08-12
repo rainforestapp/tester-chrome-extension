@@ -2,7 +2,7 @@ import { updateWorkerState } from '../actions';
 import { notifications, workerIdle } from './notifications';
 import listenStoreChanges from '../listenStoreChanges';
 
-const idlePeriod = 5 * 60;
+const idlePeriod = 3 * 60;
 
 const goIdle = (store, chrome) => {
   store.dispatch(updateWorkerState('inactive'));
@@ -12,14 +12,14 @@ const goIdle = (store, chrome) => {
 const startIdleChecking = (store, chrome) => {
   chrome.idle.setDetectionInterval(idlePeriod);
 
-  const handleUpdate = (previousState, currentState) => {
+  const handleUpdate = (_previousState, currentState) => {
     if (currentState.worker.get('state') === 'ready') {
       chrome.notifications.clear(workerIdle);
     }
   };
 
   chrome.idle.onStateChanged.addListener(state => {
-    if (state === 'idle') {
+    if (state === 'idle' || state === 'locked') {
       goIdle(store, chrome);
     }
   });
