@@ -1,5 +1,6 @@
 import { colors, CONFIG } from '../constants';
 import { iconClicked } from '../actions';
+import { alreadyWorking, notifications } from './notifications';
 
 const renderIcon = (store, chrome) => {
   const renderBadge = ({ worker }) => {
@@ -32,6 +33,18 @@ const renderIcon = (store, chrome) => {
     chrome.browserAction.setIcon(icon);
   };
 
+
+  const handleClick = () => {
+    const workerState = store.getState().worker.get('state');
+    if (workerState === 'working') {
+      const notificationDuration = 3000;
+      chrome.notifications.create(alreadyWorking, notifications[alreadyWorking]);
+      window.setTimeout(() => chrome.notifications.clear(alreadyWorking), notificationDuration);
+    } else {
+      store.dispatch(iconClicked(store.getState().worker.get('state')));
+    }
+  };
+
   const render = (state) => {
     renderBadge(state);
     renderIconImage(state);
@@ -43,9 +56,7 @@ const renderIcon = (store, chrome) => {
     render(store.getState());
   });
 
-  chrome.browserAction.onClicked.addListener(() => {
-    store.dispatch(iconClicked(store.getState().worker.get('state')));
-  });
+  chrome.browserAction.onClicked.addListener(handleClick);
 };
 
 export default renderIcon;

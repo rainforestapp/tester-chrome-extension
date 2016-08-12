@@ -11,13 +11,20 @@ import { mockChrome } from '../__mocks__/chrome';
 import { updateWorkerState, connect, authFailed } from '../../actions';
 import renderIcon from '../renderIcon';
 import { CONFIG, colors } from '../../constants';
+import { alreadyWorking } from '../notifications';
+
+const storeWithWorkerState = state => {
+  const store = createStore(pluginApp);
+  store.dispatch(updateWorkerState(state));
+
+  return store;
+};
 
 describe('renderIcon', function() {
   describe('badge', function() {
     describe('when the worker is inactive', function() {
       it('says it is OFF', function() {
-        const store = createStore(pluginApp);
-        store.dispatch(updateWorkerState('inactive'));
+        const store = storeWithWorkerState('inactive');
         const chrome = mockChrome();
 
         renderIcon(store, chrome);
@@ -89,10 +96,9 @@ describe('renderIcon', function() {
 
   describe('click handling', function() {
     it('toggles between worker states active and inactive', function() {
-      const store = createStore(pluginApp);
-      store.dispatch(updateWorkerState('inactive'));
-
+      const store = storeWithWorkerState('inactive');
       const chrome = mockChrome();
+
       renderIcon(store, chrome);
 
       chrome.clickIcon();
@@ -102,6 +108,19 @@ describe('renderIcon', function() {
       chrome.clickIcon();
 
       expect(store.getState().worker.get('state')).to.equal('inactive');
+    });
+
+    describe('when the worker is working', function() {
+      it('displays a notification to the worker', function() {
+        const store = storeWithWorkerState('working');
+        const chrome = mockChrome();
+
+        renderIcon(store, chrome);
+
+        chrome.clickIcon();
+
+        expect(chrome.getCurrentNotifications()).to.have.property(alreadyWorking);
+      });
     });
   });
 });
