@@ -1,13 +1,9 @@
-// This file is auto-required for plugin.js to bootstrap the JS loading process.
+// This file is auto-required for main.js to bootstrap the JS loading process.
 import { startChromePlugin } from './chrome';
 
 const inChromePlugin = () => (
   (typeof window.chrome === 'object') &&
     document.querySelector('div#tester-chrome-extension') !== null
-);
-
-const devTools = () => (
-  window.devToolsExtension && window.devToolsExtension()
 );
 
 window.onload = () => {
@@ -20,7 +16,7 @@ window.onload = () => {
       } else {
         auth = null;
       }
-      window.plugin = startChromePlugin(auth, window.chrome, devTools());
+      window.plugin = startChromePlugin(auth, window.chrome);
     });
   }
 };
