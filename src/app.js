@@ -1,5 +1,15 @@
-import {SchruteConn} from './schrute';
-import {RAVEN_URL, RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL} from './constants';
+import { SchruteConn } from './schrute';
+import {
+  RAVEN_URL,
+  RED,
+  GREEN,
+  GREY,
+  BASE_URL,
+  WORK_AVAILABLE_URL,
+  DEFAULT_INTERVAL,
+  IDLE_TIME,
+  SHUTOFF_TIME,
+} from './constants';
 import Raven from 'raven-js';
 
 let timeout;
@@ -133,19 +143,19 @@ function setupChromeEvents() {
   // for "inactive" users (i.e. when AFK)
 
   let shutOffTimer;
-  chrome.idle.setDetectionInterval(DEFAULT_INTERVAL * 3 / 1000);
+  chrome.idle.setDetectionInterval(IDLE_TIME);
   chrome.idle.onStateChanged.addListener(state => {
     appState.tester_state = state;
     app.pushState();
-    if (state === 'idle') {
+    if (state !== 'active') {
       checkForWorkInterval = DEFAULT_INTERVAL * 10;
       shutOffTimer = setTimeout(() => {
-        if (appState.tester_state === 'idle') {
+        if (appState.tester_state !== 'active') {
           appState.isPolling = false;
           app.togglePolling(appState.isPolling);
           app.pushState();
         }
-      }, DEFAULT_INTERVAL * 45);
+      }, SHUTOFF_TIME);
     } else if (state === 'active') {
       clearTimeout(shutOffTimer);
       checkForWorkInterval = DEFAULT_INTERVAL;
@@ -214,25 +224,29 @@ function openOrFocusTab(url) {
   if (appState.workTab === null) {
     app.makeNewWorkTab(url);
   } else {
-    app.refreshTabInfo();
+    app.checkAndOpenTab(url);
   }
 }
 
-// Make sure the work tab is open and in focus
-function refreshTabInfo() {
+// check to see if tab is valid to decide to open new tab or not
+
+function checkAndOpenTab(url) {
   chrome.tabs.get(appState.workTab.id, tab => {
     if (chrome.runtime.lastError) {
       appState.workTab = null;
+      app.makeNewWorkTab(url);
     } else {
       appState.workTab = tab;
-
-      // force selection
-      if (!appState.workTab.selected) {
-        chrome.tabs.update(appState.workTab.id, {selected: true});
+      const re = /tester\.rainforestqa\.com\/tester\//;  // test tab if worker is still working on the job
+      if (re.test(appState.workTab.url)) {
+        chrome.tabs.update(appState.workTab.id, {highlighted: true}); // focus the tab
+      } else {
+        app.makeNewWorkTab(url); // new tab because it's not on job url.
       }
     }
   });
 }
+
 
 // Open a new work tab
 function makeNewWorkTab(url) {
@@ -323,10 +337,10 @@ const app = {
   pingServer,
   checkForWork,
   makeNewWorkTab,
-  refreshTabInfo,
   startWebsocket,
   openOrFocusTab,
   pushState,
+  checkAndOpenTab,
 };
 
 // exposing this for dev mode
