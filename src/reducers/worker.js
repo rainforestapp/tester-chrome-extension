@@ -29,7 +29,10 @@ const assignWork = (state, { payload: { url } }) => {
 
 const workFinished = (state) => {
   if (state.get('state') === 'working') {
-    return state.set('state', 'ready');
+    return state.merge({
+      state: 'ready',
+      workUrl: null,
+    });
   }
 
   return state;

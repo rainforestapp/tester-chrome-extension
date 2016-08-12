@@ -100,6 +100,14 @@ describe('worker reducer', function() {
 
         expect(state.get('state')).to.equal('ready');
       });
+
+      it('clears the work URL', function() {
+        let state = workerWithState('ready');
+        state = worker(state, assignWork({ url: 'http://www.example.com' }));
+        state = worker(state, workFinished());
+
+        expect(state.get('workUrl')).to.be.null;
+      });
     });
 
     describe('when the worker is inactive', function() {
