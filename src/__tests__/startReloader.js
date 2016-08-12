@@ -23,16 +23,17 @@ describe('startReloader', function() {
 
     store.dispatch(setPluginVersion('v1'));
 
-    expect(spy).to.have.been.called;
-    spy.reset();
-
-    store.dispatch(setPluginVersion('v1'));
-
     expect(spy).to.not.have.been.called;
     spy.reset();
 
     store.dispatch(setPluginVersion('v2'));
 
     expect(spy).to.have.been.called;
+    spy.reset();
+
+    store.dispatch(setPluginVersion('v2'));
+
+    expect(spy).to.not.have.been.called;
+    spy.reset();
   });
 });
