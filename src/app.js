@@ -1,5 +1,5 @@
 import {SchruteConn} from './schrute';
-import {RAVEN_URL, RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL, IDLE_TIME} from './constants';
+import {RAVEN_URL, RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL, IDLE_TIME, SHUTOFF_TIME} from './constants';
 import Raven from 'raven-js';
 
 let timeout;
@@ -137,7 +137,7 @@ function setupChromeEvents() {
   chrome.idle.onStateChanged.addListener(state => {
     appState.tester_state = state;
     app.pushState();
-    if (state === 'idle') {
+    if (state !== 'active') {
       checkForWorkInterval = DEFAULT_INTERVAL * 10;
       shutOffTimer = setTimeout(() => {
         if (appState.tester_state !== 'active') {
@@ -145,7 +145,7 @@ function setupChromeEvents() {
           app.togglePolling(appState.isPolling);
           app.pushState();
         }
-      }, DEFAULT_INTERVAL * 45);
+      }, SHUTOFF_TIME);
     } else if (state === 'active') {
       clearTimeout(shutOffTimer);
       checkForWorkInterval = DEFAULT_INTERVAL;
