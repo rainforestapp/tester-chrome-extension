@@ -1,5 +1,5 @@
 import {SchruteConn} from './schrute';
-import {RAVEN_URL, RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL} from './constants';
+import {RAVEN_URL, RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL, IDLE_TIME} from './constants';
 import Raven from 'raven-js';
 
 let timeout;
@@ -133,14 +133,14 @@ function setupChromeEvents() {
   // for "inactive" users (i.e. when AFK)
 
   let shutOffTimer;
-  chrome.idle.setDetectionInterval(DEFAULT_INTERVAL * 3 / 1000);
+  chrome.idle.setDetectionInterval(IDLE_TIME);
   chrome.idle.onStateChanged.addListener(state => {
     appState.tester_state = state;
     app.pushState();
     if (state === 'idle') {
       checkForWorkInterval = DEFAULT_INTERVAL * 10;
       shutOffTimer = setTimeout(() => {
-        if (appState.tester_state === 'idle') {
+        if (appState.tester_state !== 'active') {
           appState.isPolling = false;
           app.togglePolling(appState.isPolling);
           app.pushState();
