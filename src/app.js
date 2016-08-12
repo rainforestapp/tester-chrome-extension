@@ -1,5 +1,15 @@
-import {SchruteConn} from './schrute';
-import {RAVEN_URL, RED, GREEN, GREY, BASE_URL, WORK_AVAILABLE_URL, DEFAULT_INTERVAL, IDLE_TIME, SHUTOFF_TIME} from './constants';
+import { SchruteConn } from './schrute';
+import {
+  RAVEN_URL,
+  RED,
+  GREEN,
+  GREY,
+  BASE_URL,
+  WORK_AVAILABLE_URL,
+  DEFAULT_INTERVAL,
+  IDLE_TIME,
+  SHUTOFF_TIME,
+} from './constants';
 import Raven from 'raven-js';
 
 let timeout;
