@@ -6,6 +6,7 @@ import listenAuth from './listenAuth';
 import handleNotifications from './handleNotifications';
 import handleWork from './handleWork';
 import renderIcon from './renderIcon';
+import startIdleChecking from './startIdleChecking';
 
 export const startChromePlugin = (auth, chrome, enhancer, socketConstructor = Socket) => {
   const reloader = () => window.location.reload(true);
@@ -18,6 +19,7 @@ export const startChromePlugin = (auth, chrome, enhancer, socketConstructor = So
   handleNotifications(store, chrome);
   renderIcon(store, chrome);
   handleWork(store, chrome);
+  startIdleChecking(store, chrome);
 
   if (CONFIG.env === 'dev') {
     // redux dev tools don't work with the plugin, so we have a dumb

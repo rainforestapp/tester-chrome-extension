@@ -4,6 +4,7 @@ export const mockChrome = (opts = {}) => {
   const currentNotifications = {};
   const notificationListeners = [];
   const iconClickedListeners = [];
+  const stateChangedListeners = [];
   const badge = { color: null, text: '' };
   const openTabs = [];
   let currentIcon;
@@ -66,6 +67,14 @@ export const mockChrome = (opts = {}) => {
       openTabs.push(tab);
     },
   };
+  const idle = {
+    setDetectionInterval: () => {},
+    onStateChanged: {
+      addListener: (listener) => {
+        stateChangedListeners.push(listener);
+      },
+    },
+  };
 
   // Mock actions
 
@@ -84,6 +93,12 @@ export const mockChrome = (opts = {}) => {
   // getStorage mocks chrome.storage.sync.get (it's synchronous to make testing
   // easier)
   const getStorage = () => storageStore;
+
+  const stateChanged = (newState) => {
+    stateChangedListeners.forEach(listener => {
+      listener(newState);
+    });
+  };
 
   const getCurrentNotifications = () => currentNotifications;
   const clickNotification = (notificationId) => {
@@ -108,6 +123,7 @@ export const mockChrome = (opts = {}) => {
     storage,
     tabs,
     browserAction,
+    idle,
 
     // Testing helpers
     sendRuntimeMessage,
@@ -119,5 +135,6 @@ export const mockChrome = (opts = {}) => {
     getBadge,
     getOpenTabs,
     getIcon,
+    stateChanged,
   };
 };
