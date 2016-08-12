@@ -12,7 +12,7 @@ const startPlugin = ({ auth, enhancer, reloader, socketConstructor = Socket }) =
   startErrorHandling(store);
 
   if (reloader) {
-    startReloader(store);
+    startReloader(store, reloader);
   }
 
   if (auth) {
