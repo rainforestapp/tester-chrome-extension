@@ -290,6 +290,10 @@ function pingServer(url) {
               app.togglePolling(appState.isPolling);
               app.pushState();
             }, checkForWorkInterval); // protect against too many requests
+          } else { // any error, turn OFF
+            appState.isPolling = false;
+            app.togglePolling(appState.isPolling);
+            app.pushState();
           }
           Raven.captureMessage(errorMessage, {
             extra: {
