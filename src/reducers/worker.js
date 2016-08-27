@@ -9,9 +9,14 @@ const initialState = fromJS({
   error: null,
 });
 
-const authenticate = (state, { payload }) => (
-  state.set('uuid', payload.workerUUID)
-);
+const authenticate = (state, { payload }) => {
+  if (!payload || !payload.workerUUID) {
+    const err = new Error('AUTHENTICATE called without workerUUID parameter');
+    return state.set('error', err);
+  }
+
+  return state.set('uuid', payload.workerUUID);
+};
 
 const updateWorkerState = (state, { payload: newState }) => (
   state.set('state', newState)
