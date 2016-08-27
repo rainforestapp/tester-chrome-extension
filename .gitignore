@@ -4,3 +4,4 @@ extension/js/main.js
 /build/*.js
 /build/*.js.map
 /lib
+/.nyc_output
