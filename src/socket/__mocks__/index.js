@@ -6,6 +6,7 @@ export const mockSocket = (opts = {}) => (
     }
 
     connect() { return this; }
+    disconnect() { return this; }
     onClose() { return this; }
     channel(name) {
       this.channelName = name;

@@ -78,6 +78,24 @@ describe('startSocket', function() {
         'update_state', { worker_state: 'ready' }
       );
     });
+
+    describe('when logged in as a different worker', function() {
+      it('reconnects as a different worker', function() {
+        const store = createStore(pluginApp);
+        const socket = authenticatedSocket(store, {});
+        const newAuth = {
+          workerUUID: 'newworker',
+          socketAuth: {
+            auth: 'SEKRETAUTH',
+            sig: 'SEKRETSIG',
+          },
+        };
+
+        store.dispatch(authenticate(newAuth));
+
+        expect(socket.getSocket().channelName).to.equal('workers:newworker');
+      });
+    });
   });
 
   describe('authenticating after the plugin starts', function() {

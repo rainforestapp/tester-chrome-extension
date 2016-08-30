@@ -67,8 +67,8 @@ export const startSocket = (store, socketConstructor = Socket) => {
         store.dispatch(logMessage(log));
       },
     });
-    socket.connect();
     socket.onClose(() => store.dispatch(connectionClosed()));
+    socket.connect();
 
     channel = socket.channel(`workers:${workerUUID}`);
     channel.on('assign_work', payload => {
@@ -87,12 +87,29 @@ export const startSocket = (store, socketConstructor = Socket) => {
       }).receive('error', resp => store.dispatch(authFailed(resp)));
   };
 
+  const reconnectSocket = (state) => {
+    if (!socket) {
+      throw Error('reconnectSocket called without a current socket');
+    }
+
+    socket.disconnect();
+    socket = null;
+    connectToSocket(state);
+  };
+
   const shouldConnect = ({ socket: socketState, worker }) => {
     const currentState = socketState.get('state');
     return socket === null &&
       socketState.get('auth') !== null &&
       (currentState === 'unconnected' || currentState === 'unauthenticated') &&
       worker.get('uuid') !== null;
+  };
+
+  const shouldReconnect = ({ worker: prevWorker }, { worker: curWorker }) => {
+    const prevUUID = prevWorker.get('uuid');
+    const curUUID = curWorker.get('uuid');
+
+    return socket && prevUUID && curUUID && prevUUID !== curUUID;
   };
 
   const handleWorkerState = (previousState, currentState) => {
@@ -107,6 +124,8 @@ export const startSocket = (store, socketConstructor = Socket) => {
   const handleUpdate = (previousState, currentState) => {
     if (shouldConnect(currentState)) {
       connectToSocket(currentState);
+    } else if (shouldReconnect(previousState, currentState)) {
+      reconnectSocket(currentState);
     }
     handleWorkerState(previousState, currentState);
   };
