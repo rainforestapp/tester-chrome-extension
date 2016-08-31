@@ -9,6 +9,7 @@ import {
   assignWork,
   workFinished,
   setPluginVersion,
+  startPolling,
 } from '../actions';
 
 export const startSocket = (store, socketConstructor = Socket) => {
@@ -45,6 +46,10 @@ export const startSocket = (store, socketConstructor = Socket) => {
     store.dispatch(setPluginVersion(version));
   };
 
+  const handleStartPolling = (payload) => {
+    store.dispatch(startPolling(payload));
+  };
+
   const connectToSocket = ({ socket: socketState, worker }) => {
     const workerUUID = worker.get('uuid');
     const socketAuth = socketState.get('auth');
@@ -79,6 +84,9 @@ export const startSocket = (store, socketConstructor = Socket) => {
     });
     channel.on('check_version', payload => {
       handleCheckVersion(payload);
+    });
+    channel.on('start_polling', payload => {
+      handleStartPolling(payload);
     });
     channel.join()
       .receive('ok', resp => {

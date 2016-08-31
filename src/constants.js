@@ -11,6 +11,11 @@ export const actions = deepFreeze({
   ICON_CLICKED: 'ICON_CLICKED',
   WORK_FINISHED: 'WORK_FINISHED',
   SET_PLUGIN_VERSION: 'SET_PLUGIN_VERSION',
+  START_POLLING: 'START_POLLING',
+  STOP_POLLING: 'STOP_POLLING',
+  SET_POLLING_INTERVAL: 'SET_POLLING_INTERVAL',
+  SET_POLL_URL: 'SET_POLL_URL',
+  CAPTCHA_REQUIRED: 'CAPTCHA_REQUIRED',
 });
 
 export const colors = deepFreeze({
@@ -19,7 +24,9 @@ export const colors = deepFreeze({
   GREY: [0, 0, 0, 230],
 });
 
-export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin']);
+export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin', 'polling']);
+
+export const DEFAULT_POLLING_INTERVAL = 20 * 1000;
 
 const getChromeConfig = () => (
   {

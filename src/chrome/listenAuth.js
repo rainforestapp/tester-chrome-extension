@@ -1,4 +1,4 @@
-import { authenticate } from '../actions';
+import { authenticate, setPollUrl } from '../actions';
 
 const listenAuth = (store, chrome) => {
   chrome.runtime.onMessageExternal.addListener(({ data }, sender, sendResponse) => {
@@ -12,8 +12,15 @@ const listenAuth = (store, chrome) => {
         worker_uuid: auth.workerUUID,
         websocket_auth: auth.socketAuth,
       });
-      sendResponse();
     }
+
+    if (data && data.work_available_endpoint) {
+      store.dispatch(setPollUrl(data.work_available_endpoint));
+      chrome.storage.sync.set({
+        work_available_endpoint: data.work_available_endpoint,
+      });
+    }
+    sendResponse();
   });
 };
 

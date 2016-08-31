@@ -40,7 +40,7 @@ export const mockChrome = (opts = {}) => {
   const storage = {
     sync: {
       set: (data) => {
-        storageStore = data;
+        storageStore = Object.assign({}, storageStore, data);
       },
     },
   };

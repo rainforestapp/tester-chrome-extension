@@ -10,6 +10,11 @@ export const authFailed = createAction(actions.AUTH_FAILED);
 export const iconClicked = createAction(actions.ICON_CLICKED);
 export const workFinished = createAction(actions.WORK_FINISHED);
 export const setPluginVersion = createAction(actions.SET_PLUGIN_VERSION);
+export const startPolling = createAction(actions.START_POLLING);
+export const stopPolling = createAction(actions.STOP_POLLING);
+export const setPollingInterval = createAction(actions.SET_POLLING_INTERVAL);
+export const setPollUrl = createAction(actions.SET_POLL_URL);
+export const captchaRequired = createAction(actions.CAPTCHA_REQUIRED);
 
 const validWorkerStates = ['ready', 'inactive', 'working'];
 

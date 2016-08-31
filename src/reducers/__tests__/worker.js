@@ -12,6 +12,7 @@ import {
   updateWorkerState,
   iconClicked,
   workFinished,
+  captchaRequired,
 } from '../../actions';
 import * as actions from '../../constants';
 import worker from '../worker';
@@ -146,6 +147,15 @@ describe('worker reducer', function() {
         state = worker(state, iconClicked());
         expect(state.get('state')).to.equal('working');
       });
+    });
+  });
+
+  describe(actions.CAPTCHA_REQUIRED, function() {
+    it('sets the worker to inactive', function() {
+      let state = workerWithState('ready');
+
+      state = worker(state, captchaRequired());
+      expect(state.get('state')).to.equal('inactive');
     });
   });
 });

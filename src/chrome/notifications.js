@@ -4,6 +4,7 @@ import deepFreeze from 'deep-freeze';
 export const notLoggedIn = 'notLoggedIn';
 export const workerIdle = 'workerIdle';
 export const alreadyWorking = 'alreadyWorking';
+export const captcha = 'captcha';
 
 export const notifications = deepFreeze({
   [notLoggedIn]: {
@@ -29,5 +30,13 @@ export const notifications = deepFreeze({
     title: "You're already working",
     message: 'You can only do one job at a time. ' +
       "If you're finished, please wait for your previous job to be processed.",
+  },
+  [captcha]: {
+    iconUrl: 'icons/icon_notification.png',
+    isClickable: true,
+    type: 'basic',
+    title: 'There was a problem with the request',
+    message: 'You may need to fill out a captcha. Click here to test the work endpoint. ' +
+      'Click the plugin icon to start polling for work again.',
   },
 });

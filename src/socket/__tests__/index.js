@@ -7,7 +7,7 @@
 import chai, { expect } from 'chai';
 import { mockSocket } from '../__mocks__';
 import { createStore } from 'redux';
-import { authenticate, updateWorkerState } from '../../actions';
+import { authenticate, updateWorkerState, setPollUrl } from '../../actions';
 import pluginApp from '../../reducers';
 import { startSocket } from '..';
 import sinon from 'sinon';
@@ -144,6 +144,18 @@ describe('startSocket', function() {
         );
       });
     });
+  });
+
+  it('starts polling when instructed', function() {
+    const store = createStore(pluginApp);
+    const socket = authenticatedSocket(store, {});
+    const channel = socket.getSocket().testChannel;
+    store.dispatch(setPollUrl('http://work.com'));
+
+    channel.serverPush('start_polling', {});
+
+    expect(store.getState().polling.get('error')).to.be.null;
+    expect(store.getState().polling.get('polling')).to.be.true;
   });
 
   describe('receiving a work assignment', function() {

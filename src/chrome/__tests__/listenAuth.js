@@ -24,6 +24,7 @@ describe('listenAuth', function() {
         data: {
           worker_uuid: 'abc123',
           websocket_auth: auth,
+          work_available_endpoint: 'http://www.work.com',
         },
       }, spy);
     };
@@ -51,6 +52,16 @@ describe('listenAuth', function() {
       expect(state.socket.get('auth')).to.equal(fromJS(auth));
     });
 
+    it('sets the polling endpoint', function() {
+      const store = createStore(pluginApp);
+      const chrome = mockChrome();
+      listenAuth(store, chrome);
+
+      sendAuth(chrome, () => {});
+
+      expect(store.getState().polling.get('pollUrl')).to.equal('http://www.work.com');
+    });
+
     it('stores the data in the chrome sync storage', function() {
       const store = createStore(pluginApp);
       const chrome = mockChrome();
@@ -61,6 +72,7 @@ describe('listenAuth', function() {
       const storage = chrome.getStorage();
       expect(storage.worker_uuid).to.equal('abc123');
       expect(storage.websocket_auth).to.equal(auth);
+      expect(storage.work_available_endpoint).to.equal('http://www.work.com');
     });
   });
 });

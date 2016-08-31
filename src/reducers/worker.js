@@ -61,12 +61,22 @@ const iconClicked = (state) => {
   return state.set('state', newState);
 };
 
+const captchaRequired = (state) => {
+  if (state.get('state') === 'working') {
+    return state.set('err',
+                     new Error('Worker needs CAPTCHA but is working.'));
+  }
+
+  return state.set('state', 'inactive');
+};
+
 const worker = handleActions({
   [actions.AUTHENTICATE]: authenticate,
   [actions.UPDATE_WORKER_STATE]: updateWorkerState,
   [actions.ASSIGN_WORK]: assignWork,
   [actions.WORK_FINISHED]: workFinished,
   [actions.ICON_CLICKED]: iconClicked,
+  [actions.CAPTCHA_REQUIRED]: captchaRequired,
 }, initialState);
 
 export default worker;

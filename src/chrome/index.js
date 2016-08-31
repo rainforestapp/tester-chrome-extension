@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { CONFIG } from '../constants';
+import { CONFIG, REDUCERS } from '../constants';
 import { Socket } from 'phoenix';
 import { startPlugin } from '..';
 import listenAuth from './listenAuth';
@@ -8,9 +8,9 @@ import handleWork from './handleWork';
 import renderIcon from './renderIcon';
 import startIdleChecking from './startIdleChecking';
 
-export const startChromePlugin = (auth, chrome, enhancer, socketConstructor = Socket) => {
+export const startChromePlugin = (auth, pollUrl, chrome, enhancer, socketConstructor = Socket) => {
   const reloader = () => window.location.reload(true);
-  const plugin = startPlugin({ auth, enhancer, reloader, socketConstructor });
+  const plugin = startPlugin({ auth, pollUrl, enhancer, reloader, socketConstructor });
   const store = plugin.getStore();
 
   const getStore = () => store;
@@ -25,10 +25,11 @@ export const startChromePlugin = (auth, chrome, enhancer, socketConstructor = So
     // redux dev tools don't work with the plugin, so we have a dumb
     // replacement.
     store.subscribe(() => {
-      const { worker, socket, plugin: pluginState } = store.getState();
-      console.log('Worker:', worker.toJS(),
-                  'Socket:', socket.toJS(),
-                  'Plugin:', pluginState.toJS());
+      const state = store.getState();
+      console.log('\n**STATE**');
+      REDUCERS.forEach(reducer => {
+        console.log(`${reducer}: `, state[reducer].toJS());
+      });
     });
   }
 
