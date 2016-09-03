@@ -24,9 +24,14 @@ const handlePolling = (store) => {
   };
 
   const ping = (url) => {
-    logDebug(`Pinging ${url}...`);
+    let urlWithInfo = url;
+    const profileInfo = store.getState().worker.get('profileInfo');
+    if (profileInfo) {
+      urlWithInfo = `${url}?info=${JSON.stringify(profileInfo)}`;
+    }
+    logDebug(`Pinging ${urlWithInfo}...`);
 
-    fetch(url).then(resp => {
+    fetch(urlWithInfo).then(resp => {
       if (resp.ok) {
         resp.json().then(checkForWork);
       } else {
