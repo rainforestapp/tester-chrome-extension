@@ -16,6 +16,7 @@ export const actions = deepFreeze({
   SET_POLLING_INTERVAL: 'SET_POLLING_INTERVAL',
   SET_POLL_URL: 'SET_POLL_URL',
   CAPTCHA_REQUIRED: 'CAPTCHA_REQUIRED',
+  SET_WORKER_PROFILE: 'SET_WORKER_PROFILE',
 });
 
 export const colors = deepFreeze({

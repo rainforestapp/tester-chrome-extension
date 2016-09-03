@@ -2,6 +2,7 @@
 import { CONFIG, REDUCERS } from '../constants';
 import { Socket } from 'phoenix';
 import { startPlugin } from '..';
+import { setWorkerProfile } from '../actions';
 import listenAuth from './listenAuth';
 import handleWorkerStateNotifications from './handleWorkerStateNotifications';
 import handleWork from './handleWork';
@@ -15,11 +16,18 @@ export const startChromePlugin = (auth, pollUrl, chrome, enhancer, socketConstru
 
   const getStore = () => store;
 
+  const getUserInfo = () => {
+    chrome.identity.getProfileUserInfo((data) => {
+      store.dispatch(setWorkerProfile(data));
+    });
+  };
+
   listenAuth(store, chrome);
   handleWorkerStateNotifications(store, chrome);
   renderIcon(store, chrome);
   handleWork(store, chrome);
   startIdleChecking(store, chrome);
+  getUserInfo();
 
   if (CONFIG.env === 'dev') {
     // redux dev tools don't work with the plugin, so we have a dumb

@@ -6,6 +6,7 @@ const initialState = fromJS({
   state: 'inactive',
   uuid: null,
   workUrl: null,
+  profileInfo: null,
   error: null,
 });
 
@@ -70,6 +71,10 @@ const captchaRequired = (state) => {
   return state.set('state', 'inactive');
 };
 
+const setWorkerProfile = (state, { payload }) => (
+  state.set('profileInfo', fromJS(payload))
+);
+
 const worker = handleActions({
   [actions.AUTHENTICATE]: authenticate,
   [actions.UPDATE_WORKER_STATE]: updateWorkerState,
@@ -77,6 +82,7 @@ const worker = handleActions({
   [actions.WORK_FINISHED]: workFinished,
   [actions.ICON_CLICKED]: iconClicked,
   [actions.CAPTCHA_REQUIRED]: captchaRequired,
+  [actions.SET_WORKER_PROFILE]: setWorkerProfile,
 }, initialState);
 
 export default worker;

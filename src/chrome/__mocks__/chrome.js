@@ -7,6 +7,10 @@ export const mockChrome = (opts = {}) => {
   const stateChangedListeners = [];
   const badge = { color: null, text: '' };
   const openTabs = [];
+  const profileUserInfo = opts.profileUserInfo || {
+    email: '',
+    id: '',
+  };
   let currentIcon;
 
   const addListener = (listener) => {
@@ -75,6 +79,11 @@ export const mockChrome = (opts = {}) => {
       },
     },
   };
+  const identity = {
+    getProfileUserInfo: (callback) => {
+      setTimeout(() => callback(profileUserInfo));
+    },
+  };
 
   // Mock actions
 
@@ -124,6 +133,7 @@ export const mockChrome = (opts = {}) => {
     tabs,
     browserAction,
     idle,
+    identity,
 
     // Testing helpers
     sendRuntimeMessage,
