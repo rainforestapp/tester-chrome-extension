@@ -12,7 +12,7 @@
     "128": "icons/icon128.png"
   },
   "background": {
-    "page": "index_staging.html",
+    "page": "index_prod.html",
     "persistent": true
   },
   "browser_action": {
