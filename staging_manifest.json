@@ -34,7 +34,7 @@
     "identity",
     "identity.email",
     "*://*.getsentry.com/*",
-    "*://*.rnfrst.com/*",
+    "*://*.rnfrst.com/*"
   ],
-  "content_security_policy": "script-src 'self' https://schrute.rnfrst.com; object-src 'self'"
+  "content_security_policy": "script-src 'self' https://static.rnfrst.com https://schrute.rnfrst.com; object-src 'self'"
 }

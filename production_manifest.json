@@ -34,7 +34,7 @@
     "identity",
     "identity.email",
     "*://*.getsentry.com/*",
-    "*://*.rainforestqa.com/*",
+    "*://*.rainforestqa.com/*"
   ],
-  "content_security_policy": "script-src 'self' https://schrute.rainforestqa.com; object-src 'self'"
+  "content_security_policy": "script-src 'self' https://static.rainforestqa.com https://schrute.rainforestqa.com; object-src 'self'"
 }

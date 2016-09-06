@@ -50,10 +50,18 @@ const getConfig = () => {
     case 'staging':
       return {
         env: 'staging',
-        socketURL: 'wss://schrute-stg.herokuapp.com/socket',
+        socketURL: 'wss://schrute.rnfrst.com/socket',
         profileUrl: 'https://portal.rnfrst.com/profile',
         chrome: getChromeConfig(),
         ravenURL: 'https://0f911298f80c47d9b53d3e6a53d236e5@app.getsentry.com/88435',
+      };
+    case 'prod':
+      return {
+        env: 'prod',
+        socketURL: 'wss://schrute.rainforestqa.com/socket',
+        profileUrl: 'https://portal.rainforestqa.com/profile',
+        chrome: getChromeConfig(),
+        ravenURL: 'https://a7b0c76390cc47208e38b884fd60ff3d@sentry.io/68477',
       };
     default:
       return {
