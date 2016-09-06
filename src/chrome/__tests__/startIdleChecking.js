@@ -47,6 +47,18 @@ describe('startIdleChecking', function() {
     expect(store.getState().worker.get('state')).to.equal('ready');
   });
 
+  it("doesn't give a notification if the worker isn't active", function() {
+    const chrome = mockChrome();
+    const store = createStore(pluginApp);
+    store.dispatch(updateWorkerState('inactive'));
+
+    startIdleChecking(store, chrome);
+
+    chrome.stateChanged('idle');
+
+    expect(chrome.getCurrentNotifications()).to.not.have.property(workerIdle);
+  });
+
   it('clears the notification when the worker goes active', function() {
     const chrome = mockChrome();
     const store = createStore(pluginApp);
