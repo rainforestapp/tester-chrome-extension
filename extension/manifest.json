@@ -15,6 +15,10 @@
     "page": "index_dev.html",
     "persistent": true
   },
+  "options_ui": {
+    "page": "options_dev.html",
+    "chrome_style": true
+  },
   "browser_action": {
     "default_icon": "icons/icon19_grey.png"
   },
