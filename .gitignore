@@ -3,5 +3,4 @@ extension/js/main.js
 .DS_Store
 /build/*.js
 /build/*.js.map
-/lib
 /.nyc_output

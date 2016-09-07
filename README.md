@@ -34,6 +34,10 @@ Clone this repo
 1. `npm install`
 2. `npm test`
 
+### 4. Before committing
+
+`npm run build` (and commit the changes to lib/)
+
 ## Deploying
 
 1. Bump the version in ``production_manifest.json``, ``staging_manifest.json`` and ``extension/manifest.json``
