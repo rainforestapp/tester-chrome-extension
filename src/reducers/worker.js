@@ -4,6 +4,9 @@ import { fromJS } from 'immutable';
 
 const initialState = fromJS({
   state: 'inactive',
+  // wantsMoreWork indicates that a working worker wants to continue to work
+  // after the current job (it's only relevant for working workers).
+  wantsMoreWork: false,
   uuid: null,
   workUrl: null,
   profileInfo: null,
@@ -19,9 +22,13 @@ const authenticate = (state, { payload }) => {
   return state.set('uuid', payload.workerUUID);
 };
 
-const updateWorkerState = (state, { payload: newState }) => (
-  state.set('state', newState)
-);
+const updateWorkerState = (state, { payload: newState }) => {
+  if (newState === 'working') {
+    return state.merge({ state: newState, wantsMoreWork: true });
+  }
+
+  return state.set('state', newState);
+};
 
 const assignWork = (state, { payload: { url } }) => {
   const oldState = state.get('state');
@@ -30,14 +37,16 @@ const assignWork = (state, { payload: { url } }) => {
     return state.set('error', err);
   }
 
-  return state.merge({ state: 'working', workUrl: url });
+  return state.merge({ state: 'working', wantsMoreWork: true, workUrl: url });
 };
 
 const workFinished = (state) => {
   if (state.get('state') === 'working') {
+    const newState = state.get('wantsMoreWork') ? 'ready' : 'inactive';
     return state.merge({
-      state: 'ready',
+      state: newState,
       workUrl: null,
+      wantsMoreWork: false,
     });
   }
 
@@ -45,21 +54,16 @@ const workFinished = (state) => {
 };
 
 const iconClicked = (state) => {
-  const oldState = state.get('state');
-  let newState;
   switch (state.get('state')) {
     case 'ready':
-      newState = 'inactive';
-      break;
+      return state.set('state', 'inactive');
     case 'inactive':
-      newState = 'ready';
-      break;
+      return state.set('state', 'ready');
+    case 'working':
+      return state.set('wantsMoreWork', !state.get('wantsMoreWork'));
     default:
-      newState = oldState;
-      break;
+      return state;
   }
-
-  return state.set('state', newState);
 };
 
 const captchaRequired = (state) => {

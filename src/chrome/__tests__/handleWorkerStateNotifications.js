@@ -41,6 +41,18 @@ describe('handleWorkerStateNotifications', function() {
 
         expect(chrome.getCurrentNotifications()).to.have.property('notLoggedIn');
       });
+
+      it('sends the worker state back to inactive', function() {
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+        store.dispatch(authFailed());
+
+        handleWorkerStateNotifications(store, chrome);
+
+        store.dispatch(updateWorkerState('ready'));
+
+        expect(store.getState().worker.get('state')).to.equal('inactive');
+      });
     });
 
     describe('when the user was not already unauthenticated', function() {

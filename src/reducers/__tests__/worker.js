@@ -22,7 +22,7 @@ import worker from '../worker';
 chai.use(chaiImmutable);
 
 const checkState = (state) => {
-  expect(state).to.have.keys(['state', 'uuid', 'workUrl', 'profileInfo', 'error']);
+  expect(state).to.have.keys(['state', 'wantsMoreWork', 'uuid', 'workUrl', 'profileInfo', 'error']);
 };
 
 const initState = worker(undefined, { type: 'INIT' });
@@ -37,6 +37,7 @@ describe('worker reducer', function() {
     checkState(state);
 
     expect(state.get('state')).to.equal('inactive');
+    expect(state.get('wantsMoreWork')).to.be.false;
     expect(state.get('uuid')).to.be.null;
   });
 
@@ -83,13 +84,25 @@ describe('worker reducer', function() {
 
   describe(actions.ASSIGN_WORK, function() {
     describe('when the worker is ready', function() {
-      it('updates the worker state to "working"', function() {
+      const workUrl = 'http://www.example.com';
+
+      const stateWithWork = () => {
         let state = initState;
         state = worker(state, updateWorkerState('ready'));
-        const workUrl = 'http://www.example.com';
-        state = worker(state, assignWork({ url: workUrl }));
+        return worker(state, assignWork({ url: workUrl }));
+      };
+
+      it('updates the worker state to "working"', function() {
+        const state = stateWithWork();
+
         expect(state.get('state')).to.equal('working');
         expect(state.get('workUrl')).to.equal(workUrl);
+      });
+
+      it('defaults wantsMoreWork to true', function() {
+        const state = stateWithWork();
+
+        expect(state.get('wantsMoreWork')).to.be.true;
       });
     });
 
@@ -106,11 +119,24 @@ describe('worker reducer', function() {
 
   describe(actions.WORK_FINISHED, function() {
     describe('when the worker is working', function() {
-      it('changes the worker to ready', function() {
-        let state = workerWithState('working');
-        state = worker(state, workFinished());
+      describe('when the worker wants more work', function() {
+        it('changes the worker to ready', function() {
+          let state = workerWithState('working').set('wantsMoreWork', true);
 
-        expect(state.get('state')).to.equal('ready');
+          state = worker(state, workFinished());
+
+          expect(state.get('state')).to.equal('ready');
+        });
+      });
+
+      describe("when the worker doesn't want more work", function() {
+        it('changes the worker to inactive', function() {
+          let state = workerWithState('working').set('wantsMoreWork', false);
+
+          state = worker(state, workFinished());
+
+          expect(state.get('state')).to.equal('inactive');
+        });
       });
 
       it('clears the work URL', function() {
@@ -119,6 +145,13 @@ describe('worker reducer', function() {
         state = worker(state, workFinished());
 
         expect(state.get('workUrl')).to.be.null;
+      });
+
+      it('sets wantsMoreWork to false', function() {
+        let state = workerWithState('working');
+        state = worker(state, workFinished());
+
+        expect(state.get('wantsMoreWork')).to.be.false;
       });
     });
 
@@ -157,6 +190,18 @@ describe('worker reducer', function() {
 
         state = worker(state, iconClicked());
         expect(state.get('state')).to.equal('working');
+      });
+
+      it('toggles wantsMoreWork', function() {
+        let state = workerWithState('ready');
+        state = worker(state, assignWork({ url: 'http://www.example.com' }));
+        expect(state.get('wantsMoreWork')).to.be.true;
+
+        state = worker(state, iconClicked());
+        expect(state.get('wantsMoreWork')).to.be.false;
+
+        state = worker(state, iconClicked());
+        expect(state.get('wantsMoreWork')).to.be.true;
       });
     });
   });

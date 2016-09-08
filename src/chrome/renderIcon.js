@@ -1,49 +1,42 @@
 import { colors, CONFIG } from '../constants';
 import { iconClicked } from '../actions';
-import { alreadyWorking, notifications } from './notifications';
 
 const renderIcon = (store, chrome) => {
   const renderBadge = ({ worker }) => {
     const workerState = worker.get('state');
 
     switch (workerState) {
-      case 'inactive':
-        chrome.browserAction.setBadgeBackgroundColor({ color: colors.RED });
-        chrome.browserAction.setBadgeText({ text: 'OFF' });
-        break;
       case 'working':
         chrome.browserAction.setBadgeBackgroundColor({ color: colors.GREEN });
-        chrome.browserAction.setBadgeText({ text: 'YES' });
-        break;
-      case 'ready':
-        chrome.browserAction.setBadgeText({ text: '' });
+        chrome.browserAction.setBadgeText({ text: 'WORK' });
         break;
       default:
-        throw new Error(`unrecognized worker state: ${workerState}`);
+        chrome.browserAction.setBadgeText({ text: '' });
+        break;
     }
   };
 
-  const renderIconImage = ({ socket }) => {
-    let icon;
-    if (socket.get('state') === 'connected') {
-      icon = Object.assign({}, CONFIG.chrome.colorIcon);
-    } else {
-      icon = Object.assign({}, CONFIG.chrome.greyIcon);
+  const iconConfig = ({ socket, worker }) => {
+    if (socket.get('state') !== 'connected') {
+      return CONFIG.chrome.greyIcon;
     }
-    chrome.browserAction.setIcon(icon);
-  };
 
-
-  const handleClick = () => {
-    const workerState = store.getState().worker.get('state');
-    if (workerState === 'working') {
-      const notificationDuration = 3000;
-      chrome.notifications.create(alreadyWorking, notifications[alreadyWorking]);
-      window.setTimeout(() => chrome.notifications.clear(alreadyWorking), notificationDuration);
-    } else {
-      store.dispatch(iconClicked(store.getState().worker.get('state')));
+    switch (worker.get('state')) {
+      case 'inactive':
+        return CONFIG.chrome.greyIcon;
+      case 'ready':
+        return CONFIG.chrome.colorIcon;
+      case 'working':
+        return worker.get('wantsMoreWork') ? CONFIG.chrome.colorIcon : CONFIG.chrome.greyIcon;
+      default:
+        return CONFIG.chrome.greyIcon;
     }
   };
+
+  const renderIconImage = (state) => {
+    chrome.browserAction.setIcon(Object.assign({}, iconConfig(state)));
+  };
+
 
   const render = (state) => {
     renderBadge(state);
@@ -56,7 +49,7 @@ const renderIcon = (store, chrome) => {
     render(store.getState());
   });
 
-  chrome.browserAction.onClicked.addListener(handleClick);
+  chrome.browserAction.onClicked.addListener(() => store.dispatch(iconClicked()));
 };
 
 export default renderIcon;

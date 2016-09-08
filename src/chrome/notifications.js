@@ -3,7 +3,6 @@ import deepFreeze from 'deep-freeze';
 
 export const notLoggedIn = 'notLoggedIn';
 export const workerIdle = 'workerIdle';
-export const alreadyWorking = 'alreadyWorking';
 export const captcha = 'captcha';
 
 export const notifications = deepFreeze({
@@ -22,14 +21,6 @@ export const notifications = deepFreeze({
     title: 'We noticed you were idle',
     message: 'You seem to have been idle for a while, so we stopped ' +
       'checking for work. Click here to start checking for work again.',
-  },
-  [alreadyWorking]: {
-    iconUrl: CONFIG.chrome.notificationIconUrl,
-    isClickable: false,
-    type: 'basic',
-    title: "You're already working",
-    message: 'You can only do one job at a time. ' +
-      "If you're finished, please wait for your previous job to be processed.",
   },
   [captcha]: {
     iconUrl: 'icons/icon_notification.png',

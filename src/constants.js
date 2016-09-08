@@ -21,7 +21,7 @@ export const actions = deepFreeze({
 
 export const colors = deepFreeze({
   RED: [255, 0, 0, 230],
-  GREEN: [0, 255, 0, 230],
+  GREEN: 'green',
   GREY: [0, 0, 0, 230],
 });
 
