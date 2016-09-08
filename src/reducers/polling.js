@@ -19,7 +19,7 @@ const startPolling = (state, { payload }) => {
 };
 
 const stopPolling = (state) => (
-  state.merge({ polling: false, pollUrl: null })
+  state.set('polling', false)
 );
 
 const setPollingInterval = (state, { payload }) => {

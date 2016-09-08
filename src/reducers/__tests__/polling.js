@@ -65,6 +65,7 @@ describe('polling reducer', function() {
       checkState(state);
 
       expect(state.get('polling')).to.be.false;
+      expect(state.get('pollUrl')).to.equal('http://example.com');
     });
   });
 
