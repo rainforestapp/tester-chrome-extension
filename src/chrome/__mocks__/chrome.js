@@ -1,5 +1,6 @@
 export const mockChrome = (opts = {}) => {
   let storageStore = {};
+  let localStorageStore = {};
   const messageListeners = [];
   const currentNotifications = {};
   const notificationListeners = [];
@@ -19,8 +20,9 @@ export const mockChrome = (opts = {}) => {
 
   if (opts.storage) {
     storageStore = opts.storage;
-  } else {
-    storageStore = {};
+  }
+  if (opts.localStorage) {
+    localStorageStore = opts.localStorage;
   }
   const extension = {};
   const notifications = {
@@ -45,6 +47,20 @@ export const mockChrome = (opts = {}) => {
     sync: {
       set: (data) => {
         storageStore = Object.assign({}, storageStore, data);
+      },
+    },
+    local: {
+      set: (data) => {
+        localStorageStore = Object.assign({}, localStorageStore, data);
+      },
+      get: (keys, callback) => {
+        setTimeout(() => {
+          const data = keys.reduce(
+            (acc, key) => Object.assign(acc, { [key]: localStorageStore[key] }),
+            {}
+          );
+          callback(data);
+        });
       },
     },
   };
@@ -103,6 +119,9 @@ export const mockChrome = (opts = {}) => {
   // easier)
   const getStorage = () => storageStore;
 
+  // getLocalStorage is like getStorage but for local storage instead of sync
+  const getLocalStorage = () => localStorageStore;
+
   const stateChanged = (newState) => {
     stateChangedListeners.forEach(listener => {
       listener(newState);
@@ -138,6 +157,7 @@ export const mockChrome = (opts = {}) => {
     // Testing helpers
     sendRuntimeMessage,
     getStorage,
+    getLocalStorage,
     getNumMessageListeners,
     getCurrentNotifications,
     clickNotification,

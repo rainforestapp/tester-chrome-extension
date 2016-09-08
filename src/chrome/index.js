@@ -6,6 +6,7 @@ import { setWorkerProfile } from '../actions';
 import listenAuth from './listenAuth';
 import handleWorkerStateNotifications from './handleWorkerStateNotifications';
 import handleWork from './handleWork';
+import handleStateSaving from './handleStateSaving';
 import renderIcon from './renderIcon';
 import startIdleChecking from './startIdleChecking';
 
@@ -22,6 +23,7 @@ export const startChromePlugin = (auth, pollUrl, chrome, enhancer, socketConstru
     });
   };
 
+  handleStateSaving(store, chrome);
   listenAuth(store, chrome);
   handleWorkerStateNotifications(store, chrome);
   renderIcon(store, chrome);
