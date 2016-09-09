@@ -5,22 +5,27 @@ checkout:
 
 machine:
   node:
-    version: 5.5.0
+    version: 6.3.0
+  environment:
+    MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
 
 test:
   override:
-    - npm run test
+    - ./checklib
+    - npm run lint
+    - npm run test:ci
+    - npm run coveralls
 
 deployment:
   staging:
     branch: develop
     commands:
+      - ./deploy stg
       - mv staging_manifest.json extension/manifest.json
       - cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
   production:
     branch: master
     commands:
-      - npm run build
+      - ./deploy prd
       - mv production_manifest.json extension/manifest.json
       - cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
-

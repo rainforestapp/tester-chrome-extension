@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+ENV="$1"
+
+if [[ -z "$CIRCLE_SHA1" ]]; then
+    echo 'Deploy should be run from CircleCI!'
+    exit 1
+fi
+
+if [[ "$ENV" == "stg" ]]; then
+    BUCKET='static.rnfrst.com'
+elif [[ "$ENV" == "prd" ]]; then
+    BUCKET='static.rainforestqa.com'
+else
+    echo "Unrecognized environment: $ENV"
+    exit 1
+fi
+
+npm run build
+aws s3 sync build "s3://$BUCKET/$CIRCLE_SHA1/" --acl public-read
+heroku config:set "PLUGIN_VERSION=$CIRCLE_SHA1" -a "schrute-$ENV"

@@ -1,3 +1,6 @@
 node_modules
 extension/js/main.js
 .DS_Store
+/build/*.js
+/build/*.js.map
+/.nyc_output
