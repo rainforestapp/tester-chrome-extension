@@ -61,6 +61,7 @@
     "watchify": "3.7.0"
   },
   "dependencies": {
+    "babel-polyfill": "6.13.0",
     "deep-freeze": "0.0.1",
     "immutable": "3.8.1",
     "phoenix": "1.2.0",
