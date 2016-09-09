@@ -19,7 +19,12 @@ const handlePolling = (store) => {
         throw new Error(msg);
       }
 
-      store.dispatch(assignWork({ url: data.url }));
+      // Double-check the worker state in case something changed since the fetch
+      // started.
+      const { worker } = store.getState();
+      if (worker.get('state') === 'ready') {
+        store.dispatch(assignWork({ url: data.url }));
+      }
     }
   };
 
