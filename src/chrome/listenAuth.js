@@ -14,8 +14,9 @@ const listenAuth = (store, chrome) => {
       });
     }
 
-    if (data && data.work_available_endpoint) {
-      store.dispatch(setPollUrl(data.work_available_endpoint));
+    if (data && data.work_available_endpoint && data.worker_uuid) {
+      const pollUrl = `${data.work_available_endpoint}${data.worker_uuid}/work_available`;
+      store.dispatch(setPollUrl(pollUrl));
       chrome.storage.sync.set({
         work_available_endpoint: data.work_available_endpoint,
       });
