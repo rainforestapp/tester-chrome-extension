@@ -56,16 +56,16 @@
     "mocha": "2.5.3",
     "mocha-junit-reporter": "1.12.0",
     "nyc": "8.1.0",
-    "raven-js": "2.1.1",
     "sinon": "1.17.5",
     "sinon-chai": "2.8.0",
     "watchify": "3.7.0"
   },
   "dependencies": {
+    "babel-polyfill": "6.13.0",
     "deep-freeze": "0.0.1",
     "immutable": "3.8.1",
     "phoenix": "1.2.0",
-    "raven-js": "3.2.1",
+    "raven-js": "3.7.0",
     "redux": "3.5.2",
     "redux-actions": "0.10.1"
   }
