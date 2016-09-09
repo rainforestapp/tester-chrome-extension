@@ -46,6 +46,13 @@ const notifications = {
     title: 'There was a problem with the request',
     message: 'You may need to fill out a captcha. Click here to test the work endpoint.',
   },
+  error: {
+    iconUrl: 'icons/icon_notification.png',
+    isClickable: false,
+    type: 'basic',
+    title: 'Unknown Error',
+    message: 'Something went wrong, You can wait for awhile then try again by turning the extension back on.',
+  },
 };
 
 function getWorkUrl() {
@@ -68,6 +75,10 @@ function pushState() {
 
 function notifyCaptcha() {
   chrome.notifications.create('captcha', notifications.captcha);
+}
+
+function notifyError() {
+  chrome.notifications.create('error', notifications.error);
 }
 
 function setupChromeEvents() {
@@ -290,6 +301,11 @@ function pingServer(url) {
               app.togglePolling(appState.isPolling);
               app.pushState();
             }, checkForWorkInterval); // protect against too many requests
+          } else { // any error, turn OFF
+            notifyError();
+            appState.isPolling = false;
+            app.togglePolling(appState.isPolling);
+            app.pushState();
           }
           Raven.captureMessage(errorMessage, {
             extra: {
