@@ -1,24 +1,26 @@
 {
   "name": "Rainforest Tester Notifier",
-  "version": "1.2.10",
+  "version": "2.0.1",
   "manifest_version": 2,
   "description": "Notifies Rainforest Testers when there is new work to be done.",
   "homepage_url": "https://portal.rainforestqa.com",
   "icons": {
     "16": "icons/icon16.png",
-    "19": "icons/icon16.png",
+    "19": "icons/icon19.png",
     "38": "icons/icon38.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
   "background": {
-    "scripts": [
-      "js/main.js"
-    ],
+    "page": "index_prod.html",
     "persistent": true
   },
+  "options_ui": {
+    "page": "options_prod.html",
+    "chrome_style": true
+  },
   "browser_action": {
-    "default_icon": "icons/icon19.png"
+    "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
     "matches": ["*://portal.rainforestqa.com/*"]
@@ -31,7 +33,8 @@
     "storage",
     "identity",
     "identity.email",
-    "https://*.getsentry.com/*",
-    "https://*.rainforestqa.com/*"
-  ]
+    "*://*.getsentry.com/*",
+    "*://*.rainforestqa.com/*"
+  ],
+  "content_security_policy": "script-src 'self' https://static.rainforestqa.com https://schrute.rainforestqa.com; object-src 'self'"
 }

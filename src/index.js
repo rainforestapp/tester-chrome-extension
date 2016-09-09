@@ -1,3 +1,7 @@
-import app from './app';
+import startPlugin from './startPlugin';
+import * as actions from './actions';
 
-app.setupChromeEvents();
+export {
+  startPlugin,
+  actions,
+};
