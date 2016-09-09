@@ -1,6 +1,6 @@
 {
   "name": "tester-chrome-extension",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "The Rainforest Chrome Extension for Testers (internal JS)",
   "main": "lib/index.js",
   "scripts": {
