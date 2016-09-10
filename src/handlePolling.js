@@ -39,7 +39,7 @@ const handlePolling = (store) => {
       }
     })
       .catch(err => {
-        Raven.captureException(err);
+        Raven.captureException(err, { extra: { url } });
       });
   };
 
