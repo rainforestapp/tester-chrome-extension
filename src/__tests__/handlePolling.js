@@ -126,6 +126,32 @@ describe('handlePolling', function() {
 
       poller = handlePolling(store);
     });
+
+    it("doesn't assign work if the worker isn't ready", function(done) {
+      const workUrl = 'http://work.com';
+      const store = storeWithPolling();
+      fetchMock.get(pollUrl, () => {
+        store.dispatch(updateWorkerState('inactive'));
+        return { work_available: true, url: workUrl };
+      });
+
+      let err = false;
+      store.subscribe(() => {
+        const { worker } = store.getState();
+        if (worker.get('error')) {
+          err = true;
+          done(worker.get('error'));
+        }
+      });
+
+      handlePolling(store);
+
+      setTimeout(() => {
+        if (!err) {
+          done();
+        }
+      }, 50);
+    });
   });
 
   describe('when polling is off', function() {
