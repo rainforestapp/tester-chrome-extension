@@ -37,5 +37,5 @@
     "*://*.rainforest.dev/*",
     "*://*.rainforestqa.com/*"
   ],
-  "content_security_policy": "script-src 'self' http://localhost:8123; object-src 'self'"
+  "content_security_policy": "script-src 'self' http://localhost:8123 https://cdnjs.cloudflare.com; object-src 'self'"
 }
