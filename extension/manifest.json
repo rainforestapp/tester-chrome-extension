@@ -23,7 +23,7 @@
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["*://portal.rainforest.dev/*"]
+    "matches": ["*://*.rainforest.dev/*", "http://localhost:3000/*"]
   },
   "permissions": [
     "cookies",

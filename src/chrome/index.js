@@ -1,9 +1,9 @@
-/* eslint-disable no-console */
-import { CONFIG, REDUCERS } from '../constants';
+import { REDUCERS } from '../constants';
 import { Socket } from 'phoenix';
 import { startPlugin } from '..';
 import { setWorkerProfile } from '../actions';
-import listenAuth from './listenAuth';
+import listenMessages from './listenMessages';
+import { logDebug } from '../logging';
 import handleWorkerStateNotifications from './handleWorkerStateNotifications';
 import handleWork from './handleWork';
 import handleStateSaving from './handleStateSaving';
@@ -24,24 +24,21 @@ export const startChromePlugin = (auth, pollUrl, chrome, enhancer, socketConstru
   };
 
   handleStateSaving(store, chrome);
-  listenAuth(store, chrome);
+  listenMessages(store, chrome);
   handleWorkerStateNotifications(store, chrome);
   renderIcon(store, chrome);
   handleWork(store, chrome);
   startIdleChecking(store, chrome);
   getUserInfo();
 
-  if (CONFIG.env === 'dev') {
-    // redux dev tools don't work with the plugin, so we have a dumb
-    // replacement.
-    store.subscribe(() => {
-      const state = store.getState();
-      console.log('\n**STATE**');
-      REDUCERS.forEach(reducer => {
-        console.log(`${reducer}: `, state[reducer].toJS());
-      });
+  // redux dev tools don't work with the plugin, so we have a dumb replacement.
+  store.subscribe(() => {
+    const state = store.getState();
+    logDebug('\n**STATE**');
+    REDUCERS.forEach(reducer => {
+      logDebug(`${reducer}: `, state[reducer]);
     });
-  }
+  });
 
   return { getStore };
 };

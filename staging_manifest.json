@@ -23,7 +23,7 @@
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["*://portal.rnfrst.com/*"]
+    "matches": ["https://*.rnfrst.com/*"]
   },
   "permissions": [
     "cookies",
