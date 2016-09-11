@@ -44,7 +44,19 @@ const handlePolling = (store) => {
       }
     })
       .catch(err => {
-        Raven.captureException(err, { extra: { url } });
+        if (err instanceof TypeError && err.message === 'Failed to fetch') {
+          // Amazingly this is how request errors are represented, and no
+          // additional information is exposed (even though if you look at the
+          // console you can SEE THE ERROR DETAILS RIGHT THERE COME ON
+          // CHROME!!!!)
+          //
+          // In what universe is a request failure a type error in the first
+          // place? Oh that's right, the JavaScript universe.
+          //
+          // Oh well, just ignore it I guess.
+        } else {
+          Raven.captureException(err, { extra: { url } });
+        }
       });
   };
 
