@@ -36,5 +36,5 @@
     "*://*.getsentry.com/*",
     "*://*.rnfrst.com/*"
   ],
-  "content_security_policy": "script-src 'self' https://static.rnfrst.com https://schrute.rnfrst.com; object-src 'self'"
+  "content_security_policy": "script-src 'self' https://static.rnfrst.com https://schrute.rnfrst.com https://cdnjs.cloudflare.com; object-src 'self'"
 }
