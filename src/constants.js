@@ -28,7 +28,7 @@ export const colors = deepFreeze({
 
 export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin', 'polling']);
 
-export const DEFAULT_POLLING_INTERVAL = 28 * 1000;
+export const DEFAULT_POLLING_INTERVAL = 30 * 1000;
 
 const getChromeConfig = () => (
   {
