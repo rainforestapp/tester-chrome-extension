@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-npm run build
-git status # somehow clears bogus changes, don't ask
-git diff-files --quiet lib
-if [ $? -ne 0 ]; then
-    echo "Differences in lib files; please run 'npm run build' and check in the results"
-    exit 1
-fi
