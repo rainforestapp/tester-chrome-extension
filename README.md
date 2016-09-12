@@ -1,4 +1,4 @@
-# tester-chrome-extension [![Coverage Status](https://coveralls.io/repos/github/rainforestapp/tester-chrome-extension/badge.svg)](https://coveralls.io/github/rainforestapp/tester-chrome-extension)
+# tester-chrome-extension [![Build Status](https://travis-ci.org/rainforestapp/tester-chrome-extension.svg?branch=develop)](https://travis-ci.org/rainforestapp/tester-chrome-extension)[![Coverage Status](https://coveralls.io/repos/github/rainforestapp/tester-chrome-extension/badge.svg)](https://coveralls.io/github/rainforestapp/tester-chrome-extension)
 
 This is a Chrome extention which notifies the tester there is new work to be done. It does this by polling the API using their tester ID.
 
