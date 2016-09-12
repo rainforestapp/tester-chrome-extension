@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { CONFIG } from './constants';
+import { CONFIG, REDUCERS } from './constants';
 
 export const logDebug = (msg, data) => {
   if (CONFIG.env !== 'dev' && !window.DEBUG) {
@@ -16,4 +16,16 @@ export const logDebug = (msg, data) => {
   } else {
     console.log(msg);
   }
+};
+
+export const logMiddleware = store => next => action => {
+  logDebug('\n***Dispatching***');
+  logDebug('action:', action);
+  const result = next(action);
+  logDebug('Next state:');
+  const state = store.getState();
+  REDUCERS.forEach(reducer => {
+    logDebug(`${reducer}: `, state[reducer]);
+  });
+  return result;
 };
