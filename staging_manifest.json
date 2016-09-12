@@ -1,6 +1,6 @@
 {
   "name": "Rainforest Tester Notifier [STG]",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "manifest_version": 2,
   "description": "Notifies Rainforest Testers when there is new work to be done.",
   "homepage_url": "https://portal.rnfrst.com",
@@ -23,7 +23,7 @@
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["*://portal.rnfrst.com/*"]
+    "matches": ["https://*.rnfrst.com/*"]
   },
   "permissions": [
     "cookies",
@@ -36,5 +36,5 @@
     "*://*.getsentry.com/*",
     "*://*.rnfrst.com/*"
   ],
-  "content_security_policy": "script-src 'self' https://static.rnfrst.com https://schrute.rnfrst.com; object-src 'self'"
+  "content_security_policy": "script-src 'self' https://static.rnfrst.com https://schrute.rnfrst.com https://cdnjs.cloudflare.com; object-src 'self'"
 }

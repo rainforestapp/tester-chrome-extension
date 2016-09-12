@@ -74,6 +74,42 @@ describe('handlePolling', function() {
       }, 10);
     });
 
+    it('checks for RATE_LIMIT_EXCEEDED', function(done) {
+      const store = storeWithPolling();
+      let poller = null;
+      fetchMock.get(pollUrl, {
+        status: 400,
+        body: '{"error":"Too many requests"}',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      let state = store.getState();
+      const interval = state.polling.get('interval');
+
+      let success = false;
+      store.subscribe(() => {
+        state = store.getState();
+        if (state.polling.get('interval') > interval) {
+          success = true;
+          fetchMock.restore();
+          poller.stop();
+          done();
+        }
+      });
+
+      poller = handlePolling(store);
+
+      setTimeout(() => {
+        if (!success) {
+          fetchMock.restore();
+          poller.stop();
+          done(new Error("RATE_LIMIT_EXCEEDED wasn't detected"));
+        }
+      }, 50);
+    });
+
     it('checks for CAPTCHAs', function(done) {
       const store = storeWithPolling();
       let poller = null;

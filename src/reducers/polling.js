@@ -45,11 +45,9 @@ const captchaRequired = (state) => (
 );
 
 const rateLimitExceeded = (state) => {
-  const newState = (state.get('interval') + (3 * 1000));
-  return state.set('interval', newState); // keep adding 3 second till we are not rate limited
+  const newInterval = (state.get('interval') + (3 * 1000));
+  return state.set('interval', newInterval); // keep adding 3 second till we are not rate limited
 };
-  
-
 
 // Seems as good a way to clear "captcha required" as any
 const iconClicked = (state) => (
