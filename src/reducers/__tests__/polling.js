@@ -14,6 +14,7 @@ import {
   assignWork,
   captchaRequired,
   iconClicked,
+  rateLimitExceeded,
 } from '../../actions';
 import chaiImmutable from 'chai-immutable';
 import polling from '../polling';
@@ -120,4 +121,15 @@ describe('polling reducer', function() {
       expect(state.get('captchaRequired')).to.be.false;
     });
   });
+  
+  describe(actions.RATE_LIMIT_EXCEEDED, function() {
+    it('increases polling Interval when rate limit exceeded', function() {
+      let state = polling(undefined, setPollingInterval(30));
+      checkState(state);
+      state = polling(state, rateLimitExceeded());
+      checkState(state);
+      
+      expect(state.get('interval')).to.equal(33);
+    });
+  });  
 });
