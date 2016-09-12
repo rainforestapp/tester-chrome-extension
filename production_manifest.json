@@ -1,6 +1,6 @@
 {
   "name": "Rainforest Tester Notifier",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "manifest_version": 2,
   "description": "Notifies Rainforest Testers when there is new work to be done.",
   "homepage_url": "https://portal.rainforestqa.com",
@@ -23,7 +23,7 @@
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["*://portal.rainforestqa.com/*"]
+    "matches": ["https://*.rainforestqa.com/*"]
   },
   "permissions": [
     "cookies",
@@ -36,5 +36,5 @@
     "*://*.getsentry.com/*",
     "*://*.rainforestqa.com/*"
   ],
-  "content_security_policy": "script-src 'self' https://static.rainforestqa.com https://schrute.rainforestqa.com; object-src 'self'"
+  "content_security_policy": "script-src 'self' https://static.rainforestqa.com https://schrute.rainforestqa.com https://cdnjs.cloudflare.com; object-src 'self'"
 }

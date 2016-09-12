@@ -105,8 +105,9 @@ export const mockChrome = (opts = {}) => {
 
   // sendRuntimeMessage mocks the chrome.runtime.sendMessage action.
   const sendRuntimeMessage = (msg, callback) => {
+    const safeCallback = typeof callback === 'function' ? callback : () => {};
     messageListeners.forEach(listener => {
-      listener(msg, {}, callback);
+      listener(msg, {}, safeCallback);
     });
   };
 
