@@ -1,5 +1,6 @@
 // This file is auto-required for main.js to bootstrap the JS loading process.
-import 'babel-polyfill';
+import startPlugin from './startPlugin';
+import * as actions from './actions';
 import { startChromePlugin } from './chrome';
 
 const inChromePlugin = () => (
@@ -25,4 +26,9 @@ window.onload = () => {
       window.plugin = startChromePlugin(auth, pollUrl, window.chrome);
     });
   }
+};
+
+window.PLUGIN = {
+  startPlugin,
+  actions,
 };
