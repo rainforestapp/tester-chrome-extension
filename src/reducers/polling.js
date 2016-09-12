@@ -45,8 +45,8 @@ const captchaRequired = (state) => (
 );
 
 const rateLimitExceeded = (state) => {
-  let newState = (state.get('interval') + 1000);
-  return state.set('interval', newState); // keep adding 1 second till we are not rate limited
+  const newState = (state.get('interval') + (3 * 1000));
+  return state.set('interval', newState); // keep adding 3 second till we are not rate limited
 };
   
 
