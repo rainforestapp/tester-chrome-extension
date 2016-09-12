@@ -34,8 +34,14 @@ export const mockChrome = (opts = {}) => {
         notificationListeners.push(callback);
       },
     },
-    clear: (id) => {
+    clear: (id, callback) => {
+      if (typeof callback !== 'function') {
+        // Older versions of chrome fail without this
+        const msg = "errorInvocation of form notifications.clear(string) doesn't match definition";
+        throw new Error(msg);
+      }
       delete currentNotifications[id];
+      setTimeout(() => { callback(true); });
     },
   };
   const runtime = {
