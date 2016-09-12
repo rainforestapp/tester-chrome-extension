@@ -1,16 +1,39 @@
 import listenStoreChanges from '../listenStoreChanges';
 
 const handleWork = (store, chrome) => {
-  const handleUpdate = ({ worker: prevWorker }, { worker: curWorker }) => {
+  let workTabId = null;
+
+  const handleAssignWork = ({ worker: prevWorker }, { worker: curWorker }) => {
     if (prevWorker.get('state') !== 'working' && curWorker.get('state') === 'working') {
       const url = curWorker.get('workUrl');
       if (!url) {
         throw new Error("Worker moved to 'working' state without a work URL");
       }
 
-      chrome.tabs.create({ url });
+      chrome.tabs.create({ url }, tab => {
+        workTabId = tab.id;
+      });
     }
   };
+
+  const handleClearWork = ({ worker: prevWorker }, { worker: curWorker }) => {
+    if (prevWorker.get('state') === 'working' && curWorker.get('state') !== 'working') {
+      if (workTabId) {
+        chrome.tabs.remove(workTabId);
+      }
+    }
+  };
+
+  const handleUpdate = (previous, current) => {
+    handleAssignWork(previous, current);
+    handleClearWork(previous, current);
+  };
+
+  chrome.tabs.onRemoved.addListener(tabId => {
+    if (tabId === workTabId) {
+      workTabId = null;
+    }
+  });
 
   listenStoreChanges(store, handleUpdate);
 };
