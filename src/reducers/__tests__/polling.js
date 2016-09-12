@@ -121,15 +121,15 @@ describe('polling reducer', function() {
       expect(state.get('captchaRequired')).to.be.false;
     });
   });
-  
+
   describe(actions.RATE_LIMIT_EXCEEDED, function() {
     it('increases polling Interval when rate limit exceeded', function() {
       let state = polling(undefined, setPollingInterval(1000));
       checkState(state);
       state = polling(state, rateLimitExceeded());
       checkState(state);
-      
+
       expect(state.get('interval')).to.equal(4000);
     });
-  });  
+  });
 });
