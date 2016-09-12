@@ -44,6 +44,10 @@ const captchaRequired = (state) => (
   state.set('captchaRequired', true)
 );
 
+const rateLimitExceeded = (state) => (
+  state.set('interval', state.get('interval') + (5 * 1000))
+);
+
 // Seems as good a way to clear "captcha required" as any
 const iconClicked = (state) => (
   state.set('captchaRequired', false)
@@ -56,6 +60,7 @@ const polling = handleActions({
   [actions.SET_POLL_URL]: setPollUrl,
   [actions.ASSIGN_WORK]: stopPolling,
   [actions.CAPTCHA_REQUIRED]: captchaRequired,
+  [actions.RATE_LIMIT_EXCEEDED]: rateLimitExceeded,
   [actions.ICON_CLICKED]: iconClicked,
 }, initialState);
 

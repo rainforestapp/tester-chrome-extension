@@ -1,14 +1,16 @@
 import { logDebug } from './logging';
-import { assignWork, captchaRequired } from './actions';
+import { assignWork, captchaRequired, rateLimitExceeded } from './actions';
 import Raven from 'raven-js';
 
 const handlePolling = (store) => {
   let running = true;
   let timeoutID = null;
 
-  const checkForCaptcha = (body) => {
+  const checkForErrors = (body) => {
     if (body.indexOf('CAPTCHA') > -1) {
       store.dispatch(captchaRequired());
+    } else if (body.indexOf('Too many requests') > -1) {
+      store.dispatch(rateLimitExceeded());
     }
   };
 
@@ -40,7 +42,7 @@ const handlePolling = (store) => {
       if (resp.ok) {
         resp.json().then(checkForWork);
       } else {
-        resp.text().then(checkForCaptcha);
+        resp.text().then(checkForErrors);
       }
     })
       .catch(err => {
