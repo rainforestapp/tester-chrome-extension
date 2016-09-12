@@ -32,15 +32,48 @@ Clone this repo
 ### 3. Run tests
 
 1. `npm install`
-2. `npm test`
+2. `npm run lint`
+3. `npm test`
+
+## Contributing
+
+Contributions are welcome! Please keep the following in mind:
+
+- Follow the
+  [Rainforest frontend conventions](https://github.com/rainforestapp/frontend-conventions)
+  where it makes sense.
+- Always follow the ESLint style suggestions.
+- State should be managed with [Redux](http://redux.js.org/); if you're not
+  familiar,
+  [this video guide](https://egghead.io/courses/getting-started-with-redux) is a
+  great resource.
+- Always write tests to go along with your changes (our tests are written with
+  [mocha](https://mochajs.org/) and [chai](http://chaijs.com/)).
+
 
 ## Deploying
 
-1. Bump the version in ``production_manifest.json``, ``staging_manifest.json`` and ``extension/manifest.json``
+Most deploys do *not* require a new release of the plugin. If you are only
+changing /src, the code will be deployed as soon as it is merged to master. (Do
+not bump any versions in this case.)
+
+If you are deploying changes to the actual plugin (as opposed to the JS source
+code), do the following:
+
+1. Bump the version in `package.json`, `production_manifest.json`, `staging_manifest.json` and `extension/manifest.json`
 2. Build on circle and download the extension.zip
 3. Go to https://chrome.google.com/webstore/developer/dashboard/u85d2beaae4ec3450eae7ccaa97b3ac82
 4. Upload the new version
 5. Click publish
+
+Changes should be tested with the staging version of the plugin before the code
+is merged to master.
+
+The following situations require new versioned plugin releases:
+
+- Changes to any files in /extension (`index_prod.html`, `options_prod.html`,
+  ``constants/prod.js``, etc).
+- Changes to manifest files.
 
 ## Internal
 
