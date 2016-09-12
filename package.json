@@ -2,7 +2,7 @@
   "name": "tester-chrome-extension",
   "version": "2.0.1",
   "description": "The Rainforest Chrome Extension for Testers (internal JS)",
-  "main": "lib/index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "mocha --require jsdom-global/register --compilers js:babel-register src/\\*\\*/__tests__/\\*.js",
     "test:ci": "nyc --require babel-register npm test -- --reporter mocha-junit-reporter",
@@ -10,10 +10,9 @@
     "lint": "eslint src",
     "lint:fix": "eslint --fix src",
     "build:browser": "mkdir -p build && browserify src/bootstrap.js -d -o build/main.js -t [ babelify --presets [ es2015 ] ] -p [ minifyify --map main.js.map --output build/main.js.map ]",
-    "build:module": "mkdir -p lib && babel src --out-dir lib",
-    "build": "npm run build:browser && npm run build:module",
+    "build": "npm run build:browser",
     "watch": "mkdir -p build && watchify src/bootstrap.js -d -o build/main.js -t [ babelify ]",
-    "devServer": "cd build && ws -p 8123"
+    "devServer": "cd build && ws -p 8123 -r '/DEV/* -> /$1'"
   },
   "repository": {
     "type": "git",
