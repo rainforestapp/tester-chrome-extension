@@ -45,7 +45,7 @@ const captchaRequired = (state) => (
 );
 
 const rateLimitExceeded = (state) => (
-  state.set('interval', state.get('interval') + (5 * 1000))
+  state.set('interval', state.get('interval') + (5 * 1000)) // keep adding 5 seconds till we are not rate limited
 );
 
 // Seems as good a way to clear "captcha required" as any
