@@ -13,22 +13,20 @@ import { updateWorkerState } from '../../actions';
 import { workerIdle } from '../notifications';
 
 describe('startIdleChecking', function() {
-  ['idle', 'locked'].forEach(state => {
-    it(`changes the worker state to inactive after chrome is ${state}`, function() {
-      const chrome = mockChrome();
-      const store = createStore(pluginApp);
-      store.dispatch(updateWorkerState('ready'));
+  it('changes the worker state to inactive after chrome is idle', function() {
+    const chrome = mockChrome();
+    const store = createStore(pluginApp);
+    store.dispatch(updateWorkerState('ready'));
 
-      startIdleChecking(store, chrome);
+    startIdleChecking(store, chrome);
 
-      chrome.stateChanged('active');
+    chrome.stateChanged('active');
 
-      expect(store.getState().worker.get('state')).to.equal('ready');
+    expect(store.getState().worker.get('state')).to.equal('ready');
 
-      chrome.stateChanged(state);
+    chrome.stateChanged('idle');
 
-      expect(store.getState().worker.get('state')).to.equal('inactive');
-    });
+    expect(store.getState().worker.get('state')).to.equal('inactive');
   });
 
   it('gives the worker a notification and logs them back in if they click it', function() {
