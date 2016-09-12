@@ -18,7 +18,7 @@ const handleWorkerStateNotifications = (store, chrome) => {
       chrome.notifications.create(notLoggedIn, notifications[notLoggedIn]);
       store.dispatch(updateWorkerState('inactive'));
     } else if (currentState.socket.get('state') === 'connected') {
-      chrome.notifications.clear(notLoggedIn);
+      chrome.notifications.clear(notLoggedIn, () => {});
     }
   };
 

@@ -16,7 +16,7 @@ const startIdleChecking = (store, chrome) => {
 
   const handleUpdate = (_previousState, currentState) => {
     if (currentState.worker.get('state') === 'ready') {
-      chrome.notifications.clear(workerIdle);
+      chrome.notifications.clear(workerIdle, () => {});
     }
   };
 
