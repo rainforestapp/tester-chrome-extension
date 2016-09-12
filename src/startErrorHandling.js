@@ -25,8 +25,15 @@ const startErrorHandling = (store, raven = Raven, testing = false) => {
     }
   };
 
+  const checkRelease = ({ plugin: prevPlugin }, { plugin: curPlugin }) => {
+    if (prevPlugin.get('version') !== curPlugin.get('version')) {
+      raven.setRelease(curPlugin.get('version'));
+    }
+  };
+
   const handleUpdate = (previousState, currentState) => {
     checkUUID(previousState, currentState);
+    checkRelease(previousState, currentState);
     REDUCERS.forEach(reducer => {
       const prev = previousState[reducer];
       const cur = currentState[reducer];
