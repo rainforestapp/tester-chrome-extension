@@ -66,15 +66,6 @@ const iconClicked = (state) => {
   }
 };
 
-const captchaRequired = (state) => {
-  if (state.get('state') === 'working') {
-    return state.set('err',
-                     new Error('Worker needs CAPTCHA but is working.'));
-  }
-
-  return state.set('state', 'inactive');
-};
-
 const setWorkerProfile = (state, { payload }) => (
   state.set('profileInfo', fromJS(payload))
 );
@@ -85,7 +76,6 @@ const worker = handleActions({
   [actions.ASSIGN_WORK]: assignWork,
   [actions.WORK_FINISHED]: workFinished,
   [actions.ICON_CLICKED]: iconClicked,
-  [actions.CAPTCHA_REQUIRED]: captchaRequired,
   [actions.SET_WORKER_PROFILE]: setWorkerProfile,
 }, initialState);
 
