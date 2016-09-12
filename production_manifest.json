@@ -23,7 +23,7 @@
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["*://portal.rainforestqa.com/*"]
+    "matches": ["https://*.rainforestqa.com/*"]
   },
   "permissions": [
     "cookies",
