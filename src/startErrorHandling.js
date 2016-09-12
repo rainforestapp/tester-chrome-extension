@@ -9,6 +9,16 @@ const startErrorHandling = (store, raven = Raven, testing = false) => {
 
   raven.config(CONFIG.ravenURL).install();
 
+  const addExtensionInfo = () => {
+    if (!window.chrome || !window.chrome.management) {
+      return;
+    }
+
+    window.chrome.management.getSelf(info => {
+      raven.setTagsContext({ 'extension.id': info.id, 'extension.version': info.version });
+    });
+  };
+
   const checkUUID = ({ worker: prevWorker }, { worker: curWorker }) => {
     if (!prevWorker.get('uuid') && curWorker.get('uuid')) {
       raven.setUserContext({ uuid: curWorker.get('uuid') });
@@ -33,6 +43,7 @@ const startErrorHandling = (store, raven = Raven, testing = false) => {
   };
 
   listenStoreChanges(store, handleUpdate);
+  addExtensionInfo();
 };
 
 export default startErrorHandling;
