@@ -110,26 +110,28 @@ describe('renderIcon', function() {
 
   describe('badge', function() {
     describe('when the worker is working', function() {
-      it('is green and says IN P', function() {
+      it('is green and says WIP', function() {
         const store = storeWithWorkerState('working');
         const chrome = mockChrome();
 
         renderIcon(store, chrome);
 
         const badge = chrome.getBadge();
-        expect(badge.text).to.equal('WORK');
+        expect(badge.text).to.equal('WIP');
         expect(badge.color).to.equal(colors.GREEN);
       });
     });
 
     describe('when the worker is inactive', function() {
-      it('is blank', function() {
+      it('says OFF', function() {
         const store = storeWithWorkerState('inactive');
         const chrome = mockChrome();
 
         renderIcon(store, chrome);
 
-        expect(chrome.getBadge().text).to.equal('');
+        const badge = chrome.getBadge();
+        expect(badge.text).to.equal('OFF');
+        expect(badge.color).to.equal(colors.RED);
       });
     });
 

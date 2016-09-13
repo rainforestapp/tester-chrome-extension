@@ -8,7 +8,11 @@ const renderIcon = (store, chrome) => {
     switch (workerState) {
       case 'working':
         chrome.browserAction.setBadgeBackgroundColor({ color: colors.GREEN });
-        chrome.browserAction.setBadgeText({ text: 'WORK' });
+        chrome.browserAction.setBadgeText({ text: 'WIP' });
+        break;
+      case 'inactive':
+        chrome.browserAction.setBadgeBackgroundColor({ color: colors.RED });
+        chrome.browserAction.setBadgeText({ text: 'OFF' });
         break;
       default:
         chrome.browserAction.setBadgeText({ text: '' });

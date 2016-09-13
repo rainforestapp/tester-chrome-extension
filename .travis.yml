@@ -4,3 +4,7 @@ node_js:
 script:
   - npm run lint
   - npm run test
+notifications:
+  email:
+    on_success: never
+    on_failure: always
