@@ -43,9 +43,10 @@ describe('handleWork', function() {
 
         setTimeout(() => {
           store.dispatch(workFinished());
+          store.dispatch(assignWork({ url: 'http://work2.com' }));
 
           const tabs = chrome.getOpenTabs();
-          if (tabs.length === 0) {
+          if (tabs.length === 1) {
             done();
           }
         });
@@ -67,9 +68,10 @@ describe('handleWork', function() {
           chrome.tabs.remove(tab.id);
 
           store.dispatch(workFinished());
+          store.dispatch(assignWork({ url: 'http://work2.com' }));
 
           const tabs = chrome.getOpenTabs();
-          if (tabs.length === 0) {
+          if (tabs.length === 1) {
             done();
           }
         });

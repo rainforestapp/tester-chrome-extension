@@ -10,23 +10,18 @@ const handleWork = (store, chrome) => {
         throw new Error("Worker moved to 'working' state without a work URL");
       }
 
+      const oldWorkTabId = workTabId;
       chrome.tabs.create({ url }, tab => {
         workTabId = tab.id;
       });
-    }
-  };
-
-  const handleClearWork = ({ worker: prevWorker }, { worker: curWorker }) => {
-    if (prevWorker.get('state') === 'working' && curWorker.get('state') !== 'working') {
-      if (workTabId) {
-        chrome.tabs.remove(workTabId);
+      if (oldWorkTabId) {
+        chrome.tabs.remove(oldWorkTabId);
       }
     }
   };
 
   const handleUpdate = (previous, current) => {
     handleAssignWork(previous, current);
-    handleClearWork(previous, current);
   };
 
   chrome.tabs.onRemoved.addListener(tabId => {
