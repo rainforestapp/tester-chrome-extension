@@ -27,7 +27,6 @@ export const notifications = deepFreeze({
     isClickable: true,
     type: 'basic',
     title: 'There was a problem with the request',
-    message: 'You may need to fill out a captcha. Click here to test the work endpoint. ' +
-      'Click the plugin icon to start polling for work again.',
+    message: 'You may need to fill out a captcha. Click here to test the work endpoint.',
   },
 });
