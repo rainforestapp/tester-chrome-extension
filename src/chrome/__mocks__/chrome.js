@@ -8,6 +8,8 @@ export const mockChrome = (opts = {}) => {
   const stateChangedListeners = [];
   const badge = { color: null, text: '' };
   const openTabs = [];
+  let tabCounter = 42;
+  const tabOnRemoveListeners = [];
   const profileUserInfo = opts.profileUserInfo || {
     email: '',
     id: '',
@@ -89,8 +91,30 @@ export const mockChrome = (opts = {}) => {
     },
   };
   const tabs = {
-    create: (tab) => {
-      openTabs.push(tab);
+    create: (tab, callback) => {
+      const chromeTab = Object.assign({}, tab, {
+        id: tabCounter++,
+      });
+      openTabs.push(chromeTab);
+      setTimeout(() => {
+        callback(chromeTab);
+      });
+    },
+    remove: (tabId, callback) => {
+      const idx = openTabs.findIndex(tab => tab.id === tabId);
+      if (idx === -1) {
+        throw new Error(`tab ${tabId} not found`);
+      }
+      openTabs.splice(idx, 1);
+      tabOnRemoveListeners.forEach(listener => listener(tabId, {}));
+      if (callback) {
+        setTimeout(callback);
+      }
+    },
+    onRemoved: {
+      addListener: (listener) => {
+        tabOnRemoveListeners.push(listener);
+      },
     },
   };
   const idle = {
