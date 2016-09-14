@@ -12,6 +12,7 @@ import {
   authenticate,
   updateWorkerState,
   iconClicked,
+  workStarted,
   workFinished,
   setWorkerProfile,
 } from '../../actions';
@@ -21,7 +22,15 @@ import worker from '../worker';
 chai.use(chaiImmutable);
 
 const checkState = (state) => {
-  expect(state).to.have.keys(['state', 'wantsMoreWork', 'uuid', 'workUrl', 'profileInfo', 'error']);
+  expect(state).to.have.keys([
+    'state',
+    'wantsMoreWork',
+    'workStarted',
+    'uuid',
+    'workUrl',
+    'profileInfo',
+    'error',
+  ]);
 };
 
 const initState = worker(undefined, { type: 'INIT' });
@@ -37,6 +46,7 @@ describe('worker reducer', function() {
 
     expect(state.get('state')).to.equal('inactive');
     expect(state.get('wantsMoreWork')).to.be.false;
+    expect(state.get('workStarted')).to.be.false;
     expect(state.get('uuid')).to.be.null;
   });
 
@@ -103,6 +113,14 @@ describe('worker reducer', function() {
 
         expect(state.get('wantsMoreWork')).to.be.true;
       });
+
+      it('sets workStarted to false', function() {
+        // This should not actually happen, it's just extra paranoia.
+        let state = workerWithState('ready').set('workStarted', true);
+        state = worker(state, assignWork({ url: workUrl }));
+
+        expect(state.get('workStarted')).to.be.false;
+      });
     });
 
     describe('when the worker is not ready', function() {
@@ -112,6 +130,30 @@ describe('worker reducer', function() {
 
         expect(state.get('state')).to.equal('inactive');
         expect(state.get('error')).to.be.an('error');
+      });
+    });
+  });
+
+  describe(actions.WORK_STARTED, function() {
+    describe("when the worker isn't working", function() {
+      it('is ignored', function() {
+        let state = workerWithState('ready');
+
+        state = worker(state, workStarted());
+
+        expect(state.get('state')).to.equal('ready');
+        expect(state.get('workStarted')).to.be.false;
+      });
+    });
+
+    describe('when the worker is working', function() {
+      it('sets workStarted to true', function() {
+        let state = workerWithState('working');
+
+        state = worker(state, workStarted());
+
+        expect(state.get('state')).to.equal('working');
+        expect(state.get('workStarted')).to.be.true;
       });
     });
   });
@@ -151,6 +193,14 @@ describe('worker reducer', function() {
         state = worker(state, workFinished());
 
         expect(state.get('wantsMoreWork')).to.be.false;
+      });
+
+      it('sets workStarted to false', function() {
+        let state = workerWithState('working');
+        state = worker(state, workStarted());
+        state = worker(state, workFinished());
+
+        expect(state.get('workStarted')).to.be.false;
       });
     });
 
