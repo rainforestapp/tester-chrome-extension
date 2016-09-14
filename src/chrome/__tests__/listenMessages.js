@@ -95,5 +95,21 @@ describe('listenMessages', function() {
         expect(store.getState().worker.get('state')).to.equal('ready');
       });
     });
+
+    describe('with a WORK_STARTED message', function() {
+      it('sets workStarted to true', function() {
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+        store.dispatch(updateWorkerState('working'));
+
+        listenMessages(store, chrome);
+
+        chrome.sendRuntimeMessage({
+          type: 'WORK_STARTED',
+        });
+
+        expect(store.getState().worker.get('workStarted')).to.be.true;
+      });
+    });
   });
 });

@@ -1,4 +1,4 @@
-import { authenticate, setPollUrl, workFinished } from '../actions';
+import { authenticate, setPollUrl, workStarted, workFinished } from '../actions';
 import { logDebug } from '../logging';
 
 const listenMessages = (store, chrome) => {
@@ -33,6 +33,10 @@ const listenMessages = (store, chrome) => {
     store.dispatch(workFinished());
   };
 
+  const handleWorkStarted = () => {
+    store.dispatch(workStarted());
+  };
+
   // TODO: This is only here for backward compatibility; we should nuke once all
   // messages have been changed.
   const handleDataMessage = (data) => {
@@ -52,6 +56,9 @@ const listenMessages = (store, chrome) => {
         return 'ok';
       case 'WORK_ERROR':
         handleWorkError();
+        return 'ok';
+      case 'WORK_STARTED':
+        handleWorkStarted();
         return 'ok';
       default:
         return 'unrecognized_message';
