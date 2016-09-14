@@ -1,4 +1,5 @@
 import listenStoreChanges from '../listenStoreChanges';
+import { workFinished } from '../actions';
 
 const handleWork = (store, chrome) => {
   let workTabId = null;
@@ -20,13 +21,21 @@ const handleWork = (store, chrome) => {
     }
   };
 
+  const workTabClosed = () => {
+    const { worker } = store.getState();
+    if (worker.get('state') === 'working' && !worker.get('workStarted')) {
+      store.dispatch(workFinished());
+    }
+    workTabId = null;
+  };
+
   const handleUpdate = (previous, current) => {
     handleAssignWork(previous, current);
   };
 
   chrome.tabs.onRemoved.addListener(tabId => {
     if (tabId === workTabId) {
-      workTabId = null;
+      workTabClosed();
     }
   });
 

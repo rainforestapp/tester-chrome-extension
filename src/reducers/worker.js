@@ -7,6 +7,7 @@ const initialState = fromJS({
   // wantsMoreWork indicates that a working worker wants to continue to work
   // after the current job (it's only relevant for working workers).
   wantsMoreWork: false,
+  workStarted: false,
   uuid: null,
   workUrl: null,
   profileInfo: null,
@@ -37,7 +38,20 @@ const assignWork = (state, { payload: { url } }) => {
     return state.set('error', err);
   }
 
-  return state.merge({ state: 'working', wantsMoreWork: true, workUrl: url });
+  return state.merge({
+    state: 'working',
+    wantsMoreWork: true,
+    workUrl: url,
+    workStarted: false,
+  });
+};
+
+const workStarted = (state) => {
+  if (state.get('state') !== 'working') {
+    return state;
+  }
+
+  return state.set('workStarted', true);
 };
 
 const workFinished = (state) => {
@@ -46,6 +60,7 @@ const workFinished = (state) => {
     return state.merge({
       state: newState,
       workUrl: null,
+      workStarted: false,
       wantsMoreWork: false,
     });
   }
@@ -74,6 +89,7 @@ const worker = handleActions({
   [actions.AUTHENTICATE]: authenticate,
   [actions.UPDATE_WORKER_STATE]: updateWorkerState,
   [actions.ASSIGN_WORK]: assignWork,
+  [actions.WORK_STARTED]: workStarted,
   [actions.WORK_FINISHED]: workFinished,
   [actions.ICON_CLICKED]: iconClicked,
   [actions.SET_WORKER_PROFILE]: setWorkerProfile,

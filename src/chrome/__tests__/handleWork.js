@@ -7,7 +7,7 @@
 
 import { mockChrome } from '../__mocks__/chrome';
 import { expect } from 'chai';
-import { assignWork, updateWorkerState, workFinished } from '../../actions';
+import { assignWork, updateWorkerState, workStarted, workFinished } from '../../actions';
 import { createStore } from 'redux';
 import pluginApp from '../../reducers';
 import handleWork from '../handleWork';
@@ -53,8 +53,8 @@ describe('handleWork', function() {
       });
     });
 
-    describe('when the work tab is closed elsewhere', function() {
-      it("doesn't error", function(done) {
+    describe('when the work tab is closed manually', function() {
+      const stateWithAssignedWork = () => {
         const store = createStore(pluginApp);
         const chrome = mockChrome();
         store.dispatch(updateWorkerState('ready'));
@@ -63,9 +63,19 @@ describe('handleWork', function() {
 
         store.dispatch(assignWork({ url: 'http://work.com' }));
 
+        return { store, chrome };
+      };
+
+      const closeTab = chrome => {
+        const tab = chrome.getOpenTabs()[0];
+        chrome.tabs.remove(tab.id);
+      };
+
+      it("doesn't error", function(done) {
+        const { store, chrome } = stateWithAssignedWork();
+
         setTimeout(() => {
-          const tab = chrome.getOpenTabs()[0];
-          chrome.tabs.remove(tab.id);
+          closeTab(chrome);
 
           store.dispatch(workFinished());
           store.dispatch(assignWork({ url: 'http://work2.com' }));
@@ -74,6 +84,35 @@ describe('handleWork', function() {
           if (tabs.length === 1) {
             done();
           }
+        });
+      });
+
+      describe('when the worker has started working', function() {
+        it("doesn't change the worker state", function(done) {
+          const { store, chrome } = stateWithAssignedWork();
+          store.dispatch(workStarted());
+
+          setTimeout(() => {
+            closeTab(chrome);
+            if (store.getState().worker.get('state') === 'working') {
+              done();
+            }
+          });
+        });
+      });
+
+      describe("when the worker hasn't started working", function() {
+        it('changes the worker state', function(done) {
+          const { store, chrome } = stateWithAssignedWork();
+
+          setTimeout(() => {
+            closeTab(chrome);
+            if (store.getState().worker.get('state') === 'working') {
+              done(new Error('Worker should not be working because tab was closed!'));
+            } else {
+              done();
+            }
+          });
         });
       });
     });

@@ -22,7 +22,8 @@ describe('listenMessages', function() {
 
     const sendAuth = (chrome, spy) => {
       chrome.sendRuntimeMessage({
-        data: {
+        type: 'AUTHENTICATE',
+        payload: {
           worker_uuid: 'abc123',
           websocket_auth: auth,
           work_available_endpoint: 'http://www.work.com/',
@@ -85,12 +86,29 @@ describe('listenMessages', function() {
         listenMessages(store, chrome);
 
         chrome.sendRuntimeMessage({
-          data: {
-            clear_work: true,
+          type: 'WORK_ERROR',
+          payload: {
+            error: 'Problem!',
           },
         });
 
         expect(store.getState().worker.get('state')).to.equal('ready');
+      });
+    });
+
+    describe('with a WORK_STARTED message', function() {
+      it('sets workStarted to true', function() {
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+        store.dispatch(updateWorkerState('working'));
+
+        listenMessages(store, chrome);
+
+        chrome.sendRuntimeMessage({
+          type: 'WORK_STARTED',
+        });
+
+        expect(store.getState().worker.get('workStarted')).to.be.true;
       });
     });
   });

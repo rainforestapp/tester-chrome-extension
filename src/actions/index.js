@@ -8,6 +8,7 @@ export const logMessage = createAction(actions.LOG_MESSAGE);
 export const connectionClosed = createAction(actions.CONNECTION_CLOSED);
 export const authFailed = createAction(actions.AUTH_FAILED);
 export const iconClicked = createAction(actions.ICON_CLICKED);
+export const workStarted = createAction(actions.WORK_STARTED);
 export const workFinished = createAction(actions.WORK_FINISHED);
 export const setPluginVersion = createAction(actions.SET_PLUGIN_VERSION);
 export const startPolling = createAction(actions.START_POLLING);
