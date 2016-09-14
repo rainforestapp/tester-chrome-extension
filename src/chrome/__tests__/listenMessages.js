@@ -22,7 +22,8 @@ describe('listenMessages', function() {
 
     const sendAuth = (chrome, spy) => {
       chrome.sendRuntimeMessage({
-        data: {
+        type: 'AUTHENTICATE',
+        payload: {
           worker_uuid: 'abc123',
           websocket_auth: auth,
           work_available_endpoint: 'http://www.work.com/',
@@ -85,8 +86,9 @@ describe('listenMessages', function() {
         listenMessages(store, chrome);
 
         chrome.sendRuntimeMessage({
-          data: {
-            clear_work: true,
+          type: 'WORK_ERROR',
+          payload: {
+            error: 'Problem!',
           },
         });
 
