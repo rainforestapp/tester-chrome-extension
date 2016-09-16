@@ -111,5 +111,35 @@ describe('listenMessages', function() {
         expect(store.getState().worker.get('workStarted')).to.be.true;
       });
     });
+
+    describe('with a SET_OPTIONS message', function() {
+      const url = 'http://example.com/beep.ogg';
+
+      const storeWithOptions = () => {
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+
+        listenMessages(store, chrome);
+
+        chrome.sendRuntimeMessage({
+          type: 'SET_OPTIONS',
+          payload: { soundUrl: url },
+        });
+
+        return { store, chrome };
+      };
+
+      it('sets options', function() {
+        const { store } = storeWithOptions();
+        expect(store.getState().plugin.get('options')).to.equal(fromJS({ soundUrl: url }));
+      });
+
+      it('saves the settings in sync storage', function() {
+        const { chrome } = storeWithOptions();
+        const storage = chrome.getStorage();
+
+        expect(storage.options).to.deep.equal({ soundUrl: url });
+      });
+    });
   });
 });
