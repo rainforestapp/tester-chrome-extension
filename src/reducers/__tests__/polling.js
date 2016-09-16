@@ -132,4 +132,26 @@ describe('polling reducer', function() {
       expect(state.get('interval')).to.equal(4000);
     });
   });
+
+  describe(actions.APPLICATION_ERROR, function() {
+    it('increases polling Interval when application error occurs', function() {
+      let state = polling(undefined, setPollingInterval(1000));
+      checkState(state);
+      state = polling(state, rateLimitExceeded());
+      checkState(state);
+
+      expect(state.get('interval')).to.equal(46000);
+    });
+  });
+
+  describe(actions.RESET_INTERVAL, function() {
+    it('resets the interval', function() {
+      let state = polling(undefined, setPollingInterval(1000));
+      checkState(state);
+      state = polling(state, rateLimitExceeded());
+      checkState(state);
+
+      expect(state.get('interval')).to.equal(46000);
+    });
+  });
 });

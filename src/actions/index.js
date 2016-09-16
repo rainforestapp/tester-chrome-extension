@@ -17,6 +17,8 @@ export const setPollingInterval = createAction(actions.SET_POLLING_INTERVAL);
 export const setPollUrl = createAction(actions.SET_POLL_URL);
 export const captchaRequired = createAction(actions.CAPTCHA_REQUIRED);
 export const rateLimitExceeded = createAction(actions.RATE_LIMIT_EXCEEDED);
+export const applicationError = createAction(actions.APPLICATION_ERROR);
+export const resetInterval = createAction(actions.RESET_INTERVAL);
 export const setWorkerProfile = createAction(actions.SET_WORKER_PROFILE);
 
 const validWorkerStates = ['ready', 'inactive', 'working'];

@@ -110,6 +110,41 @@ describe('handlePolling', function() {
       }, 50);
     });
 
+    it('checks for APPLICATION_ERROR', function(done) {
+      const store = storeWithPolling();
+      let poller = null;
+      fetchMock.get(pollUrl, {
+        status: 500,
+      });
+
+      let state = store.getState();
+      const interval = state.polling.get('interval');
+
+      let success = false;
+      store.subscribe(() => {
+        state = store.getState();
+        if (state.polling.get('interval') > interval) {
+          success = true;
+          fetchMock.restore();
+          poller.stop();
+          done();
+        }
+      });
+
+      poller = handlePolling(store);
+
+      setTimeout(() => {
+        if (!success) {
+          fetchMock.restore();
+          poller.stop();
+          done(new Error("APPLICATION_ERROR wasn't detected"));
+        }
+      }, 50);
+    });
+
+    it.skip('checks if the interval can be reset', function(done) {
+    });
+
     it('checks for CAPTCHAs', function(done) {
       const store = storeWithPolling();
       let poller = null;
