@@ -1,7 +1,7 @@
-import { authenticate, setPollUrl } from '../actions';
+import { authenticate, setOptions, setPollUrl } from '../actions';
 
 const getSync = (store, chrome) => {
-  const dataKeys = ['worker_uuid', 'websocket_auth', 'work_available_endpoint'];
+  const dataKeys = ['worker_uuid', 'websocket_auth', 'work_available_endpoint', 'options'];
   chrome.storage.sync.get(dataKeys, data => {
     let auth = null;
     if (data.hasOwnProperty('worker_uuid') &&
@@ -18,6 +18,10 @@ const getSync = (store, chrome) => {
     }
     if (pollUrl) {
       store.dispatch(setPollUrl(pollUrl));
+    }
+
+    if (data.options) {
+      store.dispatch(setOptions(data.options));
     }
   });
 };

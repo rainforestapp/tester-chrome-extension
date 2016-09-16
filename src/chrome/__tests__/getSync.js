@@ -59,4 +59,21 @@ describe('getSync', function() {
 
     getSync(store, chrome);
   });
+
+  it("sets the options if they're stored in sync", function(done) {
+    const options = { soundUrl: 'whiz' };
+    const store = createStore(pluginApp);
+    const chrome = mockChrome({ storage: { options } });
+
+    let success = false;
+    store.subscribe(() => {
+      const { plugin } = store.getState();
+      if (!success && plugin.get('options').equals(fromJS(options))) {
+        success = true;
+        done();
+      }
+    });
+
+    getSync(store, chrome);
+  });
 });
