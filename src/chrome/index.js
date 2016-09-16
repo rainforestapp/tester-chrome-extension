@@ -20,9 +20,11 @@ export const startChromePlugin = (auth, pollUrl, chrome, socketConstructor = Soc
   const getStore = () => store;
 
   const getUserInfo = () => {
-    chrome.identity.getProfileUserInfo((data) => {
-      store.dispatch(setWorkerProfile(data));
-    });
+    if (chrome.identity.getProfileUserInfo) {
+      chrome.identity.getProfileUserInfo(data => {
+        store.dispatch(setWorkerProfile(data));
+      });
+    }
   };
 
   handleStateSaving(store, chrome);
