@@ -10,7 +10,7 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import { mockChrome } from '../__mocks__/chrome';
 import { createStore } from 'redux';
-import { updateWorkerState } from '../../actions';
+import { setPluginVersion, updateWorkerState } from '../../actions';
 import pluginApp from '../../reducers';
 import { fromJS } from 'immutable';
 
@@ -61,7 +61,8 @@ describe('listenMessages', function() {
 
       sendAuth(chrome, () => {});
 
-      expect(store.getState().polling.get('pollUrl')).to.equal('http://www.work.com/abc123/work_available');
+      const pollUrl = store.getState().polling.get('pollUrl');
+      expect(pollUrl).to.equal('http://www.work.com/abc123/work_available');
     });
 
     it('stores the data in the chrome sync storage', function() {
@@ -75,6 +76,20 @@ describe('listenMessages', function() {
       expect(storage.worker_uuid).to.equal('abc123');
       expect(storage.websocket_auth).to.equal(auth);
       expect(storage.work_available_endpoint).to.equal('http://www.work.com/');
+    });
+
+    it('responds with plugin information', function(done) {
+      const store = createStore(pluginApp);
+      store.dispatch(setPluginVersion('12345'));
+      const chrome = mockChrome();
+      listenMessages(store, chrome);
+
+      sendAuth(chrome, resp => {
+        if (resp.status === 'ok' &&
+            resp.plugin.version === '12345') {
+          done();
+        }
+      });
     });
 
     describe('with a message to clear work', function() {

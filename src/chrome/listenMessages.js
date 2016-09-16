@@ -57,20 +57,27 @@ const listenMessages = (store, chrome) => {
     }
   };
 
+  const okResponse = () => (
+    {
+      status: 'ok',
+      plugin: store.getState().plugin.toJS(),
+    }
+  );
+
   const handleActionMessage = ({ type, payload }) => {
     switch (type) {
       case 'AUTHENTICATE':
         handleAuthMessage(payload);
-        return 'ok';
+        return okResponse();
       case 'WORK_ERROR':
         handleWorkError();
-        return 'ok';
+        return okResponse();
       case 'WORK_STARTED':
         handleWorkStarted();
-        return 'ok';
+        return okResponse();
       case 'SET_OPTIONS':
         handleSetOptions(payload);
-        return 'ok';
+        return okResponse();
       default:
         return 'unrecognized_message';
     }
@@ -83,7 +90,7 @@ const listenMessages = (store, chrome) => {
 
     if (message.data) {
       handleDataMessage(message.data);
-      sendResponse('ok');
+      sendResponse(okResponse());
       return;
     }
 
