@@ -15,6 +15,8 @@ import {
   captchaRequired,
   iconClicked,
   rateLimitExceeded,
+  applicationError,
+  resetInterval,
 } from '../../actions';
 import chaiImmutable from 'chai-immutable';
 import polling from '../polling';
@@ -137,7 +139,7 @@ describe('polling reducer', function() {
     it('increases polling Interval when application error occurs', function() {
       let state = polling(undefined, setPollingInterval(1000));
       checkState(state);
-      state = polling(state, rateLimitExceeded());
+      state = polling(state, applicationError());
       checkState(state);
 
       expect(state.get('interval')).to.equal(46000);
@@ -148,10 +150,11 @@ describe('polling reducer', function() {
     it('resets the interval', function() {
       let state = polling(undefined, setPollingInterval(1000));
       checkState(state);
-      state = polling(state, rateLimitExceeded());
+      state = polling(state, applicationError());
+      state = polling(state, resetInterval());
       checkState(state);
 
-      expect(state.get('interval')).to.equal(46000);
+      expect(state.get('interval')).to.equal(1000);
     });
   });
 });

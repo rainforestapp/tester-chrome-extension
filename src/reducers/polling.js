@@ -57,7 +57,6 @@ const applicationError = (state) => {
   const addedDelay = (state.get('interval') <= (5 * 60 * 1000)) ? (45 * 1000) : 0;
   const newInterval = (state.get('interval') + addedDelay);
   state.set('errorDelayEndTime', Date.now() + (0.25 * 60 * 1000));
-  console.log(state);
   return state.set('interval', newInterval);
 };
 
