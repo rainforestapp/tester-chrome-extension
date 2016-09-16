@@ -56,7 +56,7 @@ const applicationError = (state) => {
   // if app error, add 45 seconds (to max of 5 minutes) until resolved (10 minutes later)
   const addedDelay = (state.get('interval') <= (5 * 60 * 1000)) ? (45 * 1000) : 0;
   const newInterval = (state.get('interval') + addedDelay);
-  state.set('errorDelayEndTime', Date.now() + (0.25 * 60 * 1000));
+  state.set('errorDelayEndTime', Date.now() + (10 * 60 * 1000));
   return state.set('interval', newInterval);
 };
 
