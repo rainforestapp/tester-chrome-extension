@@ -20,6 +20,7 @@ export const actions = deepFreeze({
   SET_WORKER_PROFILE: 'SET_WORKER_PROFILE',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
   CHANNEL_LEFT: 'CHANNEL_LEFT',
+  SET_OPTIONS: 'SET_OPTIONS',
 });
 
 export const colors = deepFreeze({
