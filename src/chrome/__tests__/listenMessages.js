@@ -156,5 +156,22 @@ describe('listenMessages', function() {
         expect(storage.options).to.deep.equal({ soundUrl: url });
       });
     });
+
+    describe('with a PING message', function() {
+      it('sends a generic response', function(done) {
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+        store.dispatch(setPluginVersion('12345'));
+
+        listenMessages(store, chrome);
+
+        chrome.sendRuntimeMessage({ type: 'PING' }, resp => {
+          if (resp.status === 'ok' &&
+              resp.plugin.version === '12345') {
+            done();
+          }
+        });
+      });
+    });
   });
 });

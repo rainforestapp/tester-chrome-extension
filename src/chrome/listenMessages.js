@@ -78,6 +78,8 @@ const listenMessages = (store, chrome) => {
       case 'SET_OPTIONS':
         handleSetOptions(payload);
         return okResponse();
+      case 'PING':
+        return okResponse();
       default:
         return 'unrecognized_message';
     }
