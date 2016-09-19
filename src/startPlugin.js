@@ -3,11 +3,11 @@ import { startSocket } from './socket';
 import startErrorHandling from './startErrorHandling';
 import startReloader from './startReloader';
 import handlePolling from './handlePolling';
-import { authenticate, setPollUrl } from './actions';
+import { authenticate } from './actions';
 import { createStore } from 'redux';
 import { Socket } from 'phoenix';
 
-const startPlugin = ({ auth, pollUrl, enhancer, reloader, socketConstructor = Socket }) => {
+const startPlugin = ({ auth, enhancer, reloader, socketConstructor = Socket }) => {
   const store = createStore(pluginApp, enhancer);
 
   startErrorHandling(store);
@@ -18,10 +18,6 @@ const startPlugin = ({ auth, pollUrl, enhancer, reloader, socketConstructor = So
 
   if (auth) {
     store.dispatch(authenticate(auth));
-  }
-
-  if (pollUrl) {
-    store.dispatch(setPollUrl(pollUrl));
   }
 
   startSocket(store, socketConstructor);

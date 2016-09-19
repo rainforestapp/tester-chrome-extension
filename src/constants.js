@@ -19,6 +19,7 @@ export const actions = deepFreeze({
   CAPTCHA_REQUIRED: 'CAPTCHA_REQUIRED',
   SET_WORKER_PROFILE: 'SET_WORKER_PROFILE',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
+  SET_OPTIONS: 'SET_OPTIONS',
 });
 
 export const colors = deepFreeze({

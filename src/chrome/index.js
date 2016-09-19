@@ -4,6 +4,7 @@ import { setWorkerProfile } from '../actions';
 import listenMessages from './listenMessages';
 import handleWorkerStateNotifications from './handleWorkerStateNotifications';
 import handleWork from './handleWork';
+import getSync from './getSync';
 import handleStateSaving from './handleStateSaving';
 import renderIcon from './renderIcon';
 import startIdleChecking from './startIdleChecking';
@@ -11,10 +12,10 @@ import handleCaptcha from './handleCaptcha';
 import { applyMiddleware } from 'redux';
 import { logMiddleware } from '../logging';
 
-export const startChromePlugin = (auth, pollUrl, chrome, socketConstructor = Socket) => {
+export const startChromePlugin = (chrome, socketConstructor = Socket) => {
   const reloader = () => window.location.reload(true);
   const enhancer = applyMiddleware(logMiddleware);
-  const plugin = startPlugin({ auth, pollUrl, enhancer, reloader, socketConstructor });
+  const plugin = startPlugin({ enhancer, reloader, socketConstructor });
   const store = plugin.getStore();
 
   const getStore = () => store;
@@ -27,6 +28,7 @@ export const startChromePlugin = (auth, pollUrl, chrome, socketConstructor = Soc
     }
   };
 
+  getSync(store, chrome);
   handleStateSaving(store, chrome);
   listenMessages(store, chrome);
   handleWorkerStateNotifications(store, chrome);

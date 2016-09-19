@@ -18,6 +18,7 @@ export const setPollUrl = createAction(actions.SET_POLL_URL);
 export const captchaRequired = createAction(actions.CAPTCHA_REQUIRED);
 export const rateLimitExceeded = createAction(actions.RATE_LIMIT_EXCEEDED);
 export const setWorkerProfile = createAction(actions.SET_WORKER_PROFILE);
+export const setOptions = createAction(actions.SET_OPTIONS);
 
 const validWorkerStates = ['ready', 'inactive', 'working'];
 
