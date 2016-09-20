@@ -13,6 +13,11 @@ export const mockSocket = (opts = {}) => (
       this.testChannel = {
         onCallbacks: {},
         join() {
+          this.state = 'connected';
+          return this;
+        },
+        leave() {
+          this.state = 'disconnected';
           return this;
         },
         receive(code, callback) {
@@ -39,6 +44,10 @@ export const mockSocket = (opts = {}) => (
           if (callback) {
             callback(payload);
           }
+        },
+        // Get the state of the channel
+        getState() {
+          return this.state;
         },
       };
       return this.testChannel;

@@ -10,6 +10,7 @@ import {
   workFinished,
   setPluginVersion,
   startPolling,
+  channelLeft,
 } from '../actions';
 
 export const startSocket = (store, socketConstructor = Socket) => {
@@ -50,6 +51,16 @@ export const startSocket = (store, socketConstructor = Socket) => {
     store.dispatch(startPolling(payload));
   };
 
+  const handleLeave = () => {
+    if (!channel) {
+      throw new Error("Leaving a channel when channel isn't joined");
+    }
+
+    channel.leave();
+    channel = null;
+    store.dispatch(channelLeft());
+  };
+
   const connectToSocket = ({ socket: socketState, worker }) => {
     const workerUUID = worker.get('uuid');
     const socketAuth = socketState.get('auth');
@@ -88,6 +99,9 @@ export const startSocket = (store, socketConstructor = Socket) => {
     channel.on('start_polling', payload => {
       handleStartPolling(payload);
     });
+    channel.on('leave', payload => {
+      handleLeave(payload);
+    });
     channel.join()
       .receive('ok', resp => {
         pushWorkerState(workerState());
@@ -113,7 +127,12 @@ export const startSocket = (store, socketConstructor = Socket) => {
       worker.get('uuid') !== null;
   };
 
-  const shouldReconnect = ({ worker: prevWorker }, { worker: curWorker }) => {
+  const shouldReconnect = (
+    { worker: prevWorker, socket: prevSocket }, { worker: curWorker, socket: curSocket }
+  ) => {
+    if (prevSocket.get('state') !== 'reconnecting' && curSocket.get('state') === 'reconnecting') {
+      return true;
+    }
     const prevUUID = prevWorker.get('uuid');
     const curUUID = curWorker.get('uuid');
 

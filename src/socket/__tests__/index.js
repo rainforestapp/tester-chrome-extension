@@ -7,7 +7,7 @@
 import chai, { expect } from 'chai';
 import { mockSocket } from '../__mocks__';
 import { createStore } from 'redux';
-import { authenticate, updateWorkerState, setPollUrl } from '../../actions';
+import { authenticate, updateWorkerState, setPollUrl, iconClicked } from '../../actions';
 import pluginApp from '../../reducers';
 import { startSocket } from '..';
 import sinon from 'sinon';
@@ -96,6 +96,21 @@ describe('startSocket', function() {
         expect(socket.getSocket().channelName).to.equal('workers:newworker');
       });
     });
+
+    describe('when reconnecting after being kicked off', function() {
+      it('reconnectes', function() {
+        const store = createStore(pluginApp);
+        const socket = authenticatedSocket(store, {});
+        const channel = socket.getSocket().testChannel;
+
+        channel.serverPush('leave', {});
+
+        store.dispatch(iconClicked());
+
+        expect(store.getState().socket.get('state')).to.equal('connected');
+        expect(socket.getSocket().testChannel.getState()).to.equal('connected');
+      });
+    });
   });
 
   describe('authenticating after the plugin starts', function() {
@@ -156,6 +171,20 @@ describe('startSocket', function() {
 
     expect(store.getState().polling.get('error')).to.be.null;
     expect(store.getState().polling.get('polling')).to.be.true;
+  });
+
+  describe('receiving a leave instruction', function() {
+    it('leaves the channel', function() {
+      const store = createStore(pluginApp);
+      store.dispatch(updateWorkerState('ready'));
+      const socket = authenticatedSocket(store, {});
+      const channel = socket.getSocket().testChannel;
+
+      channel.serverPush('leave', {});
+
+      expect(store.getState().socket.get('state')).to.equal('left');
+      expect(channel.getState()).to.equal('disconnected');
+    });
   });
 
   describe('receiving a work assignment', function() {
