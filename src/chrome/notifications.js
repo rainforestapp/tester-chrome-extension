@@ -4,6 +4,7 @@ import deepFreeze from 'deep-freeze';
 export const notLoggedIn = 'notLoggedIn';
 export const workerIdle = 'workerIdle';
 export const captcha = 'captcha';
+export const leftChannel = 'leftChannel';
 
 export const notifications = deepFreeze({
   [notLoggedIn]: {
@@ -14,6 +15,14 @@ export const notifications = deepFreeze({
     message:
     "You don't seem to be logged in to Rainforest, click here to go to your profile and log in.",
   },
+  [leftChannel]: {
+    iconUrl: CONFIG.chrome.notificationIconUrl,
+    isClickable: false,
+    type: 'basic',
+    title: 'You have been disconnected',
+    message: 'You have disconnected, probably because you logged in on another computer. ' +
+      'Double-click the icon to reconnect.',
+  },
   [workerIdle]: {
     iconUrl: CONFIG.chrome.notificationIconUrl,
     isClickable: true,
@@ -23,7 +32,7 @@ export const notifications = deepFreeze({
       'checking for work. Click here to start checking for work again.',
   },
   [captcha]: {
-    iconUrl: 'icons/icon_notification.png',
+    iconUrl: CONFIG.chrome.notificationIconUrl,
     isClickable: true,
     type: 'basic',
     title: 'There was a problem with the request',

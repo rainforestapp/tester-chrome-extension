@@ -1,9 +1,9 @@
-import { notifications, notLoggedIn } from './notifications';
+import { notifications, notLoggedIn, leftChannel } from './notifications';
 import { CONFIG } from '../constants';
 import { updateWorkerState } from '../actions';
 import listenStoreChanges from '../listenStoreChanges';
 
-const handleWorkerStateNotifications = (store, chrome) => {
+const handleStateNotifications = (store, chrome) => {
   const shouldSendAuthNotifications = (
     { socket: prevSocket, worker: prevWorker }, { socket: curSocket, worker: curWorker }
   ) => (
@@ -22,8 +22,15 @@ const handleWorkerStateNotifications = (store, chrome) => {
     }
   };
 
+  const handleChannelNotifications = ({ socket: prevSocket }, { socket: curSocket }) => {
+    if (prevSocket.get('state') !== 'left' && curSocket.get('state') === 'left') {
+      chrome.notifications.create(leftChannel, notifications[leftChannel]);
+    }
+  };
+
   const handleUpdate = (previousState, currentState) => {
     handleAuthNotification(previousState, currentState);
+    handleChannelNotifications(previousState, currentState);
   };
 
   chrome.notifications.onClicked.addListener(notificationId => {
@@ -38,4 +45,4 @@ const handleWorkerStateNotifications = (store, chrome) => {
   listenStoreChanges(store, handleUpdate);
 };
 
-export default handleWorkerStateNotifications;
+export default handleStateNotifications;

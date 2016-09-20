@@ -13,6 +13,8 @@ import {
   logMessage,
   connectionClosed,
   authFailed,
+  channelLeft,
+  iconClicked,
 } from '../../actions';
 import socket from '../socket';
 import { actions } from '../../constants';
@@ -99,6 +101,27 @@ describe('socket reducer', function() {
     it('marks the socket as unauthenticated', function() {
       const state = socket(initState, authFailed());
       expect(state.get('state')).to.equal('unauthenticated');
+    });
+  });
+
+  describe(actions.CHANNEL_LEFT, function() {
+    it('marks the socket as left', function() {
+      let state = socket(initState, connect());
+      state = socket(state, channelLeft());
+
+      expect(state.get('state')).to.equal('left');
+    });
+  });
+
+  describe(actions.ICON_CLICKED, function() {
+    describe('when the worker has left the channel', function() {
+      it('reconnects', function() {
+        let state = socket(initState, connect());
+        state = socket(state, channelLeft());
+        state = socket(state, iconClicked());
+
+        expect(state.get('state')).to.equal('reconnecting');
+      });
     });
   });
 });
