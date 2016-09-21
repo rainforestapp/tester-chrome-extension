@@ -1,13 +1,13 @@
 // mock Audio
 
 export class MockAudio {
-  constructor(url = '') {
-    this.url = url;
+  constructor(src = '') {
+    this.src = src;
   }
   play() {
     this.onended();
   }
   onended() {
-    return;
+    // blank
   }
 }

@@ -19,7 +19,20 @@ chai.use(sinonChai);
 
 describe('playSound', function() {
   describe('getAndPlaySoundNotificationOption', function() {
-    it('repeats sound 3 times', function(done) {
+    it('sets soundUrl to audioPlayer', function() {
+      const audioPlayer = new MockAudio();
+      const store = createStore(pluginApp);
+      const options = {
+        [SOUND_URL]: 'mockSound.mp3',
+        [SOUND_REPEAT]: 3,
+      };
+      store.dispatch(setOptions(options));
+
+      getAndPlaySoundNotificationOption(store, audioPlayer);
+      expect(audioPlayer.src).to.equal('mockSound.mp3');
+    });
+
+    it('repeats sound 3 times', function() {
       const audioPlayer = new MockAudio();
       const store = createStore(pluginApp);
       const options = {
@@ -32,10 +45,9 @@ describe('playSound', function() {
       getAndPlaySoundNotificationOption(store, audioPlayer);
       expect(audioPlayer.play).to.have.been.calledThrice;
       audioPlayer.play.restore();
-      done();
     });
 
-    it('plays sound once', function(done) {
+    it('plays sound once', function() {
       const audioPlayer = new MockAudio();
       const store = createStore(pluginApp);
       const options = {
@@ -48,10 +60,9 @@ describe('playSound', function() {
       getAndPlaySoundNotificationOption(store, audioPlayer);
       expect(audioPlayer.play).to.have.been.calledOnce;
       audioPlayer.play.restore();
-      done();
     });
 
-    it('does not play sound', function(done) {
+    it('does not play sound', function() {
       const audioPlayer = new MockAudio();
       const store = createStore(pluginApp);
       const options = {};
@@ -61,7 +72,6 @@ describe('playSound', function() {
       getAndPlaySoundNotificationOption(store, audioPlayer);
       expect(audioPlayer.play).to.have.not.been.called;
       audioPlayer.play.restore();
-      done();
     });
   });
 });
