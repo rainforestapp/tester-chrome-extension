@@ -1,8 +1,10 @@
 import listenStoreChanges from '../listenStoreChanges';
 import { workFinished } from '../actions';
+import { getAndPlaySoundNotificationOption } from './playSound';
 
 const handleWork = (store, chrome) => {
   let workTabId = null;
+  const audioPlayer = new window.Audio();
 
   const handleAssignWork = ({ worker: prevWorker }, { worker: curWorker }) => {
     if (prevWorker.get('state') !== 'working' && curWorker.get('state') === 'working') {
@@ -14,6 +16,7 @@ const handleWork = (store, chrome) => {
       const oldWorkTabId = workTabId;
       chrome.tabs.create({ url }, tab => {
         workTabId = tab.id;
+        getAndPlaySoundNotificationOption(store, audioPlayer);
       });
       if (oldWorkTabId) {
         chrome.tabs.remove(oldWorkTabId);

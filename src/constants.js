@@ -33,6 +33,9 @@ export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin', 'polling']);
 
 export const DEFAULT_POLLING_INTERVAL = 30 * 1000;
 
+export const SOUND_URL = 'soundUrl';
+export const SOUND_REPEAT = 'soundRepeat';
+
 const getChromeConfig = () => (
   {
     notificationIconUrl: window.CHROME_NOTIFICATION_ICON_URL,

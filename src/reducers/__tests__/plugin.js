@@ -7,7 +7,7 @@
 import chai, { expect } from 'chai';
 import plugin from '../plugin';
 import chaiImmutable from 'chai-immutable';
-import { actions } from '../../constants';
+import { actions, SOUND_URL, SOUND_REPEAT } from '../../constants';
 import { setPluginVersion, setOptions } from '../../actions';
 import { fromJS } from 'immutable';
 
@@ -53,6 +53,21 @@ describe('plugin reducer', function() {
       const state = plugin(initState, setOptions());
 
       expect(state.get('error')).to.be.an('error');
+    });
+
+    it('sets sound options', function() {
+      const options = {
+        [SOUND_URL]: 'mock.mp3',
+        [SOUND_REPEAT]: 1,
+      };
+      let state = plugin(initState, setOptions({ foo: 'bar' }));
+      state = plugin(state, setOptions(options));
+
+      expect(state.get('options')).to.equal(fromJS({
+        foo: 'bar',
+        [SOUND_URL]: 'mock.mp3',
+        [SOUND_REPEAT]: 1,
+      }));
     });
   });
 });
