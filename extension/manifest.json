@@ -1,5 +1,5 @@
 {
-  "name": "Rainforest Tester Notifier [DEV]",
+  "name": "Rainforest Tester Notifier",
   "version": "2.0.2",
   "manifest_version": 2,
   "description": "Notifies Rainforest Testers when there is new work to be done.",
@@ -12,18 +12,18 @@
     "128": "icons/icon128.png"
   },
   "background": {
-    "page": "index_dev.html",
+    "page": "index_prod.html",
     "persistent": true
   },
   "options_ui": {
-    "page": "options_dev.html",
+    "page": "options_prod.html",
     "chrome_style": true
   },
   "browser_action": {
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["*://*.rainforest.dev/*", "http://localhost:3000/*"]
+    "matches": ["https://*.rainforestqa.com/*"]
   },
   "permissions": [
     "cookies",
@@ -34,8 +34,8 @@
     "identity",
     "identity.email",
     "*://*.getsentry.com/*",
-    "*://*.rainforest.dev/*",
     "*://*.rainforestqa.com/*"
   ],
-  "content_security_policy": "script-src 'self' http://localhost:8123 https://cdnjs.cloudflare.com; object-src 'self'"
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1VP0Q//BSPDPMJGKGg3QHMAgEgsT/QipT6rAsge0ZgB86sGoMXh2zgp4BM9etCHZVaLlkVWfH0ThizNv8st4VO56MIrV6V2EZDOhpBWqgNYQYgD+OCrFcElotLxr98RM/ayjl4zONGKV1VOkIvcUtBW2bVzYuizMojyDIVByQSDs49DrAtj6hv6j6d6Q+tBwEYxMl5xDv3A34hhnfJ6L+N7b057CkVrLJ2Q+rr2598vehFummC9VQq6HNJcDAeBd4Z2J+KS+BplxAx1SKxSbWy2ZNT2tDKzjQ1tR9ExOU9V806PDYEwNyZ5kgSeW/PdPpeDV2jhwTG8uPdR8yBoL6wIDAQAB",
+  "content_security_policy": "script-src 'self' https://static.rainforestqa.com https://schrute.rainforestqa.com https://cdnjs.cloudflare.com; object-src 'self'"
 }

@@ -51,10 +51,22 @@ export const mockChrome = (opts = {}) => {
       addListener,
     },
   };
+  const dataWithKeys = (store, keys) => (
+    keys.reduce(
+      (acc, key) => Object.assign(acc, { [key]: store[key] }),
+      {}
+    )
+  );
   const storage = {
     sync: {
       set: (data) => {
         storageStore = Object.assign({}, storageStore, data);
+      },
+      get: (keys, callback) => {
+        setTimeout(() => {
+          const data = dataWithKeys(storageStore, keys);
+          callback(data);
+        });
       },
     },
     local: {
@@ -63,10 +75,7 @@ export const mockChrome = (opts = {}) => {
       },
       get: (keys, callback) => {
         setTimeout(() => {
-          const data = keys.reduce(
-            (acc, key) => Object.assign(acc, { [key]: localStorageStore[key] }),
-            {}
-          );
+          const data = dataWithKeys(localStorageStore, keys);
           callback(data);
         });
       },
@@ -97,7 +106,9 @@ export const mockChrome = (opts = {}) => {
       });
       openTabs.push(chromeTab);
       setTimeout(() => {
-        callback(chromeTab);
+        if (callback) {
+          callback(chromeTab);
+        }
       });
     },
     remove: (tabId, callback) => {

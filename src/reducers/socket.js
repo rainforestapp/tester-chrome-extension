@@ -36,12 +36,27 @@ const authFailed = (state) => (
   state.set('state', 'unauthenticated')
 );
 
+const channelLeft = (state) => (
+  state.set('state', 'left')
+);
+
+const iconClicked = (state) => {
+  switch (state.get('state')) {
+    case 'left':
+      return state.set('state', 'reconnecting');
+    default:
+      return state;
+  }
+};
+
 const socket = handleActions({
   [actions.AUTHENTICATE]: authenticate,
   [actions.CONNECT]: connect,
   [actions.LOG_MESSAGE]: logMessage,
   [actions.CONNECTION_CLOSED]: connectionClosed,
   [actions.AUTH_FAILED]: authFailed,
+  [actions.CHANNEL_LEFT]: channelLeft,
+  [actions.ICON_CLICKED]: iconClicked,
 }, initialState);
 
 export default socket;

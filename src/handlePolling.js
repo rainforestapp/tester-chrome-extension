@@ -36,6 +36,12 @@ const handlePolling = (store) => {
     }
   };
 
+  const isFetchError = err => (
+    err instanceof TypeError &&
+      (err.message.indexOf('Failed to fetch') !== -1 ||
+       err.message.indexOf('Network request failed') !== -1)
+  );
+
   const ping = (url) => {
     let urlWithInfo = url;
     const profileInfo = store.getState().worker.get('profileInfo');
@@ -54,7 +60,7 @@ const handlePolling = (store) => {
       }
     })
       .catch(err => {
-        if (err instanceof TypeError && err.message === 'Failed to fetch') {
+        if (isFetchError(err)) {
           // Amazingly this is how request errors are represented, and no
           // additional information is exposed (even though if you look at the
           // console you can SEE THE ERROR DETAILS RIGHT THERE COME ON

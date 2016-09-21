@@ -9,7 +9,7 @@
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint src",
     "lint:fix": "eslint --fix src",
-    "build:browser": "mkdir -p build && browserify src/bootstrap.js -d -o build/main.js -t [ babelify --presets [ es2015 ] ] -p [ minifyify --map main.js.map --output build/main.js.map ]",
+    "build:browser": "browserify src/bootstrap.js -d -o extension/js/main.js -t [ babelify --presets [ es2015 ] ] -p [ minifyify --map main.js.map --output extension/js/main.js.map ]",
     "build": "npm run build:browser",
     "watch": "mkdir -p build && watchify src/bootstrap.js -d -o build/main.js -t [ babelify ]",
     "devServer": "cd build && ws -p 8123 -r '/DEV/* -> /$1'"

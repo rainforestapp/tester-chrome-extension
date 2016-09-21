@@ -7,13 +7,13 @@
 import { expect } from 'chai';
 import pluginApp from '../../reducers';
 import { createStore } from 'redux';
-import { authFailed, connect, updateWorkerState } from '../../actions';
+import { authFailed, connect, channelLeft, updateWorkerState } from '../../actions';
 import { mockChrome } from '../__mocks__/chrome';
 import { CONFIG } from '../../constants';
-import handleWorkerStateNotifications from '../handleWorkerStateNotifications';
-import { notLoggedIn } from '../notifications';
+import handleStateNotifications from '../handleStateNotifications';
+import { notLoggedIn, leftChannel } from '../notifications';
 
-describe('handleWorkerStateNotifications', function() {
+describe('handleStateNotifications', function() {
   describe('when the user is unauthenticated', function() {
     describe('when the user was already unauthenticated', function() {
       it("doesn't show a notification", function() {
@@ -21,7 +21,7 @@ describe('handleWorkerStateNotifications', function() {
         const store = createStore(pluginApp);
         store.dispatch(authFailed()); // already failed
 
-        handleWorkerStateNotifications(store, chrome);
+        handleStateNotifications(store, chrome);
 
         store.dispatch(authFailed());
 
@@ -35,11 +35,11 @@ describe('handleWorkerStateNotifications', function() {
         const store = createStore(pluginApp);
         store.dispatch(authFailed());
 
-        handleWorkerStateNotifications(store, chrome);
+        handleStateNotifications(store, chrome);
 
         store.dispatch(updateWorkerState('ready'));
 
-        expect(chrome.getCurrentNotifications()).to.have.property('notLoggedIn');
+        expect(chrome.getCurrentNotifications()).to.have.property(notLoggedIn);
       });
 
       it('sends the worker state back to inactive', function() {
@@ -47,7 +47,7 @@ describe('handleWorkerStateNotifications', function() {
         const chrome = mockChrome();
         store.dispatch(authFailed());
 
-        handleWorkerStateNotifications(store, chrome);
+        handleStateNotifications(store, chrome);
 
         store.dispatch(updateWorkerState('ready'));
 
@@ -60,11 +60,11 @@ describe('handleWorkerStateNotifications', function() {
         const chrome = mockChrome();
         const store = createStore(pluginApp);
 
-        handleWorkerStateNotifications(store, chrome);
+        handleStateNotifications(store, chrome);
 
         store.dispatch(authFailed());
 
-        expect(chrome.getCurrentNotifications()).to.have.property('notLoggedIn');
+        expect(chrome.getCurrentNotifications()).to.have.property(notLoggedIn);
       });
     });
   });
@@ -74,7 +74,7 @@ describe('handleWorkerStateNotifications', function() {
       const chrome = mockChrome();
       const store = createStore(pluginApp);
 
-      handleWorkerStateNotifications(store, chrome);
+      handleStateNotifications(store, chrome);
 
       store.dispatch(authFailed());
 
@@ -84,12 +84,26 @@ describe('handleWorkerStateNotifications', function() {
     });
   });
 
+  describe('when the user leaves the channel', function() {
+    it('shows a notification', function() {
+      const chrome = mockChrome();
+      const store = createStore(pluginApp);
+      store.dispatch(connect());
+
+      handleStateNotifications(store, chrome);
+
+      store.dispatch(channelLeft());
+
+      expect(chrome.getCurrentNotifications()).to.have.property(leftChannel);
+    });
+  });
+
   describe('clicking on a login notification', function() {
     it('opens a new tab with the profile URL', function() {
       const chrome = mockChrome();
       const store = createStore(pluginApp);
 
-      handleWorkerStateNotifications(store, chrome);
+      handleStateNotifications(store, chrome);
       store.dispatch(authFailed());
 
       chrome.clickNotification(notLoggedIn);

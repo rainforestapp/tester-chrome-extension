@@ -20,6 +20,8 @@ export const rateLimitExceeded = createAction(actions.RATE_LIMIT_EXCEEDED);
 export const applicationError = createAction(actions.APPLICATION_ERROR);
 export const resetInterval = createAction(actions.RESET_INTERVAL);
 export const setWorkerProfile = createAction(actions.SET_WORKER_PROFILE);
+export const channelLeft = createAction(actions.CHANNEL_LEFT);
+export const setOptions = createAction(actions.SET_OPTIONS);
 
 const validWorkerStates = ['ready', 'inactive', 'working'];
 
