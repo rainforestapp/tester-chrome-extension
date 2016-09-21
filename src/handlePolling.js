@@ -1,5 +1,11 @@
 import { logDebug } from './logging';
-import { assignWork, captchaRequired, rateLimitExceeded } from './actions';
+import {
+  assignWork,
+  captchaRequired,
+  rateLimitExceeded,
+  applicationError,
+  resetInterval,
+} from './actions';
 import Raven from 'raven-js';
 
 const handlePolling = (store) => {
@@ -47,6 +53,8 @@ const handlePolling = (store) => {
     fetch(urlWithInfo).then(resp => {
       if (resp.ok) {
         resp.json().then(checkForWork);
+      } else if (resp.status >= 500) {
+        store.dispatch(applicationError());
       } else {
         resp.text().then(checkForErrors);
       }
@@ -74,6 +82,13 @@ const handlePolling = (store) => {
       worker.get('state') === 'ready'
   );
 
+  const checkErrorDelay = ({ polling }) => {
+    if (polling.get('interval') !== polling.get('defaultInterval') &&
+        polling.get('errorDelayEndTime') < Date.now()) {
+      store.dispatch(resetInterval());
+    }
+  };
+
   const tick = () => {
     if (!running) {
       return;
@@ -85,6 +100,7 @@ const handlePolling = (store) => {
     } else {
       logDebug('Not pinging work server');
     }
+    checkErrorDelay(state);
     timeoutID = setTimeout(tick, state.polling.get('interval'));
   };
 

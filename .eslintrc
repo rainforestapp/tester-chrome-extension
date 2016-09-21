@@ -1,3 +1,8 @@
 {
-  "extends": "rainforest"
+  "extends": "airbnb",
+  "rules": {
+    "react/require-extension": "off",
+    "linebreak-style": [2, "windows"],
+  },
+
 }

@@ -6,8 +6,10 @@ const initialState = fromJS({
   polling: false,
   pollUrl: null,
   error: null,
+  defaultInterval: DEFAULT_POLLING_INTERVAL,
   interval: DEFAULT_POLLING_INTERVAL,
   captchaRequired: false,
+  errorDelayEndTime: null,
 });
 
 const startPolling = (state, { payload }) => {
@@ -27,7 +29,7 @@ const setPollingInterval = (state, { payload }) => {
     return state.set('error',
                      new Error(`setPollingInterval called with an incorrect payload: ${payload}`));
   }
-
+  state.set('defaultInterval', payload);
   return state.set('interval', payload);
 };
 
@@ -46,8 +48,21 @@ const captchaRequired = (state) => (
 
 const rateLimitExceeded = (state) => {
   const newInterval = (state.get('interval') + (3 * 1000));
+  state.set('defaultInterval', newInterval);
   return state.set('interval', newInterval); // keep adding 3 second till we are not rate limited
 };
+
+const applicationError = (state) => {
+  // if app error, add 45 seconds (to max of 5 minutes) until resolved (10 minutes later)
+  const addedDelay = (state.get('interval') <= (5 * 60 * 1000)) ? (45 * 1000) : 0;
+  const newInterval = (state.get('interval') + addedDelay);
+  state.set('errorDelayEndTime', Date.now() + (10 * 60 * 1000));
+  return state.set('interval', newInterval);
+};
+
+const resetInterval = (state) => (
+  state.set('interval', state.get('defaultInterval'))
+);
 
 // Seems as good a way to clear "captcha required" as any
 const iconClicked = (state) => (
@@ -62,6 +77,8 @@ const polling = handleActions({
   [actions.ASSIGN_WORK]: stopPolling,
   [actions.CAPTCHA_REQUIRED]: captchaRequired,
   [actions.RATE_LIMIT_EXCEEDED]: rateLimitExceeded,
+  [actions.APPLICATION_ERROR]: applicationError,
+  [actions.RESET_INTERVAL]: resetInterval,
   [actions.ICON_CLICKED]: iconClicked,
 }, initialState);
 
