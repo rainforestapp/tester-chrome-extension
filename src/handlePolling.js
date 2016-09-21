@@ -1,5 +1,11 @@
 import { logDebug } from './logging';
-import { assignWork, captchaRequired, rateLimitExceeded, applicationError, resetInterval } from './actions';
+import {
+  assignWork,
+  captchaRequired,
+  rateLimitExceeded,
+  applicationError,
+  resetInterval,
+} from './actions';
 import Raven from 'raven-js';
 
 const handlePolling = (store) => {
@@ -71,7 +77,8 @@ const handlePolling = (store) => {
   );
 
   const checkErrorDelay = ({ polling }) => {
-    if (polling.get('interval') !== polling.get('defaultInterval') && polling.get('errorDelayEndTime') < Date.now()) {
+    if (polling.get('interval') !== polling.get('defaultInterval') &&
+        polling.get('errorDelayEndTime') < Date.now()) {
       store.dispatch(resetInterval());
     }
   };
