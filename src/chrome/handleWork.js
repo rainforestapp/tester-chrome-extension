@@ -1,6 +1,6 @@
 import listenStoreChanges from '../listenStoreChanges';
 import { workFinished } from '../actions';
-import { audioPlayer, playSound } from '../playSound';
+import { mainAudioPlayer, playSound } from '../playSound';
 
 const handleWork = (store, chrome) => {
   let workTabId = null;
@@ -16,7 +16,7 @@ const handleWork = (store, chrome) => {
       chrome.tabs.create({ url }, tab => {
         workTabId = tab.id;
         const { plugin } = store.getState();
-        playSound(audioPlayer, plugin.get('options'));
+        playSound(mainAudioPlayer, plugin.get('options'));
       });
       if (oldWorkTabId) {
         chrome.tabs.remove(oldWorkTabId);

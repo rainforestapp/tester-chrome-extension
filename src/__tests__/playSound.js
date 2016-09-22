@@ -17,14 +17,14 @@ import pluginApp from '../reducers';
 chai.use(sinonChai);
 
 class MockAudio {
-  constructor(src = '') { 
+  constructor(src = '') {
     this.src = src;
   }
-  play() { 
+  play() {
     this.onended();
   }
   onended() {
-    //blank
+    // blank
   }
 }
 
@@ -86,7 +86,7 @@ describe('playSound', function() {
     store.dispatch(setOptions(options));
 
     const { plugin } = store.getState();
-    
+
     sinon.spy(audioPlayer, 'play');
     playSound(audioPlayer, plugin.get('options'));
     expect(audioPlayer.play).to.have.not.been.called;
