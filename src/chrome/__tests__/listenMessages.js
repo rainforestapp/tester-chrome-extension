@@ -138,7 +138,7 @@ describe('listenMessages', function() {
 
         chrome.sendRuntimeMessage({
           type: 'SET_OPTIONS',
-          payload: { soundNotificationUrl: url },
+          payload: { notificationSoundUrl: url },
         });
 
         return { store, chrome };
@@ -147,14 +147,14 @@ describe('listenMessages', function() {
       it('sets options', function() {
         const { store } = storeWithOptions();
         expect(store.getState().plugin.get('options'))
-          .to.equal(fromJS({ soundNotificationUrl: url }));
+          .to.equal(fromJS({ notificationSoundUrl: url }));
       });
 
       it('saves the settings in sync storage', function() {
         const { chrome } = storeWithOptions();
         const storage = chrome.getStorage();
 
-        expect(storage.options).to.deep.equal({ soundNotificationUrl: url });
+        expect(storage.options).to.deep.equal({ notificationSoundUrl: url });
       });
 
       it('merges options correctly', function() {
