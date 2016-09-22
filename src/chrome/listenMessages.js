@@ -41,7 +41,7 @@ const listenMessages = (store, chrome) => {
     store.dispatch(setOptions(payload));
 
     chrome.storage.sync.set({
-      options: payload,
+      options: store.getState().plugin.get('options').toJS(),
     });
   };
 
