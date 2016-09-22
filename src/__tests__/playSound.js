@@ -13,20 +13,9 @@ import { NOTIFICATION_SOUND_URL, NOTIFICATION_SOUND_REPEAT } from '../constants'
 import { setOptions } from '../actions';
 import { createStore } from 'redux';
 import pluginApp from '../reducers';
+import { MockAudio } from '../__mock__/audio';
 
 chai.use(sinonChai);
-
-class MockAudio {
-  constructor(src = '') {
-    this.src = src;
-  }
-  play() {
-    this.onended();
-  }
-  onended() {
-    // blank
-  }
-}
 
 describe('playSound', function() {
   it('sets notificationSoundUrl to audioPlayer', function() {
