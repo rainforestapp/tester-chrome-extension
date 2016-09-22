@@ -71,7 +71,10 @@ describe('playSound', function() {
   it('does not play sound', function() {
     const audioPlayer = new MockAudio();
     const store = createStore(pluginApp);
-    const options = {};
+    const options = {
+      [NOTIFICATION_SOUND_URL]: null,
+      [NOTIFICATION_SOUND_REPEAT]: null,
+    };
     store.dispatch(setOptions(options));
 
     const { plugin } = store.getState();
