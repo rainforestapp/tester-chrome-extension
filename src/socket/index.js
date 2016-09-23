@@ -11,6 +11,7 @@ import {
   setPluginVersion,
   startPolling,
   channelLeft,
+  reloadPlugin,
 } from '../actions';
 
 export const startSocket = (store, socketConstructor = Socket) => {
@@ -51,6 +52,10 @@ export const startSocket = (store, socketConstructor = Socket) => {
     store.dispatch(startPolling(payload));
   };
 
+  const handleReload = () => {
+    store.dispatch(reloadPlugin());
+  };
+
   const handleLeave = () => {
     if (!channel) {
       throw new Error("Leaving a channel when channel isn't joined");
@@ -87,21 +92,12 @@ export const startSocket = (store, socketConstructor = Socket) => {
     socket.connect();
 
     channel = socket.channel(`workers:${workerUUID}`);
-    channel.on('assign_work', payload => {
-      handleAssignWork(payload);
-    });
-    channel.on('work_finished', payload => {
-      handleWorkFinished(payload);
-    });
-    channel.on('check_version', payload => {
-      handleCheckVersion(payload);
-    });
-    channel.on('start_polling', payload => {
-      handleStartPolling(payload);
-    });
-    channel.on('leave', payload => {
-      handleLeave(payload);
-    });
+    channel.on('assign_work', handleAssignWork);
+    channel.on('work_finished', handleWorkFinished);
+    channel.on('check_version', handleCheckVersion);
+    channel.on('start_polling', handleStartPolling);
+    channel.on('reload', handleReload);
+    channel.on('leave', handleLeave);
     channel.join()
       .receive('ok', resp => {
         pushWorkerState(workerState());
