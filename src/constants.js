@@ -21,6 +21,7 @@ export const actions = deepFreeze({
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
   CHANNEL_LEFT: 'CHANNEL_LEFT',
   SET_OPTIONS: 'SET_OPTIONS',
+  RELOAD_PLUGIN: 'RELOAD_PLUGIN',
 });
 
 export const colors = deepFreeze({
