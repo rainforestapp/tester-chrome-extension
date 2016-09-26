@@ -45,18 +45,6 @@ const listenMessages = (store, chrome) => {
     });
   };
 
-  // TODO: This is only here for backward compatibility; we should nuke once all
-  // messages have been changed.
-  const handleDataMessage = (data) => {
-    if (data.worker_uuid && data.websocket_auth) {
-      handleAuthMessage(data);
-    }
-
-    if (data.clear_work) {
-      handleWorkError(data);
-    }
-  };
-
   const okResponse = () => (
     {
       status: 'ok',
@@ -89,12 +77,6 @@ const listenMessages = (store, chrome) => {
     logDebug('\n**Message received!**');
     logDebug('Message:', message);
     logDebug('Sender:', sender);
-
-    if (message.data) {
-      handleDataMessage(message.data);
-      sendResponse(okResponse());
-      return;
-    }
 
     if (message.type) {
       const resp = handleActionMessage(message);
