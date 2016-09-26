@@ -6,7 +6,7 @@
 */
 import chai, { expect } from 'chai';
 import { createStore } from 'redux';
-import { setPluginVersion } from '../actions';
+import { setPluginVersion, reloadPlugin } from '../actions';
 import pluginApp from '../reducers';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
@@ -35,5 +35,15 @@ describe('startReloader', function() {
 
     expect(spy).to.not.have.been.called;
     spy.reset();
+  });
+
+  it('reloads the page when needsReload is set to true', function() {
+    const spy = sinon.spy();
+    const store = createStore(pluginApp);
+    startReloader(store, spy);
+
+    store.dispatch(reloadPlugin());
+
+    expect(spy).to.have.been.called;
   });
 });

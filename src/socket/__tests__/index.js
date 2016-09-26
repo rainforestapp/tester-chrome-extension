@@ -187,6 +187,18 @@ describe('startSocket', function() {
     });
   });
 
+  describe('receiving a reload instruction', function() {
+    it('sets needsReload to true', function() {
+      const store = createStore(pluginApp);
+      const socket = authenticatedSocket(store, {});
+      const channel = socket.getSocket().testChannel;
+
+      channel.serverPush('reload', {});
+
+      expect(store.getState().plugin.get('needsReload')).to.be.true;
+    });
+  });
+
   describe('receiving a work assignment', function() {
     describe('when the worker is ready', function() {
       it('sets the worker state and work URL accordingly', function() {
