@@ -29,6 +29,20 @@ describe('startIdleChecking', function() {
     expect(store.getState().worker.get('state')).to.equal('inactive');
   });
 
+  it('changes wantsMoreWork to false if the worker is working', function() {
+    const chrome = mockChrome();
+    const store = createStore(pluginApp);
+    store.dispatch(updateWorkerState('working'));
+
+    startIdleChecking(store, chrome);
+
+    chrome.stateChanged('idle');
+
+    const { worker } = store.getState();
+    expect(worker.get('state')).to.equal('working');
+    expect(worker.get('wantsMoreWork')).to.be.false;
+  });
+
   it('gives the worker a notification and logs them back in if they click it', function() {
     const chrome = mockChrome();
     const store = createStore(pluginApp);
