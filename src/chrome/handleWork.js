@@ -4,7 +4,7 @@ import { playSoundOptions, stopSound } from '../playSound';
 
 const handleWork = (store, chrome) => {
   let workTabId = null;
-  let audioPlayer = null;
+  window.audioPlayer = null;
 
   const handleAssignWork = ({ worker: prevWorker }, { worker: curWorker }) => {
     if (prevWorker.get('state') !== 'working' && curWorker.get('state') === 'working') {
@@ -16,15 +16,15 @@ const handleWork = (store, chrome) => {
       const oldWorkTabId = workTabId;
       chrome.tabs.create({ url }, tab => {
         workTabId = tab.id;
-        audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
+        window.audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
       });
       if (oldWorkTabId) {
         chrome.tabs.remove(oldWorkTabId);
       }
     }
 
-    if (prevWorker.get('state') === 'working' && curWorker.get('state') !== 'working') {
-      stopSound(audioPlayer);
+    if (curWorker.get('state') !== 'working') {
+      stopSound(window.audioPlayer);
     }
   };
 
