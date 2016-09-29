@@ -23,7 +23,7 @@ const handleWork = (store, chrome) => {
       }
     }
 
-    if (curWorker.get('state') !== 'working') {
+    if (prevWorker.get('state') === 'working' && curWorker.get('state') !== 'working') {
       stopSound(window.audioPlayer);
     }
   };
