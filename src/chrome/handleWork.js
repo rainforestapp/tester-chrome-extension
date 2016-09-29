@@ -1,9 +1,10 @@
 import listenStoreChanges from '../listenStoreChanges';
 import { workFinished } from '../actions';
-import { mainAudioPlayer, playSound } from '../playSound';
+import { playSoundOptions, stopSound } from '../playSound';
 
 const handleWork = (store, chrome) => {
   let workTabId = null;
+  let audioPlayer = null;
 
   const handleAssignWork = ({ worker: prevWorker }, { worker: curWorker }) => {
     if (prevWorker.get('state') !== 'working' && curWorker.get('state') === 'working') {
@@ -15,12 +16,15 @@ const handleWork = (store, chrome) => {
       const oldWorkTabId = workTabId;
       chrome.tabs.create({ url }, tab => {
         workTabId = tab.id;
-        const { plugin } = store.getState();
-        playSound(mainAudioPlayer, plugin.get('options'));
+        audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
       });
       if (oldWorkTabId) {
         chrome.tabs.remove(oldWorkTabId);
       }
+    }
+
+    if (prevWorker.get('state') === 'working' && curWorker.get('state') !== 'working') {
+      stopSound(audioPlayer);
     }
   };
 

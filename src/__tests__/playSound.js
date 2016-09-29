@@ -5,21 +5,19 @@
  no-unused-expressions
 */
 
-import chai, { expect } from 'chai';
-import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
-import { playSound } from '../playSound';
+import { expect } from 'chai';
+import { playSoundOptions, stopSound } from '../playSound';
 import { NOTIFICATION_SOUND_URL, NOTIFICATION_SOUND_REPEAT } from '../constants';
 import { setOptions } from '../actions';
 import { createStore } from 'redux';
 import pluginApp from '../reducers';
 import { MockAudio } from '../__mock__/audio';
 
-chai.use(sinonChai);
+window.Audio = MockAudio;
 
 describe('playSound', function() {
   it('sets notificationSoundUrl to audioPlayer', function() {
-    const audioPlayer = new MockAudio();
+    let audioPlayer = null;
     const store = createStore(pluginApp);
     const options = {
       [NOTIFICATION_SOUND_URL]: 'mockSound.mp3',
@@ -27,15 +25,12 @@ describe('playSound', function() {
     };
     store.dispatch(setOptions(options));
 
-    const { plugin } = store.getState();
-
-    sinon.spy(audioPlayer.src);
-    playSound(audioPlayer, plugin.get('options'));
+    audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
     expect(audioPlayer.src).to.equal('mockSound.mp3');
   });
 
-  it('repeats sound 3 times', function() {
-    const audioPlayer = new MockAudio();
+  it('repeats sound 3 times', function(done) {
+    let audioPlayer = null;
     const store = createStore(pluginApp);
     const options = {
       [NOTIFICATION_SOUND_URL]: 'mockSound.mp3',
@@ -43,16 +38,15 @@ describe('playSound', function() {
     };
     store.dispatch(setOptions(options));
 
-    const { plugin } = store.getState();
-
-    sinon.spy(audioPlayer, 'play');
-    playSound(audioPlayer, plugin.get('options'));
-    expect(audioPlayer.play).to.have.been.calledThrice;
-    audioPlayer.play.restore();
+    audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
+    setTimeout(() => {
+      expect(audioPlayer.playCount).to.equal(3);
+      done();
+    }, 20);
   });
 
   it('plays sound once', function() {
-    const audioPlayer = new MockAudio();
+    let audioPlayer = null;
     const store = createStore(pluginApp);
     const options = {
       [NOTIFICATION_SOUND_URL]: 'mockSound.mp3',
@@ -60,16 +54,12 @@ describe('playSound', function() {
     };
     store.dispatch(setOptions(options));
 
-    const { plugin } = store.getState();
-
-    sinon.spy(audioPlayer, 'play');
-    playSound(audioPlayer, plugin.get('options'));
-    expect(audioPlayer.play).to.have.been.calledOnce;
-    audioPlayer.play.restore();
+    audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
+    expect(audioPlayer.playCount).to.equal(1);
   });
 
   it('does not play sound', function() {
-    const audioPlayer = new MockAudio();
+    let audioPlayer = null;
     const store = createStore(pluginApp);
     const options = {
       [NOTIFICATION_SOUND_URL]: null,
@@ -77,12 +67,26 @@ describe('playSound', function() {
     };
     store.dispatch(setOptions(options));
 
-    const { plugin } = store.getState();
+    audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
+    expect(audioPlayer).to.be.null;
+  });
 
-    sinon.spy(audioPlayer, 'play');
-    playSound(audioPlayer, plugin.get('options'));
-    expect(audioPlayer.play).to.have.not.been.called;
-    audioPlayer.play.restore();
+  it('stop sounds from playing', function(done) {
+    let audioPlayer = null;
+    const store = createStore(pluginApp);
+    const options = {
+      [NOTIFICATION_SOUND_URL]: 'mockSound.mp3',
+      [NOTIFICATION_SOUND_REPEAT]: 10,
+    };
+    store.dispatch(setOptions(options));
+
+    audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
+    setTimeout(() => {
+      stopSound(audioPlayer);
+      expect(audioPlayer.paused).to.be.true;
+      expect(audioPlayer.playCount).to.be.at.least(2);
+      expect(audioPlayer.playCount).to.be.below(10);
+      done();
+    }, 20);
   });
 });
-

@@ -1,11 +1,19 @@
-// window.Audio doesn't get along w/ sinon.spy
+// testable code with play count and pause boolean.
 
 export class MockAudio {
-  constructor(src = '') {
+  constructor(src = '', playCount = 0, paused = false) {
     this.src = src;
+    this.playCount = playCount;
+    this.paused = paused;
   }
   play() {
-    this.onended();
+    if (!this.paused) {
+      this.playCount++;
+      setTimeout(this.onended.bind(this), 5);
+    }
+  }
+  pause() {
+    this.paused = true;
   }
   onended() {
     // blank
