@@ -1,4 +1,4 @@
-import { updateWorkerState } from '../actions';
+import { updateWorkerState, iconClicked } from '../actions';
 import { notifications, workerIdle } from './notifications';
 import listenStoreChanges from '../listenStoreChanges';
 import { playSoundOnce } from '../playSound';
@@ -7,13 +7,21 @@ const idlePeriod = 6 * 60;
 
 const startIdleChecking = (store, chrome) => {
   const goIdle = () => {
-    if (store.getState().worker.get('state') !== 'ready') {
-      return;
+    const { worker } = store.getState();
+    switch (worker.get('state')) {
+      case 'ready':
+        store.dispatch(updateWorkerState('inactive'));
+        chrome.notifications.create(workerIdle, notifications[workerIdle]);
+        playSoundOnce(store.getState().plugin.get('options'));
+        break;
+      case 'working':
+        if (worker.get('wantsMoreWork')) {
+          // "Click icon" to indicate that the worker doesn't want more work
+          store.dispatch(iconClicked());
+        }
+        break;
+      default:
     }
-
-    store.dispatch(updateWorkerState('inactive'));
-    chrome.notifications.create(workerIdle, notifications[workerIdle]);
-    playSoundOnce(store.getState().plugin.get('options'));
   };
 
   const handleUpdate = (_previousState, currentState) => {
