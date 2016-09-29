@@ -6,7 +6,7 @@
 */
 
 import { expect } from 'chai';
-import { playSoundOptions, stopSound } from '../playSound';
+import { playSoundOptions, stopSound, playSoundOnce } from '../playSound';
 import { NOTIFICATION_SOUND_URL, NOTIFICATION_SOUND_REPEAT } from '../constants';
 import { setOptions } from '../actions';
 import { createStore } from 'redux';
@@ -88,5 +88,21 @@ describe('playSound', function() {
       expect(audioPlayer.playCount).to.be.below(10);
       done();
     }, 20);
+  });
+
+  it('playSoundOnce plays once', function(done) {
+    let audioPlayer = null;
+    const store = createStore(pluginApp);
+    const options = {
+      [NOTIFICATION_SOUND_URL]: 'mockSound.mp3',
+      [NOTIFICATION_SOUND_REPEAT]: 3,
+    };
+    store.dispatch(setOptions(options));
+
+    audioPlayer = playSoundOnce(store.getState().plugin.get('options'));
+    setTimeout(() => {
+      expect(audioPlayer.playCount).to.equal(1);
+      done();
+    }, 10);
   });
 });

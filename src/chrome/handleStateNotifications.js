@@ -2,6 +2,7 @@ import { notifications, notLoggedIn, leftChannel } from './notifications';
 import { CONFIG } from '../constants';
 import { updateWorkerState } from '../actions';
 import listenStoreChanges from '../listenStoreChanges';
+import { playSoundOnce } from '../playSound';
 
 const handleStateNotifications = (store, chrome) => {
   const shouldSendAuthNotifications = (
@@ -16,6 +17,7 @@ const handleStateNotifications = (store, chrome) => {
   const handleAuthNotification = (previousState, currentState) => {
     if (shouldSendAuthNotifications(previousState, currentState)) {
       chrome.notifications.create(notLoggedIn, notifications[notLoggedIn]);
+      playSoundOnce(store.getState().plugin.get('options'));
       store.dispatch(updateWorkerState('inactive'));
     } else if (currentState.socket.get('state') === 'connected') {
       chrome.notifications.clear(notLoggedIn, () => {});
@@ -25,6 +27,7 @@ const handleStateNotifications = (store, chrome) => {
   const handleChannelNotifications = ({ socket: prevSocket }, { socket: curSocket }) => {
     if (prevSocket.get('state') !== 'left' && curSocket.get('state') === 'left') {
       chrome.notifications.create(leftChannel, notifications[leftChannel]);
+      playSoundOnce(store.getState().plugin.get('options'));
     }
   };
 
