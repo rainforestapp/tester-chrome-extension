@@ -81,10 +81,18 @@ describe('polling reducer', function() {
 
   describe(actions.SET_POLL_URL, function() {
     it('sets the URL for polling', function() {
-      const state = polling(undefined, setPollUrl('http://work.com'));
+      const state = polling(undefined, setPollUrl('http://work.com/foo-bar'));
       checkState(state);
 
-      expect(state.get('pollUrl')).to.equal('http://work.com');
+      expect(state.get('pollUrl')).to.equal('http://work.com/foo-bar');
+    });
+
+    it('checks for invalid URLs', function() {
+      const state = polling(undefined, setPollUrl('/foo/bar'));
+      checkState(state);
+
+      expect(state.get('pollUrl')).to.be.null;
+      expect(state.get('error')).to.be.an('error');
     });
   });
 
