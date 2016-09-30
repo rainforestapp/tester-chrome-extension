@@ -67,7 +67,7 @@ describe('listenMessages', function() {
 
     it("doesn't set the polling endpoint if it's invalid", function() {
       const store = createStore(pluginApp);
-      const chrome = mockChrome();
+      const chrome = mockChrome({ storage: { work_available_endpoint: 'http://work.com' } });
       listenMessages(store, chrome);
 
       chrome.sendRuntimeMessage({
@@ -82,6 +82,8 @@ describe('listenMessages', function() {
       const { polling } = store.getState();
       expect(polling.get('pollUrl')).to.be.null;
       expect(polling.get('error')).to.be.null;
+
+      expect(chrome.getStorage().work_available_endpoint).to.equal('http://work.com');
     });
 
     it('stores the data in the chrome sync storage', function() {
