@@ -4,8 +4,7 @@ const getSync = (store, chrome) => {
   const dataKeys = ['worker_uuid', 'websocket_auth', 'work_available_endpoint', 'options'];
   chrome.storage.sync.get(dataKeys, data => {
     let auth = null;
-    if (data.hasOwnProperty('worker_uuid') &&
-        data.hasOwnProperty('websocket_auth')) {
+    if (data.worker_uuid && data.websocket_auth) {
       auth = { workerUUID: data.worker_uuid, socketAuth: data.websocket_auth };
     }
     if (auth) {
@@ -13,7 +12,7 @@ const getSync = (store, chrome) => {
     }
 
     let pollUrl = null;
-    if (data.hasOwnProperty('work_available_endpoint') && data.hasOwnProperty('worker_uuid')) {
+    if (data.work_available_endpoint && data.worker_uuid) {
       pollUrl = `${data.work_available_endpoint}${data.worker_uuid}/work_available`;
     }
     if (pollUrl) {
