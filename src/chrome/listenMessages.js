@@ -20,13 +20,17 @@ const listenMessages = (store, chrome) => {
     if (pollEndpoint) {
       const pollUrl = `${pollEndpoint}${workerUUID}/work_available`;
       store.dispatch(setPollUrl(pollUrl));
+      chrome.storage.sync.set({
+        worker_uuid: workerUUID,
+        websocket_auth: socketAuth,
+        work_available_endpoint: pollEndpoint,
+      });
+    } else {
+      chrome.storage.sync.set({
+        worker_uuid: workerUUID,
+        websocket_auth: socketAuth,
+      });
     }
-
-    chrome.storage.sync.set({
-      worker_uuid: workerUUID,
-      websocket_auth: socketAuth,
-      work_available_endpoint: pollEndpoint,
-    });
   };
 
   const handleWorkError = () => {
