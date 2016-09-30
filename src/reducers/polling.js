@@ -31,8 +31,10 @@ const setPollingInterval = (state, { payload }) => {
   return state.set('interval', payload);
 };
 
+const urlRegex = /^https?:\/\/\S+$/;
+
 const setPollUrl = (state, { payload }) => {
-  if (typeof payload !== 'string') {
+  if (typeof payload !== 'string' || !urlRegex.test(payload)) {
     return state.set('error',
                      new Error(`setPollUrl called with an incorrect payload: ${payload}`));
   }
