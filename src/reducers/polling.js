@@ -20,7 +20,7 @@ const startPolling = (state, { payload }) => {
 
 const authenticate = (state, { payload }) => {
   if (!payload) {
-    return state.set('error', new Error('authenticate dispatched without a pauload'));
+    return state.set('error', new Error('authenticate dispatched without a payload'));
   }
   const { workerUUID } = payload;
   if (!workerUUID) {
