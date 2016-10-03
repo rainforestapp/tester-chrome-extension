@@ -8,7 +8,7 @@ import { mockChrome } from '../__mocks__/chrome';
 import { expect } from 'chai';
 import handleStateSaving from '../handleStateSaving';
 import { createStore } from 'redux';
-import { updateWorkerState } from '../../actions';
+import { updateWorkerState, iconClicked } from '../../actions';
 import pluginApp from '../../reducers';
 
 describe('handleStateSaving', function() {
@@ -20,6 +20,22 @@ describe('handleStateSaving', function() {
 
     store.dispatch(updateWorkerState('ready'));
 
+    expect(chrome.getLocalStorage().workerState).to.equal('ready');
+  });
+
+  it('saves as "ready" when the worker wants more work', function() {
+    const store = createStore(pluginApp);
+    const chrome = mockChrome();
+
+    handleStateSaving(store, chrome);
+
+    store.dispatch(updateWorkerState('working'));
+    expect(chrome.getLocalStorage().workerState).to.equal('ready');
+
+    store.dispatch(iconClicked()); // indicate worker doesn't want more work
+    expect(chrome.getLocalStorage().workerState).to.equal('inactive');
+
+    store.dispatch(iconClicked());
     expect(chrome.getLocalStorage().workerState).to.equal('ready');
   });
 
