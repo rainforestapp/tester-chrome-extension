@@ -7,7 +7,12 @@
 
 import { mockChrome } from '../__mocks__/chrome';
 import { expect } from 'chai';
-import { assignWork, updateWorkerState, workStarted, workFinished } from '../../actions';
+import {
+  assignWork,
+  updateWorkerState,
+  workStarted,
+  workFinished,
+} from '../../actions';
 import { createStore } from 'redux';
 import pluginApp from '../../reducers';
 import handleWork from '../handleWork';

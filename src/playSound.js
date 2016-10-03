@@ -1,18 +1,26 @@
 import { NOTIFICATION_SOUND_URL, NOTIFICATION_SOUND_REPEAT } from './constants';
 
-export const mainAudioPlayer = new window.Audio();
-
-export const playSound = (audioPlayer, options) => {
-  const soundPlayer = audioPlayer;
-  const soundUrl = options.get(NOTIFICATION_SOUND_URL);
-  const repeat = options.get(NOTIFICATION_SOUND_REPEAT);
-  if (soundUrl && repeat > 0) {
-    soundPlayer.src = soundUrl;
+const playAudioPlayer = (soundUrl, soundRepeat) => {
+  if (soundUrl && soundRepeat > 0) {
+    const audioPlayer = new window.Audio(soundUrl);
     let repeatCount = 0;
-    soundPlayer.onended = () => {
+    audioPlayer.onended = () => {
       repeatCount++;
-      if (repeatCount < repeat) soundPlayer.play();
+      if (repeatCount < soundRepeat) audioPlayer.play();
     };
-    soundPlayer.play();
+    audioPlayer.play();
+    return audioPlayer;
   }
+  return null;
+};
+
+export const playSound = (options) => {
+  const soundUrl = options.get(NOTIFICATION_SOUND_URL);
+  const soundRepeat = options.get(NOTIFICATION_SOUND_REPEAT);
+  return playAudioPlayer(soundUrl, soundRepeat);
+};
+
+export const playSoundOnce = (options) => {
+  const soundUrl = options.get(NOTIFICATION_SOUND_URL);
+  return playAudioPlayer(soundUrl, 1);
 };
