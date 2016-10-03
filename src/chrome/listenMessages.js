@@ -1,11 +1,10 @@
-import { authenticate, setPollUrl, workStarted, workFinished, setOptions } from '../actions';
+import { authenticate, workStarted, workFinished, setOptions } from '../actions';
 import { logDebug } from '../logging';
 
 const listenMessages = (store, chrome) => {
   const handleAuthMessage = ({
     worker_uuid: workerUUID,
     websocket_auth: socketAuth,
-    work_available_endpoint: pollEndpoint,
   }) => {
     if (!workerUUID || !socketAuth) {
       throw new Error('Invalid authentication message received!');
@@ -17,20 +16,10 @@ const listenMessages = (store, chrome) => {
     };
     store.dispatch(authenticate(auth));
 
-    if (pollEndpoint) {
-      const pollUrl = `${pollEndpoint}${workerUUID}/work_available`;
-      store.dispatch(setPollUrl(pollUrl));
-      chrome.storage.sync.set({
-        worker_uuid: workerUUID,
-        websocket_auth: socketAuth,
-        work_available_endpoint: pollEndpoint,
-      });
-    } else {
-      chrome.storage.sync.set({
-        worker_uuid: workerUUID,
-        websocket_auth: socketAuth,
-      });
-    }
+    chrome.storage.sync.set({
+      worker_uuid: workerUUID,
+      websocket_auth: socketAuth,
+    });
   };
 
   const handleWorkError = () => {
