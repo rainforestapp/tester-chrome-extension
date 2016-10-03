@@ -26,7 +26,6 @@ describe('listenMessages', function() {
         payload: {
           worker_uuid: 'abc123',
           websocket_auth: auth,
-          work_available_endpoint: 'http://www.work.com/',
         },
       }, spy);
     };
@@ -62,28 +61,7 @@ describe('listenMessages', function() {
       sendAuth(chrome, () => {});
 
       const pollUrl = store.getState().polling.get('pollUrl');
-      expect(pollUrl).to.equal('http://www.work.com/abc123/work_available');
-    });
-
-    it("doesn't set the polling endpoint if it's invalid", function() {
-      const store = createStore(pluginApp);
-      const chrome = mockChrome({ storage: { work_available_endpoint: 'http://work.com' } });
-      listenMessages(store, chrome);
-
-      chrome.sendRuntimeMessage({
-        type: 'AUTHENTICATE',
-        payload: {
-          worker_uuid: 'abc123',
-          websocket_auth: auth,
-          work_available_endpoint: '',
-        },
-      });
-
-      const { polling } = store.getState();
-      expect(polling.get('pollUrl')).to.be.null;
-      expect(polling.get('error')).to.be.null;
-
-      expect(chrome.getStorage().work_available_endpoint).to.equal('http://work.com');
+      expect(pollUrl).to.equal('http://portal.rainforest.dev/api/1/testers/abc123/work_available');
     });
 
     it('stores the data in the chrome sync storage', function() {
@@ -96,7 +74,6 @@ describe('listenMessages', function() {
       const storage = chrome.getStorage();
       expect(storage.worker_uuid).to.equal('abc123');
       expect(storage.websocket_auth).to.equal(auth);
-      expect(storage.work_available_endpoint).to.equal('http://www.work.com/');
     });
 
     it('responds with plugin information', function(done) {

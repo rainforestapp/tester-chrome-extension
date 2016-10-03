@@ -14,7 +14,6 @@ export const setPluginVersion = createAction(actions.SET_PLUGIN_VERSION);
 export const startPolling = createAction(actions.START_POLLING);
 export const stopPolling = createAction(actions.STOP_POLLING);
 export const setPollingInterval = createAction(actions.SET_POLLING_INTERVAL);
-export const setPollUrl = createAction(actions.SET_POLL_URL);
 export const captchaRequired = createAction(actions.CAPTCHA_REQUIRED);
 export const rateLimitExceeded = createAction(actions.RATE_LIMIT_EXCEEDED);
 export const setWorkerProfile = createAction(actions.SET_WORKER_PROFILE);

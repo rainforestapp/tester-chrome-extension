@@ -1,6 +1,6 @@
 import { fromJS } from 'immutable';
 import { handleActions } from 'redux-actions';
-import { actions, DEFAULT_POLLING_INTERVAL } from '../constants';
+import { actions, DEFAULT_POLLING_INTERVAL, CONFIG } from '../constants';
 
 const initialState = fromJS({
   polling: false,
@@ -18,6 +18,18 @@ const startPolling = (state, { payload }) => {
   return state.set('polling', true);
 };
 
+const authenticate = (state, { payload }) => {
+  if (!payload) {
+    return state.set('error', new Error('authenticate dispatched without a pauload'));
+  }
+  const { workerUUID } = payload;
+  if (!workerUUID) {
+    return state.set('error', new Error('authenticate dispatched without worker UUID'));
+  }
+
+  return state.set('pollUrl', `${CONFIG.workAvailableEndpoint}/${workerUUID}/work_available`);
+};
+
 const stopPolling = (state) => (
   state.set('polling', false)
 );
@@ -29,17 +41,6 @@ const setPollingInterval = (state, { payload }) => {
   }
 
   return state.set('interval', payload);
-};
-
-const urlRegex = /^https?:\/\/\S+$/;
-
-const setPollUrl = (state, { payload }) => {
-  if (typeof payload !== 'string' || !urlRegex.test(payload)) {
-    return state.set('error',
-                     new Error(`setPollUrl called with an incorrect payload: ${payload}`));
-  }
-
-  return state.set('pollUrl', payload);
 };
 
 const captchaRequired = (state) => (
@@ -60,11 +61,11 @@ const polling = handleActions({
   [actions.START_POLLING]: startPolling,
   [actions.STOP_POLLING]: stopPolling,
   [actions.SET_POLLING_INTERVAL]: setPollingInterval,
-  [actions.SET_POLL_URL]: setPollUrl,
   [actions.ASSIGN_WORK]: stopPolling,
   [actions.CAPTCHA_REQUIRED]: captchaRequired,
   [actions.RATE_LIMIT_EXCEEDED]: rateLimitExceeded,
   [actions.ICON_CLICKED]: iconClicked,
+  [actions.AUTHENTICATE]: authenticate,
 }, initialState);
 
 export default polling;
