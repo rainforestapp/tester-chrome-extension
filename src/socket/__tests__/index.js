@@ -7,7 +7,7 @@
 import chai, { expect } from 'chai';
 import { mockSocket } from '../__mocks__';
 import { createStore } from 'redux';
-import { authenticate, updateWorkerState, setPollUrl, iconClicked } from '../../actions';
+import { authenticate, updateWorkerState, iconClicked } from '../../actions';
 import pluginApp from '../../reducers';
 import { startSocket } from '..';
 import sinon from 'sinon';
@@ -165,7 +165,6 @@ describe('startSocket', function() {
     const store = createStore(pluginApp);
     const socket = authenticatedSocket(store, {});
     const channel = socket.getSocket().testChannel;
-    store.dispatch(setPollUrl('http://work.com'));
 
     channel.serverPush('start_polling', {});
 

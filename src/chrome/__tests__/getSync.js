@@ -27,62 +27,18 @@ describe('getSync', function() {
 
     let success = false;
     store.subscribe(() => {
-      const { worker, socket } = store.getState();
+      const { worker, socket, polling } = store.getState();
+      const expectedPollUrl = 'http://portal.rainforest.dev/api/1/testers/abc123/work_available';
       if (!success &&
           worker.get('uuid') === workerUUID &&
-          socket.get('auth').equals(fromJS(socketAuth))) {
+          socket.get('auth').equals(fromJS(socketAuth)) &&
+          polling.get('pollUrl') === expectedPollUrl) {
         success = true;
         done();
       }
     });
 
     getSync(store, chrome);
-  });
-
-  it("sets the poll URL if it's stored in sync", function(done) {
-    const workerUUID = 'abc123';
-    const storage = {
-      worker_uuid: workerUUID,
-      work_available_endpoint: 'http://work.com/',
-    };
-    const store = createStore(pluginApp);
-    const chrome = mockChrome({ storage });
-
-    let success = false;
-    store.subscribe(() => {
-      const { polling } = store.getState();
-      if (!success && polling.get('pollUrl') === 'http://work.com/abc123/work_available') {
-        success = true;
-        done();
-      }
-    });
-
-    getSync(store, chrome);
-  });
-
-  it("doesn't set the poll URL if it would be invalid", function(done) {
-    const workerUUID = 'abc123';
-    const storage = {
-      worker_uuid: workerUUID,
-      work_available_endpoint: '',
-    };
-
-    const store = createStore(pluginApp);
-    const chrome = mockChrome({ storage });
-
-    store.subscribe(() => {
-      const { polling } = store.getState();
-      if (polling.get('error')) {
-        done(polling.get('error'));
-      }
-      if (polling.get('pollUrl')) {
-        done(new Error(`pollUrl was set to ${polling.get('pollUrl')} but shouldn't have`));
-      }
-    });
-
-    getSync(store, chrome);
-
-    setTimeout(done, 50);
   });
 
   it("sets the options if they're stored in sync", function(done) {

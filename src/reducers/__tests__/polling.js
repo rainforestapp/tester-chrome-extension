@@ -7,10 +7,10 @@
 import chai, { expect } from 'chai';
 import { actions, DEFAULT_POLLING_INTERVAL } from '../../constants';
 import {
+  authenticate,
   startPolling,
   stopPolling,
   setPollingInterval,
-  setPollUrl,
   assignWork,
   captchaRequired,
   iconClicked,
@@ -79,23 +79,6 @@ describe('polling reducer', function() {
     });
   });
 
-  describe(actions.SET_POLL_URL, function() {
-    it('sets the URL for polling', function() {
-      const state = polling(undefined, setPollUrl('http://work.com/foo-bar'));
-      checkState(state);
-
-      expect(state.get('pollUrl')).to.equal('http://work.com/foo-bar');
-    });
-
-    it('checks for invalid URLs', function() {
-      const state = polling(undefined, setPollUrl('/foo/bar'));
-      checkState(state);
-
-      expect(state.get('pollUrl')).to.be.null;
-      expect(state.get('error')).to.be.an('error');
-    });
-  });
-
   describe(actions.ASSIGN_WORK, function() {
     it('stops polling', function() {
       let state = polling(undefined, startPolling({ url: 'http://example.com' }));
@@ -138,6 +121,25 @@ describe('polling reducer', function() {
       checkState(state);
 
       expect(state.get('interval')).to.equal(4000);
+    });
+  });
+
+  describe(actions.AUTHENTICATE, function() {
+    it('sets pollUrl', function() {
+      const auth = {
+        auth: 'SEKRET',
+        sig: 'SIG',
+      };
+      const action = authenticate({
+        workerUUID: 'abc123',
+        socketAuth: auth,
+      });
+      const state = polling(undefined, action);
+      checkState(state);
+
+      expect(state.get('pollUrl')).to.equal(
+        'http://portal.rainforest.dev/api/1/testers/abc123/work_available'
+      );
     });
   });
 });

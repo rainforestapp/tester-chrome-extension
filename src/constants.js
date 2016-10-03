@@ -15,7 +15,6 @@ export const actions = deepFreeze({
   START_POLLING: 'START_POLLING',
   STOP_POLLING: 'STOP_POLLING',
   SET_POLLING_INTERVAL: 'SET_POLLING_INTERVAL',
-  SET_POLL_URL: 'SET_POLL_URL',
   CAPTCHA_REQUIRED: 'CAPTCHA_REQUIRED',
   SET_WORKER_PROFILE: 'SET_WORKER_PROFILE',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
@@ -52,6 +51,7 @@ const getConfig = () => {
         env: 'dev',
         socketURL: 'ws://localhost:4000/socket',
         profileUrl: 'http://portal.rainforest.dev/profile',
+        workAvailableEndpoint: 'http://portal.rainforest.dev/api/1/testers',
         chrome: getChromeConfig(),
         ravenURL: 'BOGUS',
       };
@@ -60,6 +60,7 @@ const getConfig = () => {
         env: 'staging',
         socketURL: 'wss://schrute.rnfrst.com/socket',
         profileUrl: 'https://portal.rnfrst.com/profile',
+        workAvailableEndpoint: 'https://portal.rainforestqa.com/api/1/testers',
         chrome: getChromeConfig(),
         ravenURL: 'https://0f911298f80c47d9b53d3e6a53d236e5@app.getsentry.com/88435',
       };
@@ -68,6 +69,7 @@ const getConfig = () => {
         env: 'prod',
         socketURL: 'wss://schrute.rainforestqa.com/socket',
         profileUrl: 'https://portal.rainforestqa.com/profile',
+        workAvailableEndpoint: 'https://bouncer.rainforestqa.com/1/testers',
         chrome: getChromeConfig(),
         ravenURL: 'https://a7b0c76390cc47208e38b884fd60ff3d@sentry.io/68477',
       };
@@ -76,6 +78,7 @@ const getConfig = () => {
         env: 'test',
         socketURL: 'ws://localhost:4000/socket',
         profileUrl: 'http://portal.rainforest.dev/profile',
+        workAvailableEndpoint: 'http://portal.rainforest.dev/api/1/testers',
         chrome: {
           notificationIconUrl: 'bogusNotifications.png',
           greyIcon: { path: 'GREY' },
