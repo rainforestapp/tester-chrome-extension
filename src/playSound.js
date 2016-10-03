@@ -1,6 +1,6 @@
 import { NOTIFICATION_SOUND_URL, NOTIFICATION_SOUND_REPEAT } from './constants';
 
-const playSound = (soundUrl, soundRepeat) => {
+const playAudioPlayer = (soundUrl, soundRepeat) => {
   if (soundUrl && soundRepeat > 0) {
     const audioPlayer = new window.Audio(soundUrl);
     let repeatCount = 0;
@@ -14,20 +14,13 @@ const playSound = (soundUrl, soundRepeat) => {
   return null;
 };
 
-export const stopSound = (audioPlayer) => {
-  if (audioPlayer) {
-    audioPlayer.pause();
-  }
-};
-
-export const playSoundOptions = (options) => {
+export const playSound = (options) => {
   const soundUrl = options.get(NOTIFICATION_SOUND_URL);
   const soundRepeat = options.get(NOTIFICATION_SOUND_REPEAT);
-  const audioPlayer = playSound(soundUrl, soundRepeat);
-  return audioPlayer;
+  return playAudioPlayer(soundUrl, soundRepeat);
 };
 
 export const playSoundOnce = (options) => {
   const soundUrl = options.get(NOTIFICATION_SOUND_URL);
-  return playSound(soundUrl, 1);
+  return playAudioPlayer(soundUrl, 1);
 };

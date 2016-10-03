@@ -6,12 +6,12 @@
 */
 
 import { expect } from 'chai';
-import { playSoundOptions, stopSound, playSoundOnce } from '../playSound';
+import { playSound, playSoundOnce } from '../playSound';
 import { NOTIFICATION_SOUND_URL, NOTIFICATION_SOUND_REPEAT } from '../constants';
 import { setOptions } from '../actions';
 import { createStore } from 'redux';
 import pluginApp from '../reducers';
-import { MockAudio } from '../__mock__/audio';
+import { MockAudio } from '../__mocks__/audio';
 
 window.Audio = MockAudio;
 
@@ -25,7 +25,7 @@ describe('playSound', function() {
     };
     store.dispatch(setOptions(options));
 
-    audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
+    audioPlayer = playSound(store.getState().plugin.get('options'));
     expect(audioPlayer.src).to.equal('mockSound.mp3');
   });
 
@@ -38,24 +38,11 @@ describe('playSound', function() {
     };
     store.dispatch(setOptions(options));
 
-    audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
+    audioPlayer = playSound(store.getState().plugin.get('options'));
     setTimeout(() => {
       expect(audioPlayer.playCount).to.equal(3);
       done();
     }, 20);
-  });
-
-  it('plays sound once', function() {
-    let audioPlayer = null;
-    const store = createStore(pluginApp);
-    const options = {
-      [NOTIFICATION_SOUND_URL]: 'mockSound.mp3',
-      [NOTIFICATION_SOUND_REPEAT]: 1,
-    };
-    store.dispatch(setOptions(options));
-
-    audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
-    expect(audioPlayer.playCount).to.equal(1);
   });
 
   it('does not play sound', function() {
@@ -67,30 +54,11 @@ describe('playSound', function() {
     };
     store.dispatch(setOptions(options));
 
-    audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
+    audioPlayer = playSound(store.getState().plugin.get('options'));
     expect(audioPlayer).to.be.null;
   });
 
-  it('stop sounds from playing', function(done) {
-    let audioPlayer = null;
-    const store = createStore(pluginApp);
-    const options = {
-      [NOTIFICATION_SOUND_URL]: 'mockSound.mp3',
-      [NOTIFICATION_SOUND_REPEAT]: 10,
-    };
-    store.dispatch(setOptions(options));
-
-    audioPlayer = playSoundOptions(store.getState().plugin.get('options'));
-    setTimeout(() => {
-      stopSound(audioPlayer);
-      expect(audioPlayer.paused).to.be.true;
-      expect(audioPlayer.playCount).to.be.at.least(2);
-      expect(audioPlayer.playCount).to.be.below(10);
-      done();
-    }, 20);
-  });
-
-  it('playSoundOnce plays once', function(done) {
+  it('uses playSoundOnce to play once', function(done) {
     let audioPlayer = null;
     const store = createStore(pluginApp);
     const options = {
