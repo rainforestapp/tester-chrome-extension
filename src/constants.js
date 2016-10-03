@@ -62,7 +62,7 @@ const getConfig = () => {
         profileUrl: 'https://portal.rnfrst.com/profile',
         workAvailableEndpoint: 'https://portal.rainforestqa.com/api/1/testers',
         chrome: getChromeConfig(),
-        ravenURL: 'https://0f911298f80c47d9b53d3e6a53d236e5@app.getsentry.com/88435',
+        ravenURL: 'https://7f2a3dc2e6644d98a2411c6883724589@sentry.io/68477',
       };
     case 'prod':
       return {
