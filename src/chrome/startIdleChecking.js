@@ -1,6 +1,7 @@
 import { updateWorkerState, iconClicked } from '../actions';
 import { notifications, workerIdle } from './notifications';
 import listenStoreChanges from '../listenStoreChanges';
+import { playSoundOnce } from '../playSound';
 
 const idlePeriod = 6 * 60;
 
@@ -11,6 +12,7 @@ const startIdleChecking = (store, chrome) => {
       case 'ready':
         store.dispatch(updateWorkerState('inactive'));
         chrome.notifications.create(workerIdle, notifications[workerIdle]);
+        playSoundOnce(store.getState().plugin.get('options'));
         break;
       case 'working':
         if (worker.get('wantsMoreWork')) {

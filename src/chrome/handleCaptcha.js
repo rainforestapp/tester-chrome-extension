@@ -1,10 +1,12 @@
 import listenStoreChanges from '../listenStoreChanges';
 import { notifications, captcha } from './notifications';
+import { playSoundOnce } from '../playSound';
 
 const handleCaptcha = (store, chrome) => {
   const handleUpdate = ({ polling: prevPolling }, { polling: curPolling }) => {
     if (!prevPolling.get('captchaRequired') && curPolling.get('captchaRequired')) {
       chrome.notifications.create(captcha, notifications[captcha]);
+      playSoundOnce(store.getState().plugin.get('options'));
     }
   };
 
