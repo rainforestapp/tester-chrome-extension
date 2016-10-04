@@ -41,35 +41,36 @@ describe('handleStateSaving', function() {
 
   describe('when the state has been saved from before', function() {
     describe('when the worker was ready', function() {
-      it('restores the state', function(done) {
+      it('restores the state', function() {
         const store = createStore(pluginApp);
         const chrome = mockChrome({ localStorage: { workerState: 'ready' } });
 
-        store.subscribe(() => {
-          if (store.getState().worker.get('state') === 'ready') {
-            done();
-          }
+        return new Promise((resolve, reject) => {
+          handleStateSaving(store, chrome).then(() => {
+            const workerState = store.getState().worker.get('state');
+            if (workerState !== 'ready') {
+              reject(new Error`Worker should have been ready but was ${workerState}`);
+            }
+            resolve();
+          });
         });
-
-        handleStateSaving(store, chrome);
       });
     });
 
     describe('when the worker was working', function() {
-      it("doesn't set the state", function(done) {
+      it("doesn't set the state", function() {
         const store = createStore(pluginApp);
         const chrome = mockChrome({ localStorage: { workerState: 'working' } });
 
-        setTimeout(() => {
-          const state = store.getState().worker.get('state');
-          if (state === 'inactive') {
-            done();
-          } else {
-            done(new Error(`worker should have been inactive but is ${state}`));
-          }
-        }, 20);
-
-        handleStateSaving(store, chrome);
+        return new Promise((resolve, reject) => {
+          handleStateSaving(store, chrome).then(() => {
+            const state = store.getState().worker.get('state');
+            if (state !== 'inactive') {
+              reject(new Error(`worker should have been inactive but is ${state}`));
+            }
+            resolve();
+          });
+        });
       });
     });
   });

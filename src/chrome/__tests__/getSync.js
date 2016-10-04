@@ -11,12 +11,13 @@ import { fromJS } from 'immutable';
 import getSync from '../getSync';
 
 describe('getSync', function() {
-  it("sets the authentication if it's stored in sync", function(done) {
-    const workerUUID = 'abc123';
-    const socketAuth = {
-      auth: 'SEKRET',
-      sig: 'SIG',
-    };
+  const workerUUID = 'abc123';
+  const socketAuth = {
+    auth: 'SEKRET',
+    sig: 'SIG',
+  };
+
+  it("sets the authentication if it's stored in sync", function() {
     const chrome = mockChrome({
       storage: {
         worker_uuid: workerUUID,
@@ -25,36 +26,39 @@ describe('getSync', function() {
     });
     const store = createStore(pluginApp);
 
-    let success = false;
-    store.subscribe(() => {
-      const { worker, socket, polling } = store.getState();
-      const expectedPollUrl = 'http://portal.rainforest.dev/api/1/testers/abc123/work_available';
-      if (!success &&
-          worker.get('uuid') === workerUUID &&
-          socket.get('auth').equals(fromJS(socketAuth)) &&
-          polling.get('pollUrl') === expectedPollUrl) {
-        success = true;
-        done();
-      }
+    return new Promise((resolve, reject) => {
+      getSync(store, chrome).then(() => {
+        const { worker, socket, polling } = store.getState();
+        const expectedPollUrl = 'http://portal.rainforest.dev/api/1/testers/abc123/work_available';
+        if (worker.get('uuid') !== workerUUID) {
+          reject(new Error(`UUID should have been ${workerUUID} but was ${worker.get('uuid')}`));
+        }
+        if (!socket.get('auth').equals(fromJS(socketAuth))) {
+          reject(new Error('socketAuth not set correctly'));
+        }
+        if (polling.get('pollUrl') !== expectedPollUrl) {
+          reject(new Error(
+            `pollUrl should have been set to ${expectedPollUrl} but was ${polling.get('pollUrl')}`
+          ));
+        }
+        resolve();
+      });
     });
-
-    getSync(store, chrome);
   });
 
-  it("sets the options if they're stored in sync", function(done) {
+  it("sets the options if they're stored in sync", function() {
     const options = { soundUrl: 'whiz' };
     const store = createStore(pluginApp);
     const chrome = mockChrome({ storage: { options } });
 
-    let success = false;
-    store.subscribe(() => {
-      const { plugin } = store.getState();
-      if (!success && plugin.get('options').equals(fromJS(options))) {
-        success = true;
-        done();
-      }
+    return new Promise((resolve, reject) => {
+      getSync(store, chrome).then(() => {
+        const { plugin } = store.getState();
+        if (!plugin.get('options').equals(fromJS(options))) {
+          reject(new Error('Plugin options set incorrectly'));
+        }
+        resolve();
+      });
     });
-
-    getSync(store, chrome);
   });
 });
