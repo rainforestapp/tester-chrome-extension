@@ -2,12 +2,6 @@ import { updateWorkerState } from '../actions';
 import listenStoreChanges from '../listenStoreChanges';
 
 const handleStateSaving = (store, chrome) => {
-  chrome.storage.local.get(['workerState'], data => {
-    if (data.workerState === 'ready') {
-      store.dispatch(updateWorkerState(data.workerState));
-    }
-  });
-
   const shouldSaveState = (prevWorker, curWorker) => (
     prevWorker.get('state') !== curWorker.get('state') ||
       prevWorker.get('wantsMoreWork') !== curWorker.get('wantsMoreWork')
@@ -38,6 +32,15 @@ const handleStateSaving = (store, chrome) => {
   };
 
   listenStoreChanges(store, handleUpdate);
+
+  return new Promise(resolve => {
+    chrome.storage.local.get(['workerState'], data => {
+      if (data.workerState === 'ready') {
+        store.dispatch(updateWorkerState(data.workerState));
+      }
+      resolve();
+    });
+  });
 };
 
 export default handleStateSaving;

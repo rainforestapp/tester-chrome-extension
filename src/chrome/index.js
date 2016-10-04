@@ -28,15 +28,17 @@ export const startChromePlugin = (chrome, socketConstructor = Socket) => {
     }
   };
 
-  getSync(store, chrome);
-  handleStateSaving(store, chrome);
-  listenMessages(store, chrome);
-  handleStateNotifications(store, chrome);
-  renderIcon(store, chrome);
-  handleWork(store, chrome);
-  startIdleChecking(store, chrome);
-  getUserInfo();
-  handleCaptcha(store, chrome);
+  getSync(store, chrome)
+    .then(() => handleStateSaving(store, chrome))
+    .then(() => {
+      listenMessages(store, chrome);
+      handleStateNotifications(store, chrome);
+      renderIcon(store, chrome);
+      handleWork(store, chrome);
+      startIdleChecking(store, chrome);
+      getUserInfo();
+      handleCaptcha(store, chrome);
+    });
 
   return { getStore };
 };
