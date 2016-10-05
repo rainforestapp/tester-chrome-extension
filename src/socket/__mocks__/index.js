@@ -3,14 +3,14 @@ export const mockSocket = (opts = {}) => (
     constructor(endpoint, sockOpts = {}) {
       this.endpoint = endpoint;
       this.opts = sockOpts;
+      this.testChannels = {};
     }
 
     connect() { return this; }
     disconnect() { return this; }
     onClose() { return this; }
     channel(name) {
-      this.channelName = name;
-      this.testChannel = {
+      this.testChannels[name] = {
         onCallbacks: {},
         join() {
           this.state = 'connected';
@@ -50,7 +50,7 @@ export const mockSocket = (opts = {}) => (
           return this.state;
         },
       };
-      return this.testChannel;
+      return this.testChannels[name];
     }
   }
 );

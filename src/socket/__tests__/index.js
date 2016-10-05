@@ -23,6 +23,8 @@ const auth = {
   },
 };
 
+const channelName = 'workers:abc123';
+
 const authenticatedSocket = (store, opts) => {
   store.dispatch(authenticate(auth));
   const socket = startSocket(store, mockSocket(Object.assign(opts, { joinReply: 'ok' })));
@@ -61,7 +63,8 @@ describe('startSocket', function() {
       const socket = authenticatedSocket(store, {});
 
       expect(socket.getSocket().endpoint).to.equal('ws://localhost:4000/socket');
-      expect(socket.getSocket().channelName).to.equal('workers:abc123');
+      expect(Object.keys(socket.getSocket().testChannels))
+        .to.eql(['workers:abc123', 'workers:lobby']);
       expect(socket.getSocket().opts.params).to.eql(auth.socketAuth);
       expect(store.getState().socket.get('state')).to.equal('connected');
     });
@@ -93,7 +96,8 @@ describe('startSocket', function() {
 
         store.dispatch(authenticate(newAuth));
 
-        expect(socket.getSocket().channelName).to.equal('workers:newworker');
+        expect(Object.keys(socket.getSocket().testChannels))
+          .to.eql(['workers:newworker', 'workers:lobby']);
       });
     });
 
@@ -101,14 +105,14 @@ describe('startSocket', function() {
       it('reconnectes', function() {
         const store = createStore(pluginApp);
         const socket = authenticatedSocket(store, {});
-        const channel = socket.getSocket().testChannel;
+        const channel = socket.getSocket().testChannels[channelName];
 
         channel.serverPush('leave', {});
 
         store.dispatch(iconClicked());
 
         expect(store.getState().socket.get('state')).to.equal('connected');
-        expect(socket.getSocket().testChannel.getState()).to.equal('connected');
+        expect(socket.getSocket().testChannels[channelName].getState()).to.equal('connected');
       });
     });
   });
@@ -131,7 +135,7 @@ describe('startSocket', function() {
   describe('setting the plugin version', function() {
     it('dispatches to the store', function() {
       const store = createStore(pluginApp);
-      const channel = authenticatedSocket(store, {}).getSocket().testChannel;
+      const channel = authenticatedSocket(store, {}).getSocket().testChannels[channelName];
 
       channel.serverPush('check_version', { version: 'v1' });
 
@@ -164,7 +168,7 @@ describe('startSocket', function() {
   it('starts polling when instructed', function() {
     const store = createStore(pluginApp);
     const socket = authenticatedSocket(store, {});
-    const channel = socket.getSocket().testChannel;
+    const channel = socket.getSocket().testChannels[channelName];
 
     channel.serverPush('start_polling', {});
 
@@ -177,7 +181,7 @@ describe('startSocket', function() {
       const store = createStore(pluginApp);
       store.dispatch(updateWorkerState('ready'));
       const socket = authenticatedSocket(store, {});
-      const channel = socket.getSocket().testChannel;
+      const channel = socket.getSocket().testChannels[channelName];
 
       channel.serverPush('leave', {});
 
@@ -190,7 +194,19 @@ describe('startSocket', function() {
     it('sets needsReload to true', function() {
       const store = createStore(pluginApp);
       const socket = authenticatedSocket(store, {});
-      const channel = socket.getSocket().testChannel;
+      const channel = socket.getSocket().testChannels[channelName];
+
+      channel.serverPush('reload', {});
+
+      expect(store.getState().plugin.get('needsReload')).to.be.true;
+    });
+  });
+
+  describe('receiving a reload instruction from the lobby channel', function() {
+    it('sets needsReload to true', function() {
+      const store = createStore(pluginApp);
+      const socket = authenticatedSocket(store, {});
+      const channel = socket.getSocket().testChannels['workers:lobby'];
 
       channel.serverPush('reload', {});
 
@@ -204,7 +220,7 @@ describe('startSocket', function() {
         const store = createStore(pluginApp);
         store.dispatch(updateWorkerState('ready'));
         const socket = authenticatedSocket(store, {});
-        const channel = socket.getSocket().testChannel;
+        const channel = socket.getSocket().testChannels[channelName];
         const workUrl = 'http://example.com';
 
         channel.serverPush('assign_work', { url: workUrl });
@@ -219,7 +235,7 @@ describe('startSocket', function() {
         const store = createStore(pluginApp);
         const pushCallback = sinon.spy();
         const socket = authenticatedSocket(store, { pushCallback });
-        const channel = socket.getSocket().testChannel;
+        const channel = socket.getSocket().testChannels[channelName];
 
         channel.serverPush('assign_work', { url: 'foobar.com' });
 
@@ -238,7 +254,7 @@ describe('startSocket', function() {
       const store = createStore(pluginApp);
       store.dispatch(updateWorkerState('working'));
       const socket = authenticatedSocket(store, {});
-      const channel = socket.getSocket().testChannel;
+      const channel = socket.getSocket().testChannels[channelName];
 
       channel.serverPush('work_finished', {});
 

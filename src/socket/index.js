@@ -1,5 +1,6 @@
 import { Socket } from 'phoenix';
 import listenStoreChanges from '../listenStoreChanges';
+import { logDebug } from '../logging';
 import { CONFIG } from '../constants';
 import {
   connect,
@@ -66,6 +67,16 @@ export const startSocket = (store, socketConstructor = Socket) => {
     store.dispatch(channelLeft());
   };
 
+  const joinLobby = () => {
+    const lobby = socket.channel('workers:lobby');
+    lobby.on('reload', handleReload);
+    lobby.join().receive('ok', resp => {
+      logDebug('Joined lobby successfully', resp);
+    }).receive('error', resp => {
+      throw new Error(`Error joining lobby: ${resp}`);
+    });
+  };
+
   const connectToSocket = ({ socket: socketState, worker }) => {
     const workerUUID = worker.get('uuid');
     const socketAuth = socketState.get('auth');
@@ -102,6 +113,9 @@ export const startSocket = (store, socketConstructor = Socket) => {
       .receive('ok', resp => {
         pushWorkerState(workerState());
         store.dispatch(connect(resp));
+        // We only want to join the lobby if the actual channel connection was
+        // successful
+        joinLobby();
       }).receive('error', resp => store.dispatch(authFailed(resp)));
   };
 
