@@ -23,7 +23,7 @@
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["https://*.rnfrst.com/*"]
+    "matches": ["https://*.rnfrst.com/*", "https://*.rnfrstqa.com/*"]
   },
   "permissions": [
     "cookies",
@@ -34,7 +34,8 @@
     "identity",
     "identity.email",
     "*://*.getsentry.com/*",
-    "*://*.rnfrst.com/*"
+    "*://*.rnfrst.com/*",
+    "*://*.rnfrstqa.com/*"
   ],
   "content_security_policy": "script-src 'self' https://static.rnfrst.com https://schrute.rnfrst.com https://cdnjs.cloudflare.com; object-src 'self'"
 }
