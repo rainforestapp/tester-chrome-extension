@@ -69,6 +69,19 @@ describe('startSocket', function() {
       expect(store.getState().socket.get('state')).to.equal('connected');
     });
 
+    it('reconnects after it gets disconnected', function() {
+      const store = createStore(pluginApp);
+      const socket = authenticatedSocket(store, {});
+
+      socket.getSocket().disconnect();
+
+      expect(store.getState().socket.get('state')).to.equal('unconnected');
+
+      store.dispatch(iconClicked());
+
+      expect(store.getState().socket.get('state')).to.equal('connected');
+    });
+
     it('pushes the worker state to the server', function() {
       const store = createStore(pluginApp);
       store.dispatch(updateWorkerState('ready'));
