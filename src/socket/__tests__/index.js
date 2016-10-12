@@ -7,7 +7,7 @@
 import chai, { expect } from 'chai';
 import { mockSocket } from '../__mocks__';
 import { createStore } from 'redux';
-import { authenticate, updateWorkerState, iconClicked } from '../../actions';
+import { authenticate, updateWorkerState, iconClicked, connectionClosed } from '../../actions';
 import pluginApp from '../../reducers';
 import { startSocket } from '..';
 import sinon from 'sinon';
@@ -66,6 +66,18 @@ describe('startSocket', function() {
       expect(Object.keys(socket.getSocket().testChannels))
         .to.eql(['workers:abc123', 'workers:lobby']);
       expect(socket.getSocket().opts.params).to.eql(auth.socketAuth);
+      expect(store.getState().socket.get('state')).to.equal('connected');
+    });
+
+    it('reconnecting to the socket after disconnect', function() {
+      const store = createStore(pluginApp);
+      authenticatedSocket(store, {});
+
+      store.dispatch(connectionClosed());
+      expect(store.getState().socket.get('state')).to.equal('unconnected');
+
+      store.dispatch(iconClicked());
+
       expect(store.getState().socket.get('state')).to.equal('connected');
     });
 

@@ -41,12 +41,10 @@ const channelLeft = (state) => (
 );
 
 const iconClicked = (state) => {
-  switch (state.get('state')) {
-    case 'left':
-      return state.set('state', 'reconnecting');
-    default:
-      return state;
+  if (state.get('state') !== 'connected') {
+    return state.set('state', 'reconnecting');
   }
+  return state;
 };
 
 const socket = handleActions({
