@@ -22,6 +22,7 @@ deployment:
       - ./deploy stg
       - mv staging_manifest.json extension/manifest.json
       - cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
+      - bundle exec circlemator self-merge --base-branch=master --compare-branch=develop
   production:
     branch: master
     commands:
