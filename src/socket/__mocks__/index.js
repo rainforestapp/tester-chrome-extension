@@ -4,19 +4,11 @@ export const mockSocket = (opts = {}) => (
       this.endpoint = endpoint;
       this.opts = sockOpts;
       this.testChannels = {};
-      this.onCloseCallback = null;
     }
 
     connect() { return this; }
-    disconnect() {
-      if (this.onCloseCallback) {
-        this.onCloseCallback();
-      }
-      this.testChannels = {};
-    }
-    onClose(callback) {
-      this.onCloseCallback = callback;
-    }
+    disconnect() { return this; }
+    onClose() { return this; }
     channel(name) {
       this.testChannels[name] = {
         onCallbacks: {},
