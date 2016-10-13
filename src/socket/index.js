@@ -99,10 +99,7 @@ export const startSocket = (store, socketConstructor = Socket) => {
         store.dispatch(logMessage(log));
       },
     });
-    socket.onClose(() => {
-      store.dispatch(connectionClosed());
-      socket = null;
-    });
+    socket.onClose(() => store.dispatch(connectionClosed()));
     socket.connect();
 
     channel = socket.channel(`workers:${workerUUID}`);
