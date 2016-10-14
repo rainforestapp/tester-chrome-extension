@@ -21,7 +21,7 @@ export const notifications = deepFreeze({
     type: 'basic',
     title: 'You have been disconnected',
     message: 'You have disconnected, probably because you logged in on another computer. ' +
-      'Double-click the icon to reconnect.',
+      'Click the extension icon to reconnect.',
   },
   [workerIdle]: {
     iconUrl: CONFIG.chrome.notificationIconUrl,

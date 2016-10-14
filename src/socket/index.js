@@ -65,6 +65,7 @@ export const startSocket = (store, socketConstructor = Socket) => {
     channel.leave();
     channel = null;
     store.dispatch(channelLeft());
+    socket.disconnect();
   };
 
   const joinLobby = () => {

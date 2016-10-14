@@ -4,10 +4,14 @@ export const mockSocket = (opts = {}) => (
       this.endpoint = endpoint;
       this.opts = sockOpts;
       this.testChannels = {};
+      this.disconnected = false;
     }
 
     connect() { return this; }
-    disconnect() { return this; }
+    disconnect() {
+      this.disconnected = true;
+      return this;
+    }
     onClose() { return this; }
     channel(name) {
       this.testChannels[name] = {
