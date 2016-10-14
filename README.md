@@ -2,6 +2,14 @@
 
 This is a Chrome extention which notifies the tester there is new work to be done. It does this by polling the API using their tester ID.
 
+## Important!!!
+
+This repo is only for technical discussion of the extension, not for general
+Rainforest-related discussion. Please use the
+[tester forum](https://forum.rainforestqa.com/) for general discussion (if
+you're not sure, the forum is likely the right place to go). If you want to open
+an issue or contribute, please see the [CONTRIBUTING guide](https://github.com/rainforestapp/tester-chrome-extension/blob/develop/CONTRIBUTING.md).
+
 ## Installing from the portal
 
 Note: to use this extension you MUST have done at least one job for us before. This is as we pay you via either Mechancial Turk, or Crowd Flower as normal, against an older job you did.
@@ -35,22 +43,6 @@ Clone this repo
 2. `npm run lint`
 3. `npm test`
 
-## Contributing
-
-Contributions are welcome! Please keep the following in mind:
-
-- Follow the
-  [Rainforest frontend conventions](https://github.com/rainforestapp/frontend-conventions)
-  where it makes sense.
-- Always follow the ESLint style suggestions.
-- State should be managed with [Redux](http://redux.js.org/); if you're not
-  familiar,
-  [this video guide](https://egghead.io/courses/getting-started-with-redux) is a
-  great resource.
-- Always write tests to go along with your changes (our tests are written with
-  [mocha](https://mochajs.org/) and [chai](http://chaijs.com/)).
-
-
 ## Deploying
 
 Most deploys do *not* require a new release of the plugin. If you are only
@@ -65,6 +57,9 @@ code), do the following:
 3. Go to https://chrome.google.com/webstore/developer/dashboard/u85d2beaae4ec3450eae7ccaa97b3ac82
 4. Upload the new version
 5. Click publish
+
+**Warning: don't open a release PR until you've published the staging version,
+otherwise it will get auto-merged.**
 
 Changes should be tested with the staging version of the plugin before the code
 is merged to master.
