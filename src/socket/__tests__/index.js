@@ -177,7 +177,7 @@ describe('startSocket', function() {
   });
 
   describe('receiving a leave instruction', function() {
-    it('leaves the channel', function() {
+    it('leaves the channel and disconnects', function() {
       const store = createStore(pluginApp);
       store.dispatch(updateWorkerState('ready'));
       const socket = authenticatedSocket(store, {});
@@ -187,6 +187,7 @@ describe('startSocket', function() {
 
       expect(store.getState().socket.get('state')).to.equal('left');
       expect(channel.getState()).to.equal('disconnected');
+      expect(socket.getSocket().disconnected).to.be.true;
     });
   });
 
