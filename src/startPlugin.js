@@ -3,6 +3,7 @@ import { startSocket } from './socket';
 import startErrorHandling from './startErrorHandling';
 import startReloader from './startReloader';
 import handlePolling from './handlePolling';
+import handleStateNotifications from './handleStateNotifications';
 import { authenticate } from './actions';
 import { createStore } from 'redux';
 import { Socket } from 'phoenix';
@@ -22,6 +23,7 @@ const startPlugin = ({ auth, enhancer, reloader, socketConstructor = Socket }) =
 
   startSocket(store, socketConstructor);
   handlePolling(store);
+  handleStateNotifications(store);
 
   const getStore = () => store;
   return { getStore };
