@@ -2,20 +2,38 @@ import { colors, CONFIG } from '../constants';
 import { iconClicked } from '../actions';
 
 const renderIcon = (store, chrome) => {
-  const renderBadge = ({ worker }) => {
+  const offBadge = () => {
+    chrome.browserAction.setBadgeBackgroundColor({ color: colors.RED });
+    chrome.browserAction.setBadgeText({ text: 'OFF' });
+  };
+
+  const wipBadge = () => {
+    chrome.browserAction.setBadgeBackgroundColor({ color: colors.GREEN });
+    chrome.browserAction.setBadgeText({ text: 'WIP' });
+  };
+
+  const blankBadge = () => {
+    chrome.browserAction.setBadgeText({ text: '' });
+  };
+
+
+  const renderBadge = ({ socket, worker }) => {
+    if (socket.get('state') === 'unauthenticated') {
+      offBadge();
+      return;
+    }
+
     const workerState = worker.get('state');
 
     switch (workerState) {
       case 'working':
-        chrome.browserAction.setBadgeBackgroundColor({ color: colors.GREEN });
-        chrome.browserAction.setBadgeText({ text: 'WIP' });
+        wipBadge();
         break;
       case 'inactive':
-        chrome.browserAction.setBadgeBackgroundColor({ color: colors.RED });
-        chrome.browserAction.setBadgeText({ text: 'OFF' });
+        offBadge();
         break;
       default:
-        chrome.browserAction.setBadgeText({ text: '' });
+        blankBadge();
         break;
     }
   };
