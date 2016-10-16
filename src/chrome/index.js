@@ -13,7 +13,10 @@ import { applyMiddleware } from 'redux';
 import { logMiddleware } from '../logging';
 
 export const startChromePlugin = (chrome, socketConstructor = Socket) => {
-  const reloader = () => window.location.reload(true);
+  const reloader = () => {
+    chrome.storage.local.set({ reload: true });
+    window.location.reload(true);
+  };
   const enhancer = applyMiddleware(logMiddleware);
   const plugin = startPlugin({ enhancer, reloader, socketConstructor });
   const store = plugin.getStore();
