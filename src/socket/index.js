@@ -12,6 +12,8 @@ import {
   setPluginVersion,
   channelLeft,
   reloadPlugin,
+  updateWorkerState,
+  notify,
 } from '../actions';
 
 const AUTO_RECONNECT_TIMEOUT = 60 * 1000;
@@ -27,7 +29,11 @@ export const startSocket = (store, socketConstructor = Socket) => {
       return;
     }
 
-    channel.push('update_state', { worker_state: state });
+    channel.push('update_state', { worker_state: state })
+      .receive('already_ready', () => {
+        store.dispatch(updateWorkerState('inactive'));
+        store.dispatch(notify('doubleReady'));
+      });
   };
 
   const workerState = () => store.getState().worker.get('state');
