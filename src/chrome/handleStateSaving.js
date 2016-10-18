@@ -38,8 +38,7 @@ const handleStateSaving = (store, chrome) => {
       if (data.reload && data.workerState === 'ready') {
         store.dispatch(updateWorkerState(data.workerState));
       }
-      chrome.storage.local.set({ reload: false });
-      resolve();
+      chrome.storage.local.set({ reload: false }, resolve);
     });
   });
 };

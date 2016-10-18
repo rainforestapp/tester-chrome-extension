@@ -70,8 +70,10 @@ export const mockChrome = (opts = {}) => {
       },
     },
     local: {
-      set: (data) => {
+      set: (data, callback) => {
+        const safeCallback = typeof callback === 'function' ? callback : () => {};
         localStorageStore = Object.assign({}, localStorageStore, data);
+        safeCallback();
       },
       get: (keys, callback) => {
         setTimeout(() => {
