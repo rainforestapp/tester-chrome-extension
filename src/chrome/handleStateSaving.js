@@ -34,11 +34,11 @@ const handleStateSaving = (store, chrome) => {
   listenStoreChanges(store, handleUpdate);
 
   return new Promise(resolve => {
-    chrome.storage.local.get(['workerState'], data => {
-      if (data.workerState === 'ready') {
+    chrome.storage.local.get(['workerState', 'reload'], data => {
+      if (data.reload && data.workerState === 'ready') {
         store.dispatch(updateWorkerState(data.workerState));
       }
-      resolve();
+      chrome.storage.local.set({ reload: false }, resolve);
     });
   });
 };
