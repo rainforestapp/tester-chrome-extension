@@ -145,6 +145,19 @@ describe('renderIcon', function() {
         expect(chrome.getBadge().text).to.equal('');
       });
     });
+
+    describe('when the socket is unauthenticated', function() {
+      it('says OFF', function() {
+        const store = createStore(pluginApp);
+        store.dispatch(authFailed());
+        store.dispatch(updateWorkerState('ready'));
+        const chrome = mockChrome();
+
+        renderIcon(store, chrome);
+
+        expect(chrome.getBadge().text).to.equal('OFF');
+      });
+    });
   });
 
   describe('click handling', function() {

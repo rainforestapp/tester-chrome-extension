@@ -2,7 +2,7 @@ import { Socket } from 'phoenix';
 import { startPlugin } from '..';
 import { setWorkerProfile } from '../actions';
 import listenMessages from './listenMessages';
-import handleStateNotifications from './handleStateNotifications';
+import handleNotifications from './handleNotifications';
 import handleWork from './handleWork';
 import getSync from './getSync';
 import handleStateSaving from './handleStateSaving';
@@ -32,7 +32,7 @@ export const startChromePlugin = (chrome, socketConstructor = Socket) => {
     .then(() => handleStateSaving(store, chrome))
     .then(() => {
       listenMessages(store, chrome);
-      handleStateNotifications(store, chrome);
+      handleNotifications(store, chrome);
       renderIcon(store, chrome);
       handleWork(store, chrome);
       startIdleChecking(store, chrome);

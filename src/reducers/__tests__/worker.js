@@ -10,6 +10,7 @@ import { fromJS } from 'immutable';
 import {
   assignWork,
   authenticate,
+  authFailed,
   updateWorkerState,
   iconClicked,
   workStarted,
@@ -66,6 +67,16 @@ describe('worker reducer', function() {
 
       expect(state.get('state')).to.equal('inactive');
       expect(state.get('uuid')).to.equal('abc123');
+    });
+  });
+
+  describe(actions.AUTH_FAILED, function() {
+    it('sets the worker to inactive', function() {
+      let state = worker(initState, updateWorkerState('ready'));
+      checkState(state);
+      state = worker(state, authFailed());
+
+      expect(state.get('state')).to.equal('inactive');
     });
   });
 

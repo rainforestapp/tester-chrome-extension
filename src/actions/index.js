@@ -20,6 +20,8 @@ export const setWorkerProfile = createAction(actions.SET_WORKER_PROFILE);
 export const channelLeft = createAction(actions.CHANNEL_LEFT);
 export const setOptions = createAction(actions.SET_OPTIONS);
 export const reloadPlugin = createAction(actions.RELOAD_PLUGIN);
+export const notify = createAction(actions.NOTIFY);
+export const clearNotification = createAction(actions.CLEAR_NOTIFICATION);
 
 const validWorkerStates = ['ready', 'inactive', 'working'];
 

@@ -1,5 +1,9 @@
-import { updateWorkerState, iconClicked } from '../actions';
-import { notifications, workerIdle } from './notifications';
+import {
+  updateWorkerState,
+  iconClicked,
+  notify,
+  clearNotification,
+} from '../actions';
 import listenStoreChanges from '../listenStoreChanges';
 import { playSoundOnce } from '../playSound';
 
@@ -11,7 +15,7 @@ const startIdleChecking = (store, chrome) => {
     switch (worker.get('state')) {
       case 'ready':
         store.dispatch(updateWorkerState('inactive'));
-        chrome.notifications.create(workerIdle, notifications[workerIdle]);
+        store.dispatch(notify('workerIdle'));
         playSoundOnce(store.getState().plugin.get('options'));
         break;
       case 'working':
@@ -24,9 +28,10 @@ const startIdleChecking = (store, chrome) => {
     }
   };
 
-  const handleUpdate = (_previousState, currentState) => {
-    if (currentState.worker.get('state') === 'ready') {
-      chrome.notifications.clear(workerIdle, () => {});
+  const handleUpdate = (previousState, currentState) => {
+    if (currentState.worker.get('state') === 'ready' &&
+        previousState.worker.get('state') !== 'ready') {
+      store.dispatch(clearNotification('workerIdle'));
     }
   };
 
@@ -35,12 +40,6 @@ const startIdleChecking = (store, chrome) => {
   chrome.idle.onStateChanged.addListener(state => {
     if (state === 'idle') {
       goIdle();
-    }
-  });
-
-  chrome.notifications.onClicked.addListener(notificationId => {
-    if (notificationId === workerIdle) {
-      store.dispatch(updateWorkerState('ready'));
     }
   });
 
