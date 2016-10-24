@@ -165,17 +165,6 @@ describe('startSocket', function() {
     });
   });
 
-  it('starts polling when instructed', function() {
-    const store = createStore(pluginApp);
-    const socket = authenticatedSocket(store, {});
-    const channel = socket.getSocket().testChannels[channelName];
-
-    channel.serverPush('start_polling', {});
-
-    expect(store.getState().polling.get('error')).to.be.null;
-    expect(store.getState().polling.get('polling')).to.be.true;
-  });
-
   describe('receiving a leave instruction', function() {
     it('leaves the channel and disconnects', function() {
       const store = createStore(pluginApp);

@@ -8,7 +8,6 @@ import getSync from './getSync';
 import handleStateSaving from './handleStateSaving';
 import renderIcon from './renderIcon';
 import startIdleChecking from './startIdleChecking';
-import handleCaptcha from './handleCaptcha';
 import { applyMiddleware } from 'redux';
 import { logMiddleware } from '../logging';
 
@@ -41,7 +40,6 @@ export const startChromePlugin = (chrome, socketConstructor = Socket) => {
       handleWork(store, chrome);
       startIdleChecking(store, chrome);
       getUserInfo();
-      handleCaptcha(store, chrome);
     });
 
   return { getStore };

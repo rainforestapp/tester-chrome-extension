@@ -13,15 +13,6 @@ const handleNotifications = (store, chrome) => {
     notLoggedIn: () => {
       chrome.tabs.create({ url: CONFIG.profileUrl });
     },
-    captcha: () => {
-      const url = store.getState().polling.get('pollUrl');
-      if (!url) {
-        // Not polling, so not a problem
-        return;
-      }
-
-      chrome.tabs.create({ url });
-    },
     workerIdle: () => {
       store.dispatch(updateWorkerState('ready'));
     },
