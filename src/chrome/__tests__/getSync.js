@@ -28,18 +28,12 @@ describe('getSync', function() {
 
     return new Promise((resolve, reject) => {
       getSync(store, chrome).then(() => {
-        const { worker, socket, polling } = store.getState();
-        const expectedPollUrl = 'http://portal.rainforest.dev/api/1/testers/abc123/work_available';
+        const { worker, socket } = store.getState();
         if (worker.get('uuid') !== workerUUID) {
           reject(new Error(`UUID should have been ${workerUUID} but was ${worker.get('uuid')}`));
         }
         if (!socket.get('auth').equals(fromJS(socketAuth))) {
           reject(new Error('socketAuth not set correctly'));
-        }
-        if (polling.get('pollUrl') !== expectedPollUrl) {
-          reject(new Error(
-            `pollUrl should have been set to ${expectedPollUrl} but was ${polling.get('pollUrl')}`
-          ));
         }
         resolve();
       });

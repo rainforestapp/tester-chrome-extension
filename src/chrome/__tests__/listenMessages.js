@@ -53,17 +53,6 @@ describe('listenMessages', function() {
       expect(state.socket.get('auth')).to.equal(fromJS(auth));
     });
 
-    it('sets the polling endpoint', function() {
-      const store = createStore(pluginApp);
-      const chrome = mockChrome();
-      listenMessages(store, chrome);
-
-      sendAuth(chrome, () => {});
-
-      const pollUrl = store.getState().polling.get('pollUrl');
-      expect(pollUrl).to.equal('http://portal.rainforest.dev/api/1/testers/abc123/work_available');
-    });
-
     it('stores the data in the chrome sync storage', function() {
       const store = createStore(pluginApp);
       const chrome = mockChrome();
