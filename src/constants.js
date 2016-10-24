@@ -12,10 +12,6 @@ export const actions = deepFreeze({
   WORK_STARTED: 'WORK_STARTED',
   WORK_FINISHED: 'WORK_FINISHED',
   SET_PLUGIN_VERSION: 'SET_PLUGIN_VERSION',
-  START_POLLING: 'START_POLLING',
-  STOP_POLLING: 'STOP_POLLING',
-  SET_POLLING_INTERVAL: 'SET_POLLING_INTERVAL',
-  CAPTCHA_REQUIRED: 'CAPTCHA_REQUIRED',
   SET_WORKER_PROFILE: 'SET_WORKER_PROFILE',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
   CHANNEL_LEFT: 'CHANNEL_LEFT',
@@ -31,9 +27,7 @@ export const colors = deepFreeze({
   GREY: [0, 0, 0, 230],
 });
 
-export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin', 'polling', 'notifications']);
-
-export const DEFAULT_POLLING_INTERVAL = 30 * 1000;
+export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin', 'notifications']);
 
 export const NOTIFICATION_SOUND_URL = 'notificationSoundUrl';
 export const NOTIFICATION_SOUND_REPEAT = 'notificationSoundRepeat';
@@ -108,9 +102,5 @@ export const NOTIFICATIONS = deepFreeze({
     title: 'We noticed you were idle',
     message: 'You seem to have been idle for a while, so we stopped ' +
       'checking for work. Click here to start checking for work again.',
-  },
-  captcha: {
-    title: 'There was a problem with the request',
-    message: 'You may need to fill out a captcha. Click here to test the work endpoint.',
   },
 });

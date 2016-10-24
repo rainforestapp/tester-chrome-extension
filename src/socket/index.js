@@ -10,7 +10,6 @@ import {
   assignWork,
   workFinished,
   setPluginVersion,
-  startPolling,
   channelLeft,
   reloadPlugin,
 } from '../actions';
@@ -47,10 +46,6 @@ export const startSocket = (store, socketConstructor = Socket) => {
 
   const handleCheckVersion = ({ version }) => {
     store.dispatch(setPluginVersion(version));
-  };
-
-  const handleStartPolling = (payload) => {
-    store.dispatch(startPolling(payload));
   };
 
   const handleReload = () => {
@@ -107,7 +102,6 @@ export const startSocket = (store, socketConstructor = Socket) => {
     channel.on('assign_work', handleAssignWork);
     channel.on('work_finished', handleWorkFinished);
     channel.on('check_version', handleCheckVersion);
-    channel.on('start_polling', handleStartPolling);
     channel.on('reload', handleReload);
     channel.on('leave', handleLeave);
     channel.join()
