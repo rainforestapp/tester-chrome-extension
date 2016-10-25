@@ -5,6 +5,7 @@ export const mockSocket = (opts = {}) => (
       this.opts = sockOpts;
       this.testChannels = {};
       this.disconnected = false;
+      this.onCloseCallbacks = [];
     }
 
     connect() { return this; }
@@ -12,7 +13,10 @@ export const mockSocket = (opts = {}) => (
       this.disconnected = true;
       return this;
     }
-    onClose() { return this; }
+    onClose(callback) {
+      this.onCloseCallbacks.push(callback);
+      return this;
+    }
     channel(name) {
       this.testChannels[name] = {
         onCallbacks: {},
@@ -55,6 +59,12 @@ export const mockSocket = (opts = {}) => (
         },
       };
       return this.testChannels[name];
+    }
+
+    // Simulate server disconnection for testing purposes
+    serverDisconnect() {
+      this.onCloseCallbacks.forEach(callback => callback());
+      this.disconnected = true;
     }
   }
 );
