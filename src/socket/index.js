@@ -14,9 +14,12 @@ import {
   reloadPlugin,
 } from '../actions';
 
+const AUTO_RECONNECT_TIMEOUT = 60 * 1000;
+
 export const startSocket = (store, socketConstructor = Socket) => {
   let socket = null;
   let channel = null;
+  let disconnectedAt = null;
 
   const pushWorkerState = (state) => {
     if (!channel) {
@@ -95,7 +98,10 @@ export const startSocket = (store, socketConstructor = Socket) => {
         store.dispatch(logMessage(log));
       },
     });
-    socket.onClose(() => store.dispatch(connectionClosed()));
+    socket.onClose(() => {
+      disconnectedAt = Date.now();
+      store.dispatch(connectionClosed());
+    });
     socket.connect();
 
     channel = socket.channel(`workers:${workerUUID}`);
@@ -106,6 +112,7 @@ export const startSocket = (store, socketConstructor = Socket) => {
     channel.on('leave', handleLeave);
     channel.join()
       .receive('ok', resp => {
+        disconnectedAt = null;
         pushWorkerState(workerState());
         store.dispatch(connect(resp));
         // We only want to join the lobby if the actual channel connection was
@@ -121,6 +128,7 @@ export const startSocket = (store, socketConstructor = Socket) => {
 
     socket.disconnect();
     socket = null;
+    disconnectedAt = null;
     connectToSocket(state);
   };
 
@@ -138,10 +146,22 @@ export const startSocket = (store, socketConstructor = Socket) => {
     if (prevSocket.get('state') !== 'reconnecting' && curSocket.get('state') === 'reconnecting') {
       return true;
     }
+
+    if (disconnectedAt &&
+        curSocket.get('state') === 'unconnected' &&
+        (Date.now() - disconnectedAt > AUTO_RECONNECT_TIMEOUT)) {
+      // If it's been a while since we disconnected, it's possible that the
+      // auto-reconnect has failed so we try to manually reconnect.
+      return true;
+    }
+
     const prevUUID = prevWorker.get('uuid');
     const curUUID = curWorker.get('uuid');
+    if (socket && prevUUID && curUUID && prevUUID !== curUUID) {
+      return true;
+    }
 
-    return socket && prevUUID && curUUID && prevUUID !== curUUID;
+    return false;
   };
 
   const handleWorkerState = (previousState, currentState) => {
