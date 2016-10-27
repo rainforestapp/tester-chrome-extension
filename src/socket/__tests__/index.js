@@ -115,6 +115,34 @@ describe('startSocket', function() {
         expect(socket.getSocket().testChannels[channelName].getState()).to.equal('connected');
       });
     });
+
+    describe('reconnecting after having been disconnected for a while', function() {
+      it('makes a new connection', function() {
+        const clock = sinon.useFakeTimers();
+        clock.tick(1200); // some non-important non-0 time
+        const store = createStore(pluginApp);
+        const socketHandler = authenticatedSocket(store, {});
+        let socket = socketHandler.getSocket();
+
+        socket.serverDisconnect();
+        expect(socket.disconnected).to.be.true;
+        expect(store.getState().socket.get('state')).to.eq('unconnected');
+
+        clock.tick(1000);
+        store.dispatch(iconClicked());
+
+        socket = socketHandler.getSocket();
+        expect(socket.disconnected).to.be.true;
+
+        clock.tick(60000);
+        store.dispatch(iconClicked());
+
+        socket = socketHandler.getSocket();
+        expect(socket.disconnected).to.be.false;
+        expect(store.getState().socket.get('state')).to.eq('connected');
+        clock.restore();
+      });
+    });
   });
 
   describe('authenticating after the plugin starts', function() {
