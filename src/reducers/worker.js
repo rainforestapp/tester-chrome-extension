@@ -68,6 +68,25 @@ const workFinished = (state) => {
   return state;
 };
 
+const checkState = (state, { payload: newState }) => {
+  const wasWorking = state.get('state') === 'working';
+  const nowWorking = newState === 'working';
+
+  if (wasWorking && !nowWorking) {
+    return workFinished(state);
+  }
+
+  if (!wasWorking && nowWorking) {
+    return state.merge({
+      state: 'working',
+      workStarted: true,
+      wantsMoreWork: state.get('state') === 'ready',
+    });
+  }
+
+  return state;
+};
+
 const iconClicked = (state) => {
   switch (state.get('state')) {
     case 'ready':
@@ -96,6 +115,7 @@ const worker = handleActions({
   [actions.ASSIGN_WORK]: assignWork,
   [actions.WORK_STARTED]: workStarted,
   [actions.WORK_FINISHED]: workFinished,
+  [actions.CHECK_STATE]: checkState,
   [actions.ICON_CLICKED]: iconClicked,
   [actions.SET_WORKER_PROFILE]: setWorkerProfile,
 }, initialState);

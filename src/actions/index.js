@@ -10,6 +10,7 @@ export const authFailed = createAction(actions.AUTH_FAILED);
 export const iconClicked = createAction(actions.ICON_CLICKED);
 export const workStarted = createAction(actions.WORK_STARTED);
 export const workFinished = createAction(actions.WORK_FINISHED);
+export const checkState = createAction(actions.CHECK_STATE);
 export const setPluginVersion = createAction(actions.SET_PLUGIN_VERSION);
 export const rateLimitExceeded = createAction(actions.RATE_LIMIT_EXCEEDED);
 export const setWorkerProfile = createAction(actions.SET_WORKER_PROFILE);
