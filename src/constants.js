@@ -103,4 +103,8 @@ export const NOTIFICATIONS = deepFreeze({
     message: 'You seem to have been idle for a while, so we stopped ' +
       'checking for work. Click here to start checking for work again.',
   },
+  doubleReady: {
+    title: 'You are active on another computer',
+    message: 'Please turn off your extension elsewhere before turning it on here.',
+  },
 });

@@ -28,20 +28,23 @@ export const mockSocket = (opts = {}) => (
           this.state = 'disconnected';
           return this;
         },
-        receive(code, callback) {
-          if (opts.joinReply === code) {
+        receive(event, callback) {
+          if (opts.joinReply === event) {
             callback();
           }
+          this.onCallbacks[event] = callback;
 
           return this;
         },
-        push: (event, payload) => {
+        push(event, payload) {
           if (opts.pushCallback !== undefined) {
             opts.pushCallback(event, payload);
           }
-          if (this.opts.logger !== undefined) {
-            this.opts.logger('fake_send', event, payload);
+          if (opts.logger !== undefined) {
+            opts.logger('fake_send', event, payload);
           }
+
+          return this;
         },
         on(event, callback) {
           this.onCallbacks[event] = callback;
