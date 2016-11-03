@@ -191,6 +191,21 @@ describe('startSocket', function() {
         );
       });
     });
+
+    describe('when the worker is ready on another computer', function() {
+      it('makes the worker inactive and makes a notification', function() {
+        const store = createStore(pluginApp);
+        const channel = authenticatedSocket(store, {}).getSocket().testChannels[channelName];
+
+        store.dispatch(updateWorkerState('ready'));
+        // simulate reply
+        channel.serverPush('already_ready');
+
+        const { worker, notifications } = store.getState();
+        expect(worker.get('state')).to.equal('inactive');
+        expect(notifications.get('activeNotifications').includes('doubleReady')).to.be.true;
+      });
+    });
   });
 
   describe('receiving a leave instruction', function() {
