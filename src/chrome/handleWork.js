@@ -9,7 +9,9 @@ const handleWork = (store, chrome) => {
     if (prevWorker.get('state') !== 'working' && curWorker.get('state') === 'working') {
       const url = curWorker.get('workUrl');
       if (!url) {
-        throw new Error("Worker moved to 'working' state without a work URL");
+        // This means that the worker moved to "working" without an explicit
+        // assignment, which is fine.
+        return;
       }
 
       const oldWorkTabId = workTabId;

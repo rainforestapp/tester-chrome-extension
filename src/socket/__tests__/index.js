@@ -171,6 +171,32 @@ describe('startSocket', function() {
     });
   });
 
+  describe('checking plugin state', function() {
+    it('dispatches to the store', function() {
+      const store = createStore(pluginApp);
+      const channel = authenticatedSocket(store, {}).getSocket().testChannels[channelName];
+
+      channel.serverPush('check_state', { worker_state: 'working' });
+
+      expect(store.getState().worker.get('state')).to.equal('working');
+    });
+
+    it("signals the state if it's different from what's on the server", function() {
+      const store = createStore(pluginApp);
+      const pushCallback = sinon.spy();
+      const channel = authenticatedSocket(store, { pushCallback })
+            .getSocket().testChannels[channelName];
+      store.dispatch(updateWorkerState('ready'));
+
+      pushCallback.reset();
+
+      channel.serverPush('check_state', { worker_state: 'inactive' });
+      expect(pushCallback).to.have.been.calledWithExactly(
+        'update_state', { worker_state: 'ready' }
+      );
+    });
+  });
+
   describe('updating the worker state', function() {
     it('sends a message to the channel if the state has changed', function() {
       const store = createStore(pluginApp);
