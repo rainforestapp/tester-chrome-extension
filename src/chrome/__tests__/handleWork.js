@@ -35,6 +35,19 @@ describe('handleWork', function() {
     });
   });
 
+  describe('when the worker goes to "working" without a work URL', function() {
+    it("doesn't open up a work tab", function() {
+      const store = createStore(pluginApp);
+      const chrome = mockChrome();
+      store.dispatch(updateWorkerState('ready'));
+
+      handleWork(store, chrome);
+
+      store.dispatch(updateWorkerState('working'));
+      expect(chrome.getOpenTabs().length).to.equal(0);
+    });
+  });
+
   describe('when the worker stops working', function() {
     describe('when the work tab is open', function() {
       it('closes the work tab', function(done) {

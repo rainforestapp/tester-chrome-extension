@@ -9,6 +9,7 @@ import {
   authFailed,
   assignWork,
   workFinished,
+  checkState,
   setPluginVersion,
   channelLeft,
   reloadPlugin,
@@ -55,6 +56,18 @@ export const startSocket = (store, socketConstructor = Socket) => {
 
   const handleCheckVersion = ({ version }) => {
     store.dispatch(setPluginVersion(version));
+  };
+
+  const handleCheckState = ({ worker_state: state }) => {
+    if (!(['working', 'inactive', 'ready'].includes(state))) {
+      throw new Error(`Unrecognized state for check_state message: ${state}`);
+    }
+
+    store.dispatch(checkState(state));
+    const currentState = store.getState().worker.get('state');
+    if (currentState !== state) {
+      pushWorkerState(currentState);
+    }
   };
 
   const handleReload = () => {
@@ -114,6 +127,7 @@ export const startSocket = (store, socketConstructor = Socket) => {
     channel.on('assign_work', handleAssignWork);
     channel.on('work_finished', handleWorkFinished);
     channel.on('check_version', handleCheckVersion);
+    channel.on('check_state', handleCheckState);
     channel.on('reload', handleReload);
     channel.on('leave', handleLeave);
     channel.join()
