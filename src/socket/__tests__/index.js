@@ -102,7 +102,7 @@ describe('startSocket', function() {
     });
 
     describe('when reconnecting after being kicked off', function() {
-      it('reconnectes', function() {
+      it('reconnects', function() {
         const store = createStore(pluginApp);
         const socket = authenticatedSocket(store, {});
         const channel = socket.getSocket().testChannels[channelName];
@@ -118,8 +118,7 @@ describe('startSocket', function() {
 
     describe('reconnecting after having been disconnected for a while', function() {
       it('makes a new connection', function() {
-        const clock = sinon.useFakeTimers();
-        clock.tick(1200); // some non-important non-0 time
+        const clock = sinon.useFakeTimers(1200);
         const store = createStore(pluginApp);
         const socketHandler = authenticatedSocket(store, {});
         let socket = socketHandler.getSocket();
@@ -141,6 +140,61 @@ describe('startSocket', function() {
         expect(socket.disconnected).to.be.false;
         expect(store.getState().socket.get('state')).to.eq('connected');
         clock.restore();
+      });
+    });
+
+    describe('reconnecting when "ready" and receiving "already_ready"', function() {
+      it('retries for a while instead of displaying a warning', function() {
+        const clock = sinon.useFakeTimers(1200);
+        const pushCallback = sinon.spy();
+
+        const store = createStore(pluginApp);
+        store.dispatch(updateWorkerState('ready'));
+
+        const channel = authenticatedSocket(store, { pushCallback })
+              .getSocket().testChannels[channelName];
+        channel.serverPush('already_ready');
+        expect(store.getState().notifications.get('activeNotifications').size).to.eq(0);
+        expect(store.getState().worker.get('state')).to.eq('ready');
+
+        for (let idx = 0; idx < 6; idx++) {
+          pushCallback.reset();
+          clock.tick(10000);
+          expect(pushCallback).to.have.been.calledWithExactly(
+            'update_state', { worker_state: 'ready' }
+          );
+          channel.serverPush('already_ready');
+          expect(store.getState().worker.get('state')).to.eq('ready');
+        }
+
+        // Move forward past timeout
+        clock.tick(10000);
+        channel.serverPush('already_ready');
+        expect(store.getState().worker.get('state')).to.eq('inactive');
+
+        clock.restore();
+      });
+
+      it("stops retrying if there's a manual state change", function() {
+        const clock = sinon.useFakeTimers(1200);
+        const pushCallback = sinon.spy();
+        const store = createStore(pluginApp);
+        store.dispatch(updateWorkerState('ready'));
+
+        const channel = authenticatedSocket(store, { pushCallback })
+              .getSocket().testChannels[channelName];
+        channel.serverPush('already_ready');
+        clock.tick(3000);
+
+        // Manually dispatch a state change
+        store.dispatch(updateWorkerState('inactive'));
+        expect(store.getState().worker.get('state')).to.eq('inactive');
+
+        pushCallback.reset();
+
+        // Advance to where the retry would have happened
+        clock.tick(10000);
+        expect(pushCallback).to.not.have.been.called;
       });
     });
   });
