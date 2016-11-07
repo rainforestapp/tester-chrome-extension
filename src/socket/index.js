@@ -1,4 +1,5 @@
 import { Socket } from 'phoenix';
+import Raven from 'raven-js';
 import listenStoreChanges from '../listenStoreChanges';
 import { logDebug } from '../logging';
 import { CONFIG } from '../constants';
@@ -18,22 +19,59 @@ import {
 } from '../actions';
 
 const AUTO_RECONNECT_TIMEOUT = 60 * 1000;
+const READY_RETRY_TIMEOUT = 60 * 1000;
+const READY_RETRY_PERIOD = 10 * 1000;
 
 export const startSocket = (store, socketConstructor = Socket) => {
   let socket = null;
   let channel = null;
   let disconnectedAt = null;
+  let readyRetryStartedAt = null;
+  let readyRetryTimer = null;
 
-  const pushWorkerState = (state) => {
+  const clearReadyRetry = () => {
+    clearTimeout(readyRetryTimer);
+    readyRetryStartedAt = null;
+    readyRetryTimer = null;
+  };
+
+  const pushWorkerState = (state, retryOnFail = false) => {
     if (!channel) {
       // Channel hasn't been joined, but it's OK.
       return;
     }
 
+    if (!retryOnFail && readyRetryTimer) {
+      // There was a previous attempt at automatically retrying; cancel it
+      // because we manually changed state.
+      clearReadyRetry();
+    }
+
     channel.push('update_state', { worker_state: state })
       .receive('already_ready', () => {
-        store.dispatch(updateWorkerState('inactive'));
-        store.dispatch(notify('doubleReady'));
+        if (retryOnFail) {
+          // In this case, we're automatically reconnecting so it's unlikely
+          // that there are actually multiple connections and more likely that
+          // there's a "zombie" connection on the server. So we retry for a
+          // while (long enough for zombie connections to timeout) and then move
+          // to "inactive" without a notification.
+          if (!readyRetryStartedAt) {
+            readyRetryStartedAt = Date.now();
+          }
+          if (Date.now() - readyRetryStartedAt > READY_RETRY_TIMEOUT) {
+            const uuid = store.getState().worker.get('uuid');
+            Raven.captureException(new Error('Worker timed out moving to "ready" state'), {
+              extra: { worker_uuid: uuid },
+            });
+            clearReadyRetry();
+            store.dispatch(updateWorkerState('inactive'));
+          } else {
+            readyRetryTimer = setTimeout(() => pushWorkerState('ready', true), READY_RETRY_PERIOD);
+          }
+        } else {
+          store.dispatch(updateWorkerState('inactive'));
+          store.dispatch(notify('doubleReady'));
+        }
       });
   };
 
@@ -119,6 +157,7 @@ export const startSocket = (store, socketConstructor = Socket) => {
     });
     socket.onClose(() => {
       disconnectedAt = Date.now();
+      clearReadyRetry();
       store.dispatch(connectionClosed());
     });
     socket.connect();
@@ -133,7 +172,7 @@ export const startSocket = (store, socketConstructor = Socket) => {
     channel.join()
       .receive('ok', resp => {
         disconnectedAt = null;
-        pushWorkerState(workerState());
+        pushWorkerState(workerState(), true);
         store.dispatch(connect(resp));
         // We only want to join the lobby if the actual channel connection was
         // successful
