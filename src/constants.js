@@ -108,4 +108,10 @@ export const NOTIFICATIONS = deepFreeze({
     title: 'You are active on another computer',
     message: 'Please turn off your extension elsewhere before turning it on here.',
   },
+  workAssigned: {
+    title: 'Work is ready!',
+    message: 'Click here to begin working!',
+    isClickable: true,
+    requireInteraction: true,
+  },
 });
