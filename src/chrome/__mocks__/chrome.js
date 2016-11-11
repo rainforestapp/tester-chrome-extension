@@ -185,9 +185,12 @@ export const mockChrome = (opts = {}) => {
 
   const getCurrentNotifications = () => currentNotifications;
   const clickNotification = (notificationId) => {
-    notificationListeners.forEach(listener => {
-      listener(notificationId);
-    });
+    if (currentNotifications[notificationId] &&
+        currentNotifications[notificationId].isClickable) {
+      notificationListeners.forEach(listener => {
+        listener(notificationId);
+      });
+    }
   };
   const closeNotification = (notificationId) => {
     notificationClosedListeners.forEach(listener => {
