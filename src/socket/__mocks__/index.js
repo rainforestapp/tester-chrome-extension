@@ -3,14 +3,22 @@ export const mockSocket = (opts = {}) => (
     constructor(endpoint, sockOpts = {}) {
       this.endpoint = endpoint;
       this.opts = sockOpts;
+      this.testChannels = {};
+      this.disconnected = false;
+      this.onCloseCallbacks = [];
     }
 
     connect() { return this; }
-    disconnect() { return this; }
-    onClose() { return this; }
+    disconnect() {
+      this.disconnected = true;
+      return this;
+    }
+    onClose(callback) {
+      this.onCloseCallbacks.push(callback);
+      return this;
+    }
     channel(name) {
-      this.channelName = name;
-      this.testChannel = {
+      this.testChannels[name] = {
         onCallbacks: {},
         join() {
           this.state = 'connected';
@@ -20,20 +28,23 @@ export const mockSocket = (opts = {}) => (
           this.state = 'disconnected';
           return this;
         },
-        receive(code, callback) {
-          if (opts.joinReply === code) {
+        receive(event, callback) {
+          if (opts.joinReply === event) {
             callback();
           }
+          this.onCallbacks[event] = callback;
 
           return this;
         },
-        push: (event, payload) => {
+        push(event, payload) {
           if (opts.pushCallback !== undefined) {
             opts.pushCallback(event, payload);
           }
-          if (this.opts.logger !== undefined) {
-            this.opts.logger('fake_send', event, payload);
+          if (opts.logger !== undefined) {
+            opts.logger('fake_send', event, payload);
           }
+
+          return this;
         },
         on(event, callback) {
           this.onCallbacks[event] = callback;
@@ -50,7 +61,13 @@ export const mockSocket = (opts = {}) => (
           return this.state;
         },
       };
-      return this.testChannel;
+      return this.testChannels[name];
+    }
+
+    // Simulate server disconnection for testing purposes
+    serverDisconnect() {
+      this.onCloseCallbacks.forEach(callback => callback());
+      this.disconnected = true;
     }
   }
 );

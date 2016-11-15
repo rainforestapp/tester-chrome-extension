@@ -26,7 +26,6 @@ describe('listenMessages', function() {
         payload: {
           worker_uuid: 'abc123',
           websocket_auth: auth,
-          work_available_endpoint: 'http://www.work.com/',
         },
       }, spy);
     };
@@ -54,17 +53,6 @@ describe('listenMessages', function() {
       expect(state.socket.get('auth')).to.equal(fromJS(auth));
     });
 
-    it('sets the polling endpoint', function() {
-      const store = createStore(pluginApp);
-      const chrome = mockChrome();
-      listenMessages(store, chrome);
-
-      sendAuth(chrome, () => {});
-
-      const pollUrl = store.getState().polling.get('pollUrl');
-      expect(pollUrl).to.equal('http://www.work.com/abc123/work_available');
-    });
-
     it('stores the data in the chrome sync storage', function() {
       const store = createStore(pluginApp);
       const chrome = mockChrome();
@@ -75,7 +63,6 @@ describe('listenMessages', function() {
       const storage = chrome.getStorage();
       expect(storage.worker_uuid).to.equal('abc123');
       expect(storage.websocket_auth).to.equal(auth);
-      expect(storage.work_available_endpoint).to.equal('http://www.work.com/');
     });
 
     it('responds with plugin information', function(done) {
@@ -138,7 +125,7 @@ describe('listenMessages', function() {
 
         chrome.sendRuntimeMessage({
           type: 'SET_OPTIONS',
-          payload: { soundUrl: url },
+          payload: { notificationSoundUrl: url },
         });
 
         return { store, chrome };
@@ -146,14 +133,42 @@ describe('listenMessages', function() {
 
       it('sets options', function() {
         const { store } = storeWithOptions();
-        expect(store.getState().plugin.get('options')).to.equal(fromJS({ soundUrl: url }));
+        expect(store.getState().plugin.get('options'))
+          .to.equal(fromJS({ notificationSoundUrl: url }));
       });
 
       it('saves the settings in sync storage', function() {
         const { chrome } = storeWithOptions();
         const storage = chrome.getStorage();
 
-        expect(storage.options).to.deep.equal({ soundUrl: url });
+        expect(storage.options).to.deep.equal({ notificationSoundUrl: url });
+      });
+
+      it('merges options correctly', function() {
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+
+        listenMessages(store, chrome);
+
+        chrome.sendRuntimeMessage({
+          type: 'SET_OPTIONS',
+          payload: { foo: 'bar' },
+        });
+
+        chrome.sendRuntimeMessage({
+          type: 'SET_OPTIONS',
+          payload: { baz: 'qux' },
+        });
+
+        expect(chrome.getStorage().options).to.deep.equal({
+          foo: 'bar',
+          baz: 'qux',
+        });
+
+        expect(store.getState().plugin.get('options')).to.equal(fromJS({
+          foo: 'bar',
+          baz: 'qux',
+        }));
       });
     });
 

@@ -11,16 +11,15 @@ export const actions = deepFreeze({
   ICON_CLICKED: 'ICON_CLICKED',
   WORK_STARTED: 'WORK_STARTED',
   WORK_FINISHED: 'WORK_FINISHED',
+  CHECK_STATE: 'CHECK_STATE',
   SET_PLUGIN_VERSION: 'SET_PLUGIN_VERSION',
-  START_POLLING: 'START_POLLING',
-  STOP_POLLING: 'STOP_POLLING',
-  SET_POLLING_INTERVAL: 'SET_POLLING_INTERVAL',
-  SET_POLL_URL: 'SET_POLL_URL',
-  CAPTCHA_REQUIRED: 'CAPTCHA_REQUIRED',
   SET_WORKER_PROFILE: 'SET_WORKER_PROFILE',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
   CHANNEL_LEFT: 'CHANNEL_LEFT',
   SET_OPTIONS: 'SET_OPTIONS',
+  RELOAD_PLUGIN: 'RELOAD_PLUGIN',
+  NOTIFY: 'NOTIFY',
+  CLEAR_NOTIFICATION: 'CLEAR_NOTIFICATION',
 });
 
 export const colors = deepFreeze({
@@ -29,9 +28,10 @@ export const colors = deepFreeze({
   GREY: [0, 0, 0, 230],
 });
 
-export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin', 'polling']);
+export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin', 'notifications']);
 
-export const DEFAULT_POLLING_INTERVAL = 30 * 1000;
+export const NOTIFICATION_SOUND_URL = 'notificationSoundUrl';
+export const NOTIFICATION_SOUND_REPEAT = 'notificationSoundRepeat';
 
 const getChromeConfig = () => (
   {
@@ -48,6 +48,7 @@ const getConfig = () => {
         env: 'dev',
         socketURL: 'ws://localhost:4000/socket',
         profileUrl: 'http://portal.rainforest.dev/profile',
+        workAvailableEndpoint: 'http://portal.rainforest.dev/api/1/testers',
         chrome: getChromeConfig(),
         ravenURL: 'BOGUS',
       };
@@ -56,14 +57,16 @@ const getConfig = () => {
         env: 'staging',
         socketURL: 'wss://schrute.rnfrst.com/socket',
         profileUrl: 'https://portal.rnfrst.com/profile',
+        workAvailableEndpoint: 'https://portal.rainforestqa.com/api/1/testers',
         chrome: getChromeConfig(),
-        ravenURL: 'https://0f911298f80c47d9b53d3e6a53d236e5@app.getsentry.com/88435',
+        ravenURL: 'https://7f2a3dc2e6644d98a2411c6883724589@sentry.io/68477',
       };
     case 'prod':
       return {
         env: 'prod',
         socketURL: 'wss://schrute.rainforestqa.com/socket',
         profileUrl: 'https://portal.rainforestqa.com/profile',
+        workAvailableEndpoint: 'https://bouncer.rainforestqa.com/1/testers',
         chrome: getChromeConfig(),
         ravenURL: 'https://a7b0c76390cc47208e38b884fd60ff3d@sentry.io/68477',
       };
@@ -72,6 +75,7 @@ const getConfig = () => {
         env: 'test',
         socketURL: 'ws://localhost:4000/socket',
         profileUrl: 'http://portal.rainforest.dev/profile',
+        workAvailableEndpoint: 'http://portal.rainforest.dev/api/1/testers',
         chrome: {
           notificationIconUrl: 'bogusNotifications.png',
           greyIcon: { path: 'GREY' },
@@ -83,3 +87,31 @@ const getConfig = () => {
 };
 
 export const CONFIG = deepFreeze(getConfig());
+
+export const NOTIFICATIONS = deepFreeze({
+  notLoggedIn: {
+    title: "You're not logged in",
+    message:
+    "You don't seem to be logged in to Rainforest, click here to go to your profile and log in.",
+  },
+  leftChannel: {
+    title: 'You have been disconnected',
+    message: 'You have disconnected, probably because you logged in on another computer. ' +
+      'Click the extension icon to reconnect.',
+  },
+  workerIdle: {
+    title: 'We noticed you were idle',
+    message: 'You seem to have been idle for a while, so we stopped ' +
+      'checking for work. Click here to start checking for work again.',
+  },
+  doubleReady: {
+    title: 'You are active on another computer',
+    message: 'Please turn off your extension elsewhere before turning it on here.',
+  },
+  workAssigned: {
+    title: 'Work is ready!',
+    message: 'Click here to begin working!',
+    isClickable: true,
+    requireInteraction: true,
+  },
+});

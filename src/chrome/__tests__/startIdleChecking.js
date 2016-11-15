@@ -4,13 +4,20 @@
   space-before-function-paren,
   no-unused-expressions
 */
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
+import chaiImmutable from 'chai-immutable';
+import { Set } from 'immutable';
 import { mockChrome } from '../__mocks__/chrome';
 import startIdleChecking from '../startIdleChecking';
 import pluginApp from '../../reducers';
 import { createStore } from 'redux';
 import { updateWorkerState } from '../../actions';
-import { workerIdle } from '../notifications';
+
+chai.use(chaiImmutable);
+
+const activeNotifications = store => (
+  store.getState().notifications.get('activeNotifications')
+);
 
 describe('startIdleChecking', function() {
   it('changes the worker state to inactive after chrome is idle', function() {
@@ -29,20 +36,18 @@ describe('startIdleChecking', function() {
     expect(store.getState().worker.get('state')).to.equal('inactive');
   });
 
-  it('gives the worker a notification and logs them back in if they click it', function() {
+  it('changes wantsMoreWork to false if the worker is working', function() {
     const chrome = mockChrome();
     const store = createStore(pluginApp);
-    store.dispatch(updateWorkerState('ready'));
+    store.dispatch(updateWorkerState('working'));
 
     startIdleChecking(store, chrome);
 
     chrome.stateChanged('idle');
 
-    expect(chrome.getCurrentNotifications()).to.have.property(workerIdle);
-
-    chrome.clickNotification(workerIdle);
-
-    expect(store.getState().worker.get('state')).to.equal('ready');
+    const { worker } = store.getState();
+    expect(worker.get('state')).to.equal('working');
+    expect(worker.get('wantsMoreWork')).to.be.false;
   });
 
   it("doesn't give a notification if the worker isn't active", function() {
@@ -54,7 +59,7 @@ describe('startIdleChecking', function() {
 
     chrome.stateChanged('idle');
 
-    expect(chrome.getCurrentNotifications()).to.not.have.property(workerIdle);
+    expect(activeNotifications(store)).to.equal(Set([]));
   });
 
   it('clears the notification when the worker goes active', function() {
@@ -68,6 +73,6 @@ describe('startIdleChecking', function() {
 
     store.dispatch(updateWorkerState('ready'));
 
-    expect(chrome.getCurrentNotifications()).to.not.have.property(workerIdle);
+    expect(activeNotifications(store)).to.equal(Set([]));
   });
 });

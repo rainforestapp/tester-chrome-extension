@@ -10,6 +10,8 @@ import { fromJS } from 'immutable';
 import {
   assignWork,
   authenticate,
+  authFailed,
+  checkState,
   updateWorkerState,
   iconClicked,
   workStarted,
@@ -21,7 +23,7 @@ import worker from '../worker';
 
 chai.use(chaiImmutable);
 
-const checkState = (state) => {
+const checkKeys = (state) => {
   expect(state).to.have.keys([
     'state',
     'wantsMoreWork',
@@ -42,7 +44,7 @@ const workerWithState = (state) => (
 describe('worker reducer', function() {
   it('starts with everything inactive', function() {
     const state = initState;
-    checkState(state);
+    checkKeys(state);
 
     expect(state.get('state')).to.equal('inactive');
     expect(state.get('wantsMoreWork')).to.be.false;
@@ -62,10 +64,20 @@ describe('worker reducer', function() {
       });
 
       const state = worker(undefined, action);
-      checkState(state);
+      checkKeys(state);
 
       expect(state.get('state')).to.equal('inactive');
       expect(state.get('uuid')).to.equal('abc123');
+    });
+  });
+
+  describe(actions.AUTH_FAILED, function() {
+    it('sets the worker to inactive', function() {
+      let state = worker(initState, updateWorkerState('ready'));
+      checkKeys(state);
+      state = worker(state, authFailed());
+
+      expect(state.get('state')).to.equal('inactive');
     });
   });
 
@@ -79,6 +91,14 @@ describe('worker reducer', function() {
       expect(state.get('state')).to.equal('ready');
       state = worker(state, updateWorkerState('inactive'));
       expect(state.get('state')).to.equal('inactive');
+    });
+
+    it('can move the worker to "working" without a work URL', function() {
+      const state = worker(initState, updateWorkerState('working'));
+
+      expect(state.get('error')).to.be.null;
+      expect(state.get('workUrl')).to.be.null;
+      expect(state.get('state')).to.equal('working');
     });
   });
 
@@ -210,6 +230,76 @@ describe('worker reducer', function() {
         state = worker(state, workFinished());
 
         expect(state.get('state')).to.equal('inactive');
+      });
+    });
+  });
+
+  describe(actions.CHECK_STATE, function() {
+    describe('with "inactive"', function() {
+      describe('when the worker is inactive', function() {
+        it('keeps the worker inactive', function() {
+          let state = workerWithState('inactive');
+          state = worker(state, checkState('inactive'));
+
+          expect(state.get('state')).to.equal('inactive');
+        });
+      });
+
+      describe('when the worker is ready', function() {
+        it('keeps the worker ready', function() {
+          let state = workerWithState('ready');
+          state = worker(state, checkState('inactive'));
+
+          expect(state.get('state')).to.equal('ready');
+        });
+      });
+
+      describe('when the worker is working and wants more work', function() {
+        it('sets the worker to ready', function() {
+          let state = workerWithState('working').set('wantsMoreWork', true);
+          state = worker(state, checkState('inactive'));
+
+          expect(state.get('state')).to.equal('ready');
+        });
+      });
+
+      describe("when the worker is working doesn't want more work", function() {
+        it('sets the worker to inactive', function() {
+          let state = workerWithState('working').set('wantsMoreWork', false);
+          state = worker(state, checkState('inactive'));
+
+          expect(state.get('state')).to.equal('inactive');
+        });
+      });
+    });
+
+    describe('with "working"', function() {
+      it('always sets the state to "working"', function() {
+        ['ready', 'inactive'].forEach(status => {
+          let state = workerWithState(status);
+          state = worker(state, checkState('working'));
+
+          expect(state.get('state')).to.equal('working');
+          expect(state.get('workStarted')).to.be.true;
+        });
+
+        let state = workerWithState('working');
+        state = worker(state, checkState('working'));
+
+        expect(state.get('state')).to.equal('working');
+        expect(state.get('workStarted')).to.be.false;
+      });
+
+      it('sets "wantsMoreWork" based on whether the worker was ready', function() {
+        let state = workerWithState('ready');
+        state = worker(state, checkState('working'));
+
+        expect(state.get('wantsMoreWork')).to.be.true;
+
+        state = workerWithState('inactive');
+        state = worker(state, checkState('working'));
+
+        expect(state.get('wantsMoreWork')).to.be.false;
       });
     });
   });

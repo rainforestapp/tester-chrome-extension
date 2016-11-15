@@ -4,6 +4,7 @@ export const mockChrome = (opts = {}) => {
   const messageListeners = [];
   const currentNotifications = {};
   const notificationListeners = [];
+  const notificationClosedListeners = [];
   const iconClickedListeners = [];
   const stateChangedListeners = [];
   const badge = { color: null, text: '' };
@@ -36,6 +37,11 @@ export const mockChrome = (opts = {}) => {
         notificationListeners.push(callback);
       },
     },
+    onClosed: {
+      addListener: (callback) => {
+        notificationClosedListeners.push(callback);
+      },
+    },
     clear: (id, callback) => {
       if (typeof callback !== 'function') {
         // Older versions of chrome fail without this
@@ -43,7 +49,12 @@ export const mockChrome = (opts = {}) => {
         throw new Error(msg);
       }
       delete currentNotifications[id];
-      setTimeout(() => { callback(true); });
+      setTimeout(() => {
+        callback(true);
+        notificationClosedListeners.forEach(listener => {
+          listener(id, false); // second arg is byUser
+        });
+      });
     },
   };
   const runtime = {
@@ -70,8 +81,10 @@ export const mockChrome = (opts = {}) => {
       },
     },
     local: {
-      set: (data) => {
+      set: (data, callback) => {
+        const safeCallback = typeof callback === 'function' ? callback : () => {};
         localStorageStore = Object.assign({}, localStorageStore, data);
+        safeCallback();
       },
       get: (keys, callback) => {
         setTimeout(() => {
@@ -172,8 +185,16 @@ export const mockChrome = (opts = {}) => {
 
   const getCurrentNotifications = () => currentNotifications;
   const clickNotification = (notificationId) => {
-    notificationListeners.forEach(listener => {
-      listener(notificationId);
+    if (currentNotifications[notificationId] &&
+        currentNotifications[notificationId].isClickable) {
+      notificationListeners.forEach(listener => {
+        listener(notificationId);
+      });
+    }
+  };
+  const closeNotification = (notificationId) => {
+    notificationClosedListeners.forEach(listener => {
+      listener(notificationId, true); // second arg is byUser
     });
   };
 
@@ -203,6 +224,7 @@ export const mockChrome = (opts = {}) => {
     getNumMessageListeners,
     getCurrentNotifications,
     clickNotification,
+    closeNotification,
     clickIcon,
     getBadge,
     getOpenTabs,

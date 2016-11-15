@@ -33,7 +33,7 @@ describe('startErrorHandling', function() {
     // Bad call to authenticate
     store.dispatch(authenticate());
 
-    expect(captureException).to.have.been.called.twice;
+    expect(captureException).to.have.been.calledTwice;
   });
 
   it("records the worker UUID when it's set", function() {

@@ -7,26 +7,94 @@
 
 import { mockChrome } from '../__mocks__/chrome';
 import { expect } from 'chai';
-import { assignWork, updateWorkerState, workStarted, workFinished } from '../../actions';
+import sinon from 'sinon';
+import {
+  assignWork,
+  setOptions,
+  updateWorkerState,
+  workStarted,
+  workFinished,
+} from '../../actions';
 import { createStore } from 'redux';
 import pluginApp from '../../reducers';
 import handleWork from '../handleWork';
+import handleNotifications from '../handleNotifications';
 
 describe('handleWork', function() {
   describe('when work is assigned', function() {
-    it('opens a tab with the work', function() {
+    describe('without work confirmation enabled', function() {
+      it('opens a tab with the work', function() {
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+        store.dispatch(updateWorkerState('ready'));
+
+        handleWork(store, chrome);
+
+        const url = 'http://www.example.com';
+        store.dispatch(assignWork({ url }));
+
+        const tabs = chrome.getOpenTabs();
+        expect(tabs.length).to.equal(1);
+        expect(tabs[0].url).to.equal(url);
+      });
+    });
+
+    describe('with work confirmation enabled', function() {
+      it("shows a notification and then assigns the work if it's clicked", function() {
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+        store.dispatch(updateWorkerState('ready'));
+        store.dispatch(setOptions({ confirmWorkAssignment: true }));
+
+        handleWork(store, chrome);
+        handleNotifications(store, chrome);
+
+        const url = 'http://www.example.com';
+        store.dispatch(assignWork({ url }));
+
+        expect(chrome.getOpenTabs().length).to.equal(0);
+        const openNotifications = store.getState().notifications.get('activeNotifications');
+        expect(openNotifications.includes('workAssigned')).to.be.true;
+
+        chrome.clickNotification('workAssigned');
+        const tabs = chrome.getOpenTabs();
+        expect(tabs.length).to.equal(1);
+        expect(tabs[0].url).to.equal(url);
+      });
+
+      it('times out after 30 seconds', function() {
+        const clock = sinon.useFakeTimers(1);
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+        store.dispatch(updateWorkerState('ready'));
+        store.dispatch(setOptions({ confirmWorkAssignment: true }));
+
+        handleWork(store, chrome);
+
+        const url = 'http://www.example.com';
+        store.dispatch(assignWork({ url }));
+
+        clock.tick(31000);
+
+        const openNotifications = store.getState().notifications.get('activeNotifications');
+        expect(openNotifications.includes('workAssigned')).to.be.false;
+        expect(store.getState().worker.get('state')).to.eq('inactive');
+
+        clock.restore();
+      });
+    });
+  });
+
+  describe('when the worker goes to "working" without a work URL', function() {
+    it("doesn't open up a work tab", function() {
       const store = createStore(pluginApp);
       const chrome = mockChrome();
       store.dispatch(updateWorkerState('ready'));
 
       handleWork(store, chrome);
 
-      const url = 'http://www.example.com';
-      store.dispatch(assignWork({ url }));
-
-      const tabs = chrome.getOpenTabs();
-      expect(tabs.length).to.equal(1);
-      expect(tabs[0].url).to.equal(url);
+      store.dispatch(updateWorkerState('working'));
+      expect(chrome.getOpenTabs().length).to.equal(0);
     });
   });
 

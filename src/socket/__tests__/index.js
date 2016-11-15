@@ -7,7 +7,7 @@
 import chai, { expect } from 'chai';
 import { mockSocket } from '../__mocks__';
 import { createStore } from 'redux';
-import { authenticate, updateWorkerState, setPollUrl, iconClicked } from '../../actions';
+import { authenticate, updateWorkerState, iconClicked } from '../../actions';
 import pluginApp from '../../reducers';
 import { startSocket } from '..';
 import sinon from 'sinon';
@@ -22,6 +22,8 @@ const auth = {
     sig: 'SEKRETSIG',
   },
 };
+
+const channelName = 'workers:abc123';
 
 const authenticatedSocket = (store, opts) => {
   store.dispatch(authenticate(auth));
@@ -61,7 +63,8 @@ describe('startSocket', function() {
       const socket = authenticatedSocket(store, {});
 
       expect(socket.getSocket().endpoint).to.equal('ws://localhost:4000/socket');
-      expect(socket.getSocket().channelName).to.equal('workers:abc123');
+      expect(Object.keys(socket.getSocket().testChannels))
+        .to.eql(['workers:abc123', 'workers:lobby']);
       expect(socket.getSocket().opts.params).to.eql(auth.socketAuth);
       expect(store.getState().socket.get('state')).to.equal('connected');
     });
@@ -93,22 +96,105 @@ describe('startSocket', function() {
 
         store.dispatch(authenticate(newAuth));
 
-        expect(socket.getSocket().channelName).to.equal('workers:newworker');
+        expect(Object.keys(socket.getSocket().testChannels))
+          .to.eql(['workers:newworker', 'workers:lobby']);
       });
     });
 
     describe('when reconnecting after being kicked off', function() {
-      it('reconnectes', function() {
+      it('reconnects', function() {
         const store = createStore(pluginApp);
         const socket = authenticatedSocket(store, {});
-        const channel = socket.getSocket().testChannel;
+        const channel = socket.getSocket().testChannels[channelName];
 
         channel.serverPush('leave', {});
 
         store.dispatch(iconClicked());
 
         expect(store.getState().socket.get('state')).to.equal('connected');
-        expect(socket.getSocket().testChannel.getState()).to.equal('connected');
+        expect(socket.getSocket().testChannels[channelName].getState()).to.equal('connected');
+      });
+    });
+
+    describe('reconnecting after having been disconnected for a while', function() {
+      it('makes a new connection', function() {
+        const clock = sinon.useFakeTimers(1200);
+        const store = createStore(pluginApp);
+        const socketHandler = authenticatedSocket(store, {});
+        let socket = socketHandler.getSocket();
+
+        socket.serverDisconnect();
+        expect(socket.disconnected).to.be.true;
+        expect(store.getState().socket.get('state')).to.eq('unconnected');
+
+        clock.tick(1000);
+        store.dispatch(iconClicked());
+
+        socket = socketHandler.getSocket();
+        expect(socket.disconnected).to.be.true;
+
+        clock.tick(60000);
+        store.dispatch(iconClicked());
+
+        socket = socketHandler.getSocket();
+        expect(socket.disconnected).to.be.false;
+        expect(store.getState().socket.get('state')).to.eq('connected');
+        clock.restore();
+      });
+    });
+
+    describe('reconnecting when "ready" and receiving "already_ready"', function() {
+      it('retries for a while instead of displaying a warning', function() {
+        const clock = sinon.useFakeTimers(1200);
+        const pushCallback = sinon.spy();
+
+        const store = createStore(pluginApp);
+        store.dispatch(updateWorkerState('ready'));
+
+        const channel = authenticatedSocket(store, { pushCallback })
+              .getSocket().testChannels[channelName];
+        channel.serverPush('already_ready');
+        expect(store.getState().notifications.get('activeNotifications').size).to.eq(0);
+        expect(store.getState().worker.get('state')).to.eq('ready');
+
+        for (let idx = 0; idx < 6; idx++) {
+          pushCallback.reset();
+          clock.tick(10000);
+          expect(pushCallback).to.have.been.calledWithExactly(
+            'update_state', { worker_state: 'ready' }
+          );
+          channel.serverPush('already_ready');
+          expect(store.getState().worker.get('state')).to.eq('ready');
+        }
+
+        // Move forward past timeout
+        clock.tick(10000);
+        channel.serverPush('already_ready');
+        expect(store.getState().worker.get('state')).to.eq('inactive');
+
+        clock.restore();
+      });
+
+      it("stops retrying if there's a manual state change", function() {
+        const clock = sinon.useFakeTimers(1200);
+        const pushCallback = sinon.spy();
+        const store = createStore(pluginApp);
+        store.dispatch(updateWorkerState('ready'));
+
+        const channel = authenticatedSocket(store, { pushCallback })
+              .getSocket().testChannels[channelName];
+        channel.serverPush('already_ready');
+        clock.tick(3000);
+
+        // Manually dispatch a state change
+        store.dispatch(updateWorkerState('inactive'));
+        expect(store.getState().worker.get('state')).to.eq('inactive');
+
+        pushCallback.reset();
+
+        // Advance to where the retry would have happened
+        clock.tick(10000);
+        expect(pushCallback).to.not.have.been.called;
       });
     });
   });
@@ -131,11 +217,37 @@ describe('startSocket', function() {
   describe('setting the plugin version', function() {
     it('dispatches to the store', function() {
       const store = createStore(pluginApp);
-      const channel = authenticatedSocket(store, {}).getSocket().testChannel;
+      const channel = authenticatedSocket(store, {}).getSocket().testChannels[channelName];
 
       channel.serverPush('check_version', { version: 'v1' });
 
       expect(store.getState().plugin.get('version')).to.equal('v1');
+    });
+  });
+
+  describe('checking plugin state', function() {
+    it('dispatches to the store', function() {
+      const store = createStore(pluginApp);
+      const channel = authenticatedSocket(store, {}).getSocket().testChannels[channelName];
+
+      channel.serverPush('check_state', { worker_state: 'working' });
+
+      expect(store.getState().worker.get('state')).to.equal('working');
+    });
+
+    it("signals the state if it's different from what's on the server", function() {
+      const store = createStore(pluginApp);
+      const pushCallback = sinon.spy();
+      const channel = authenticatedSocket(store, { pushCallback })
+            .getSocket().testChannels[channelName];
+      store.dispatch(updateWorkerState('ready'));
+
+      pushCallback.reset();
+
+      channel.serverPush('check_state', { worker_state: 'inactive' });
+      expect(pushCallback).to.have.been.calledWithExactly(
+        'update_state', { worker_state: 'ready' }
+      );
     });
   });
 
@@ -159,31 +271,59 @@ describe('startSocket', function() {
         );
       });
     });
-  });
 
-  it('starts polling when instructed', function() {
-    const store = createStore(pluginApp);
-    const socket = authenticatedSocket(store, {});
-    const channel = socket.getSocket().testChannel;
-    store.dispatch(setPollUrl('http://work.com'));
+    describe('when the worker is ready on another computer', function() {
+      it('makes the worker inactive and makes a notification', function() {
+        const store = createStore(pluginApp);
+        const channel = authenticatedSocket(store, {}).getSocket().testChannels[channelName];
 
-    channel.serverPush('start_polling', {});
+        store.dispatch(updateWorkerState('ready'));
+        // simulate reply
+        channel.serverPush('already_ready');
 
-    expect(store.getState().polling.get('error')).to.be.null;
-    expect(store.getState().polling.get('polling')).to.be.true;
+        const { worker, notifications } = store.getState();
+        expect(worker.get('state')).to.equal('inactive');
+        expect(notifications.get('activeNotifications').includes('doubleReady')).to.be.true;
+      });
+    });
   });
 
   describe('receiving a leave instruction', function() {
-    it('leaves the channel', function() {
+    it('leaves the channel and disconnects', function() {
       const store = createStore(pluginApp);
       store.dispatch(updateWorkerState('ready'));
       const socket = authenticatedSocket(store, {});
-      const channel = socket.getSocket().testChannel;
+      const channel = socket.getSocket().testChannels[channelName];
 
       channel.serverPush('leave', {});
 
       expect(store.getState().socket.get('state')).to.equal('left');
       expect(channel.getState()).to.equal('disconnected');
+      expect(socket.getSocket().disconnected).to.be.true;
+    });
+  });
+
+  describe('receiving a reload instruction', function() {
+    it('sets needsReload to true', function() {
+      const store = createStore(pluginApp);
+      const socket = authenticatedSocket(store, {});
+      const channel = socket.getSocket().testChannels[channelName];
+
+      channel.serverPush('reload', {});
+
+      expect(store.getState().plugin.get('needsReload')).to.be.true;
+    });
+  });
+
+  describe('receiving a reload instruction from the lobby channel', function() {
+    it('sets needsReload to true', function() {
+      const store = createStore(pluginApp);
+      const socket = authenticatedSocket(store, {});
+      const channel = socket.getSocket().testChannels['workers:lobby'];
+
+      channel.serverPush('reload', {});
+
+      expect(store.getState().plugin.get('needsReload')).to.be.true;
     });
   });
 
@@ -193,7 +333,7 @@ describe('startSocket', function() {
         const store = createStore(pluginApp);
         store.dispatch(updateWorkerState('ready'));
         const socket = authenticatedSocket(store, {});
-        const channel = socket.getSocket().testChannel;
+        const channel = socket.getSocket().testChannels[channelName];
         const workUrl = 'http://example.com';
 
         channel.serverPush('assign_work', { url: workUrl });
@@ -208,7 +348,7 @@ describe('startSocket', function() {
         const store = createStore(pluginApp);
         const pushCallback = sinon.spy();
         const socket = authenticatedSocket(store, { pushCallback });
-        const channel = socket.getSocket().testChannel;
+        const channel = socket.getSocket().testChannels[channelName];
 
         channel.serverPush('assign_work', { url: 'foobar.com' });
 
@@ -227,7 +367,7 @@ describe('startSocket', function() {
       const store = createStore(pluginApp);
       store.dispatch(updateWorkerState('working'));
       const socket = authenticatedSocket(store, {});
-      const channel = socket.getSocket().testChannel;
+      const channel = socket.getSocket().testChannels[channelName];
 
       channel.serverPush('work_finished', {});
 

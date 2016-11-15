@@ -10,16 +10,15 @@ export const authFailed = createAction(actions.AUTH_FAILED);
 export const iconClicked = createAction(actions.ICON_CLICKED);
 export const workStarted = createAction(actions.WORK_STARTED);
 export const workFinished = createAction(actions.WORK_FINISHED);
+export const checkState = createAction(actions.CHECK_STATE);
 export const setPluginVersion = createAction(actions.SET_PLUGIN_VERSION);
-export const startPolling = createAction(actions.START_POLLING);
-export const stopPolling = createAction(actions.STOP_POLLING);
-export const setPollingInterval = createAction(actions.SET_POLLING_INTERVAL);
-export const setPollUrl = createAction(actions.SET_POLL_URL);
-export const captchaRequired = createAction(actions.CAPTCHA_REQUIRED);
 export const rateLimitExceeded = createAction(actions.RATE_LIMIT_EXCEEDED);
 export const setWorkerProfile = createAction(actions.SET_WORKER_PROFILE);
 export const channelLeft = createAction(actions.CHANNEL_LEFT);
 export const setOptions = createAction(actions.SET_OPTIONS);
+export const reloadPlugin = createAction(actions.RELOAD_PLUGIN);
+export const notify = createAction(actions.NOTIFY);
+export const clearNotification = createAction(actions.CLEAR_NOTIFICATION);
 
 const validWorkerStates = ['ready', 'inactive', 'working'];
 

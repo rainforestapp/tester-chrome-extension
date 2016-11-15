@@ -1,11 +1,10 @@
-import { authenticate, setPollUrl, workStarted, workFinished, setOptions } from '../actions';
+import { authenticate, workStarted, workFinished, setOptions } from '../actions';
 import { logDebug } from '../logging';
 
 const listenMessages = (store, chrome) => {
   const handleAuthMessage = ({
     worker_uuid: workerUUID,
     websocket_auth: socketAuth,
-    work_available_endpoint: pollEndpoint,
   }) => {
     if (!workerUUID || !socketAuth) {
       throw new Error('Invalid authentication message received!');
@@ -17,15 +16,9 @@ const listenMessages = (store, chrome) => {
     };
     store.dispatch(authenticate(auth));
 
-    if (pollEndpoint) {
-      const pollUrl = `${pollEndpoint}${workerUUID}/work_available`;
-      store.dispatch(setPollUrl(pollUrl));
-    }
-
     chrome.storage.sync.set({
       worker_uuid: workerUUID,
       websocket_auth: socketAuth,
-      work_available_endpoint: pollEndpoint,
     });
   };
 
@@ -41,20 +34,8 @@ const listenMessages = (store, chrome) => {
     store.dispatch(setOptions(payload));
 
     chrome.storage.sync.set({
-      options: payload,
+      options: store.getState().plugin.get('options').toJS(),
     });
-  };
-
-  // TODO: This is only here for backward compatibility; we should nuke once all
-  // messages have been changed.
-  const handleDataMessage = (data) => {
-    if (data.worker_uuid && data.websocket_auth) {
-      handleAuthMessage(data);
-    }
-
-    if (data.clear_work) {
-      handleWorkError(data);
-    }
   };
 
   const okResponse = () => (
@@ -89,12 +70,6 @@ const listenMessages = (store, chrome) => {
     logDebug('\n**Message received!**');
     logDebug('Message:', message);
     logDebug('Sender:', sender);
-
-    if (message.data) {
-      handleDataMessage(message.data);
-      sendResponse(okResponse());
-      return;
-    }
 
     if (message.type) {
       const resp = handleActionMessage(message);
