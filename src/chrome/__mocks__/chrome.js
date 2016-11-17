@@ -16,6 +16,8 @@ export const mockChrome = (opts = {}) => {
     id: '',
   };
   let currentIcon;
+  const createdMenus = [];
+  const checkedMenus = [];
 
   const addListener = (listener) => {
     messageListeners.push(listener);
@@ -154,6 +156,14 @@ export const mockChrome = (opts = {}) => {
       setTimeout(() => callback(profileUserInfo));
     },
   };
+  const contextMenus = {
+    create: (option, callback) => {
+      createdMenus.push(option);
+      if (option.checked) checkedMenus.push(option);
+      const safeCallback = typeof callback === 'function' ? callback : () => {};
+      safeCallback();
+    },
+  };
 
   // Mock actions
 
@@ -206,6 +216,10 @@ export const mockChrome = (opts = {}) => {
 
   const getIcon = () => currentIcon;
 
+  const getCreatedMenus = () => createdMenus;
+
+  const getCheckedMenus = () => checkedMenus;
+
   return {
     // "Real" objects
     extension,
@@ -216,6 +230,7 @@ export const mockChrome = (opts = {}) => {
     browserAction,
     idle,
     identity,
+    contextMenus,
 
     // Testing helpers
     sendRuntimeMessage,
@@ -230,5 +245,7 @@ export const mockChrome = (opts = {}) => {
     getOpenTabs,
     getIcon,
     stateChanged,
+    getCreatedMenus,
+    getCheckedMenus,
   };
 };

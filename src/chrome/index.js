@@ -8,6 +8,7 @@ import getSync from './getSync';
 import handleStateSaving from './handleStateSaving';
 import renderIcon from './renderIcon';
 import startIdleChecking from './startIdleChecking';
+import buildContextMenus from './buildContextMenus';
 import { applyMiddleware } from 'redux';
 import { logMiddleware } from '../logging';
 
@@ -39,6 +40,7 @@ export const startChromePlugin = (chrome, socketConstructor = Socket) => {
       renderIcon(store, chrome);
       handleWork(store, chrome);
       startIdleChecking(store, chrome);
+      buildContextMenus(store, chrome);
       getUserInfo();
     });
 

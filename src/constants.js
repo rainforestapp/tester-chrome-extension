@@ -30,6 +30,7 @@ export const colors = deepFreeze({
 
 export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin', 'notifications']);
 
+export const CONFIRM_WORK_ASSIGNMENT = 'confirmWorkAssignment';
 export const NOTIFICATION_SOUND_URL = 'notificationSoundUrl';
 export const NOTIFICATION_SOUND_REPEAT = 'notificationSoundRepeat';
 
