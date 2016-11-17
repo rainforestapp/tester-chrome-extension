@@ -156,10 +156,13 @@ export const mockChrome = (opts = {}) => {
       setTimeout(() => callback(profileUserInfo));
     },
   };
+
   const contextMenus = {
     create: (option, callback) => {
       createdMenus.push(option);
-      if (option.checked) checkedMenus.push(option);
+      if (option.checked) {
+        checkedMenus.push(option);
+      }
       const safeCallback = typeof callback === 'function' ? callback : () => {};
       safeCallback();
     },
