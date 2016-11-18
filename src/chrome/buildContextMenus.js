@@ -6,6 +6,10 @@ import {
 } from '../constants';
 
 const buildContextMenus = (store, chrome) => {
+  if (chrome.contextMenus === undefined) {
+    return;
+  }
+
   const pluginOptions = store.getState().plugin.get('options');
 
   const isChecked = (name, value) => (
