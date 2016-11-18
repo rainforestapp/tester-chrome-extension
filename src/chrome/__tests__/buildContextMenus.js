@@ -50,5 +50,15 @@ describe('buildContextMenus', function() {
       expect(menuChecked[1].title).to.equal('office');
       expect(menuChecked[2].title).to.equal('3');
     });
+
+    it('does not duplicates menus', function() {
+      const { store, chrome } = init();
+
+      buildContextMenus(store, chrome);
+      buildContextMenus(store, chrome);
+
+      const menuCreated = chrome.getCreatedMenus();
+      expect(menuCreated.length).to.equal(17);
+    });
   });
 });

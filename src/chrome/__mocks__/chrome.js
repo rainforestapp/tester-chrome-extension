@@ -16,8 +16,8 @@ export const mockChrome = (opts = {}) => {
     id: '',
   };
   let currentIcon;
-  const createdMenus = [];
-  const checkedMenus = [];
+  let createdMenus = [];
+  let checkedMenus = [];
 
   const addListener = (listener) => {
     messageListeners.push(listener);
@@ -29,7 +29,9 @@ export const mockChrome = (opts = {}) => {
   if (opts.localStorage) {
     localStorageStore = opts.localStorage;
   }
+
   const extension = {};
+
   const notifications = {
     create: (id, notificationOpts) => {
       currentNotifications[id] = notificationOpts;
@@ -59,17 +61,20 @@ export const mockChrome = (opts = {}) => {
       });
     },
   };
+
   const runtime = {
     onMessageExternal: {
       addListener,
     },
   };
+
   const dataWithKeys = (store, keys) => (
     keys.reduce(
       (acc, key) => Object.assign(acc, { [key]: store[key] }),
       {}
     )
   );
+
   const storage = {
     sync: {
       set: (data) => {
@@ -96,6 +101,7 @@ export const mockChrome = (opts = {}) => {
       },
     },
   };
+
   const browserAction = {
     setBadgeBackgroundColor: ({ color }) => {
       badge.color = color;
@@ -114,6 +120,7 @@ export const mockChrome = (opts = {}) => {
       },
     },
   };
+
   const tabs = {
     create: (tab, callback) => {
       const chromeTab = Object.assign({}, tab, {
@@ -143,6 +150,7 @@ export const mockChrome = (opts = {}) => {
       },
     },
   };
+
   const idle = {
     setDetectionInterval: () => {},
     onStateChanged: {
@@ -151,6 +159,7 @@ export const mockChrome = (opts = {}) => {
       },
     },
   };
+
   const identity = {
     getProfileUserInfo: (callback) => {
       setTimeout(() => callback(profileUserInfo));
@@ -165,6 +174,10 @@ export const mockChrome = (opts = {}) => {
       }
       const safeCallback = typeof callback === 'function' ? callback : () => {};
       safeCallback();
+    },
+    removeAll: () => {
+      createdMenus = [];
+      checkedMenus = [];
     },
   };
 

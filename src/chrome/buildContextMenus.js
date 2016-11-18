@@ -41,6 +41,8 @@ const buildContextMenus = (store, chrome) => {
     });
   };
 
+  chrome.contextMenus.removeAll();
+
   createContextMenu({
     name: CONFIRM_WORK_ASSIGNMENT,
     title: 'Confirm Work Assignments',
