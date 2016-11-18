@@ -13,6 +13,8 @@ import { createStore } from 'redux';
 import { setPluginVersion, updateWorkerState } from '../../actions';
 import pluginApp from '../../reducers';
 import { fromJS } from 'immutable';
+import buildContextMenus from '../buildContextMenus';
+import { CONFIRM_WORK_ASSIGNMENT } from '../../constants';
 
 chai.use(sinonChai);
 
@@ -169,6 +171,24 @@ describe('listenMessages', function() {
           foo: 'bar',
           baz: 'qux',
         }));
+      });
+
+      it('updates context menus', function() {
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+
+        buildContextMenus(store, chrome);
+        expect(chrome.getCheckedMenus().length).to.equal(0);
+
+        listenMessages(store, chrome);
+
+        chrome.sendRuntimeMessage({
+          type: 'SET_OPTIONS',
+          payload: { [CONFIRM_WORK_ASSIGNMENT]: true },
+        });
+
+        expect(chrome.getCheckedMenus().length).to.equal(1);
+        expect(chrome.getCheckedMenus()[0].title).to.equal('Yes');
       });
     });
 

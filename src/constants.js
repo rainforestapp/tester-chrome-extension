@@ -14,7 +14,6 @@ export const actions = deepFreeze({
   CHECK_STATE: 'CHECK_STATE',
   SET_PLUGIN_VERSION: 'SET_PLUGIN_VERSION',
   SET_WORKER_PROFILE: 'SET_WORKER_PROFILE',
-  RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
   CHANNEL_LEFT: 'CHANNEL_LEFT',
   SET_OPTIONS: 'SET_OPTIONS',
   RELOAD_PLUGIN: 'RELOAD_PLUGIN',
@@ -30,6 +29,7 @@ export const colors = deepFreeze({
 
 export const REDUCERS = deepFreeze(['worker', 'socket', 'plugin', 'notifications']);
 
+export const CONFIRM_WORK_ASSIGNMENT = 'confirmWorkAssignment';
 export const NOTIFICATION_SOUND_URL = 'notificationSoundUrl';
 export const NOTIFICATION_SOUND_REPEAT = 'notificationSoundRepeat';
 
