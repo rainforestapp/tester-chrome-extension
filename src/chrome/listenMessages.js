@@ -1,5 +1,6 @@
 import { authenticate, workStarted, workFinished, setOptions } from '../actions';
 import { logDebug } from '../logging';
+import buildContextMenus from './buildContextMenus';
 
 const listenMessages = (store, chrome) => {
   const handleAuthMessage = ({
@@ -32,6 +33,8 @@ const listenMessages = (store, chrome) => {
 
   const handleSetOptions = (payload) => {
     store.dispatch(setOptions(payload));
+
+    buildContextMenus(store, chrome);
 
     chrome.storage.sync.set({
       options: store.getState().plugin.get('options').toJS(),
