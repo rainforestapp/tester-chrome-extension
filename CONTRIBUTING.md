@@ -21,14 +21,24 @@ You should open an issue in one of two cases:
 
 Bug reports are welcome, but please follow these guidelines:
 
-1. Make sure your issue is extension-related and not a problem with the tester
+1. Unless you're experienced with submitting bug reports, it's best to ask on
+   the [tester forum](https://forum.rainforestqa.com/) first. There are many
+   people willing to help walk through problems and/or prepare a good bug
+   report.
+2. Make sure your issue is extension-related and not a problem with the tester
    terminal, VMs, etc.
-2. Look through existing open issues to see if your issue has already been
+3. Look through existing open issues to see if your issue has already been
    reported.
-3. If it hasn't already been reported, open a new issue with *as many details as
-   possible* (ideally, steps to consistently reproduce the issue). Keep each
-   GitHub issue focused on a single problem (don't put multiple problems in the
-   same issue).
+4. When you report a bug, make sure you have *both* of the following:
+   - What isn't working *from your perspective* (example: "The extension doesn't
+     turn green and I'm not getting work").
+   - *As many details as possible* about what's going wrong. Ideally, this would
+     mean steps to consistently reproduce the issue. At minimum, you'll want to
+     include the exact browser version you're using (which you can find at
+     chrome://chrome) and also the JS console logs.
+
+Keep each GitHub issue focused on a single problem (don't put multiple problems
+in the same issue).
 
 Examples of good bug reports:
 
