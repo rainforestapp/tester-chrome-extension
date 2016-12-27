@@ -163,11 +163,11 @@ export const mockChrome = (opts = {}) => {
         id: tabCounter++,
       });
       openTabs.push(tab);
-      const window = { tabs: [tab] };
-      openWindows.push(window);
+      const windowSpec = { tabs: [tab] };
+      openWindows.push(windowSpec);
       setTimeout(() => {
         if (callback) {
-          callback(window);
+          callback(windowSpec);
         }
       });
     },
@@ -252,7 +252,7 @@ export const mockChrome = (opts = {}) => {
 
   const getOpenTabs = () => openTabs;
 
-  const closeWindow = () => {
+  const closeWindows = () => {
     openWindows = [];
   };
 
@@ -283,7 +283,7 @@ export const mockChrome = (opts = {}) => {
     getCurrentNotifications,
     clickNotification,
     closeNotification,
-    closeWindow,
+    closeWindows,
     clickIcon,
     getBadge,
     getOpenTabs,

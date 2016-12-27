@@ -46,7 +46,7 @@ describe('handleWork', function() {
         store.dispatch(updateWorkerState('ready'));
 
         handleWork(store, chrome);
-        chrome.closeWindow();
+        chrome.closeWindows();
 
         const url = 'http://www.example.com';
 
