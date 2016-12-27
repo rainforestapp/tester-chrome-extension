@@ -39,6 +39,25 @@ describe('handleWork', function() {
       });
     });
 
+    describe('when the main window is closed', function() {
+      it('opens a new window', function() {
+        const store = createStore(pluginApp);
+        const chrome = mockChrome();
+        store.dispatch(updateWorkerState('ready'));
+
+        handleWork(store, chrome);
+        chrome.closeWindow();
+
+        const url = 'http://www.example.com';
+
+        store.dispatch(assignWork({ url }));
+
+        const tabs = chrome.getOpenTabs();
+        expect(tabs.length).to.equal(1);
+        expect(tabs[0].url).to.equal(url);
+      });
+    });
+
     describe('with work confirmation enabled', function() {
       it("shows a notification and then assigns the work if it's clicked", function() {
         const store = createStore(pluginApp);

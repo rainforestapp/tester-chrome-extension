@@ -14,12 +14,20 @@ const handleWork = (store, chrome) => {
 
   const assignWork = (url) => {
     const oldWorkTabId = workTabId;
-    chrome.tabs.create({ url }, tab => {
-      workTabId = tab.id;
+    chrome.windows.getAll(windows => {
+      if (windows.length >= 1) {
+        chrome.tabs.create({ url }, tab => {
+          workTabId = tab.id;
+        });
+      } else {
+        chrome.windows.create({ url }, window => {
+          workTabId = window.tabs[0].id;
+        });
+      }
+      if (oldWorkTabId) {
+        chrome.tabs.remove(oldWorkTabId);
+      }
     });
-    if (oldWorkTabId) {
-      chrome.tabs.remove(oldWorkTabId);
-    }
   };
 
   const showConfirmationNotification = () => {

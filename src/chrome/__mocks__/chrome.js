@@ -9,6 +9,7 @@ export const mockChrome = (opts = {}) => {
   const stateChangedListeners = [];
   const badge = { color: null, text: '' };
   const openTabs = [];
+  let openWindows = [{ tabs: [] }];
   let tabCounter = 42;
   const tabOnRemoveListeners = [];
   const profileUserInfo = opts.profileUserInfo || {
@@ -151,6 +152,27 @@ export const mockChrome = (opts = {}) => {
     },
   };
 
+  const windows = {
+    getAll: (callback) => {
+      // This should really be async, but it complicates the tests horribly
+      callback(openWindows);
+    },
+
+    create: (tabSpec, callback) => {
+      const tab = Object.assign({}, tabSpec, {
+        id: tabCounter++,
+      });
+      openTabs.push(tab);
+      const window = { tabs: [tab] };
+      openWindows.push(window);
+      setTimeout(() => {
+        if (callback) {
+          callback(window);
+        }
+      });
+    },
+  };
+
   const idle = {
     setDetectionInterval: () => {},
     onStateChanged: {
@@ -230,6 +252,10 @@ export const mockChrome = (opts = {}) => {
 
   const getOpenTabs = () => openTabs;
 
+  const closeWindow = () => {
+    openWindows = [];
+  };
+
   const getIcon = () => currentIcon;
 
   const getCreatedMenus = () => createdMenus;
@@ -243,6 +269,7 @@ export const mockChrome = (opts = {}) => {
     runtime,
     storage,
     tabs,
+    windows,
     browserAction,
     idle,
     identity,
@@ -256,6 +283,7 @@ export const mockChrome = (opts = {}) => {
     getCurrentNotifications,
     clickNotification,
     closeNotification,
+    closeWindow,
     clickIcon,
     getBadge,
     getOpenTabs,
