@@ -47,8 +47,8 @@ const getConfig = () => {
       return {
         env: 'dev',
         socketURL: 'ws://localhost:4000/socket',
-        profileUrl: 'http://portal.rainforest.dev/profile',
-        workAvailableEndpoint: 'http://portal.rainforest.dev/api/1/testers',
+        profileUrl: 'http://portal.rainforest.test/profile',
+        workAvailableEndpoint: 'http://portal.rainforest.test/api/1/testers',
         chrome: getChromeConfig(),
         ravenURL: 'BOGUS',
       };
@@ -74,8 +74,8 @@ const getConfig = () => {
       return {
         env: 'test',
         socketURL: 'ws://localhost:4000/socket',
-        profileUrl: 'http://portal.rainforest.dev/profile',
-        workAvailableEndpoint: 'http://portal.rainforest.dev/api/1/testers',
+        profileUrl: 'http://portal.rainforest.test/profile',
+        workAvailableEndpoint: 'http://portal.rainforest.test/api/1/testers',
         chrome: {
           notificationIconUrl: 'bogusNotifications.png',
           greyIcon: { path: 'GREY' },

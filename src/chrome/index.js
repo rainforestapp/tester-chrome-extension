@@ -35,6 +35,7 @@ export const startChromePlugin = (chrome, socketConstructor = Socket) => {
   getSync(store, chrome)
     .then(() => handleStateSaving(store, chrome))
     .then(() => {
+      debugger;
       listenMessages(store, chrome);
       handleNotifications(store, chrome);
       renderIcon(store, chrome);
