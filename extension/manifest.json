@@ -23,7 +23,7 @@
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["*://*.rainforest.dev/*", "http://localhost:3000/*"]
+    "matches": ["*://*.rainforest.dev/*", "*://*.rainforest.test/*", "http://localhost:3000/*"]
   },
   "permissions": [
     "cookies",
@@ -36,6 +36,7 @@
     "identity.email",
     "*://*.getsentry.com/*",
     "*://*.rainforest.dev/*",
+    "*://*.rainforest.test/*",
     "*://*.rainforestqa.com/*"
   ],
   "content_security_policy": "script-src 'self' http://localhost:8123 https://cdnjs.cloudflare.com; object-src 'self'"
