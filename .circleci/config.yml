@@ -45,6 +45,13 @@ jobs:
       - run:
           name: Run tests
           command: npm run test:ci
+  merge_to_master:
+    docker:
+      - image: rainforestapp/circlemator:latest
+    steps:
+      - run:
+          name: Merge to master
+          command: circlemator self-merge --base-branch=master --compare-branch=develop
   deploy_staging:
     docker:
       - image: circleci/node:6.14
@@ -70,7 +77,7 @@ jobs:
       - run:
           name: Zip extension 
           command: cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
-  run_rainforest_tests:
+  run_rainforest:
     docker:
       - image: rainforestapp/rainforest-cli:latest
     steps:
@@ -108,5 +115,40 @@ workflows:
   version: 2
   test_and_deploy:
     jobs:
-      - lint
-      - test
+      - lint:
+          filters:
+            branches:
+              ignore:
+                - master
+                - develop
+      - test:
+          filters:
+            branches:
+              ignore:
+                - master
+      - deploy_staging:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - develop
+      - run_rainforest:
+          requires:
+            - deploy_staging
+          filters:
+            branches:
+              only:
+                - develop
+      - merge_to_master:
+          requires:
+            - run_rainforest
+          filters:
+            branches:
+              only:
+                - develop
+      - deploy_production:
+          filters:
+            branches:
+              only:
+                - master
