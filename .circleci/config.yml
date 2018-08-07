@@ -110,6 +110,6 @@ jobs:
 workflows:
   version: 2
   test_and_deploy:
-    - lint
-    - test
-
+    jobs:
+      - lint
+      - test
