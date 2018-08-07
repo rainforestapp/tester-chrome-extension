@@ -1,0 +1,115 @@
+version: 2
+
+experimental:
+  notify:
+    branches:
+      only:
+        - master
+
+jobs:
+  lint:
+    docker:
+      - image: circleci/node:6.14
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+      - run:
+          name: NPM install
+          command: npm install
+      - save_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+          paths: 
+            - ~/node_modules
+      - run:
+          name: Lint source
+          command: npm run lint
+  test:
+    docker:
+      - image: circleci/node:6.14
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+      - run:
+          name: NPM install
+          command: npm install
+      - save_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+          paths: 
+            - ~/node_modules
+      - run:
+          name: Run tests
+          command: npm run test:ci
+      - run:
+          name: Upload coveralls
+          command: npm run coveralls
+  deploy_staging:
+    docker:
+      - image: circleci/node:6.14
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+      - run:
+          name: NPM install
+          command: npm install
+      - save_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+          paths: 
+            - ~/node_modules
+      - run:
+          name: Build stage
+          command: ./deploy stg
+      - run:
+          name: Move extension manifest
+          command: mv staging_manifest.json extension/manifest.json
+      - run:
+          name: Zip extension 
+          command: cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
+  run_rainforest_tests:
+    docker:
+      - image: rainforestapp/rainforest-cli:latest
+    steps:
+      - run:
+          name: Run Rainforest
+          command: 
+            rainforest-cli run --token "$rainforest_token" --environment-id 356 --folder 3982 --fg --conflict abort --description "$circle_project_reponame - $circle_branch $circle_build_num"
+  deploy_prod:
+    docker:
+      - image: circleci/node:6.14
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+      - run:
+          name: NPM install
+          command: npm install
+      - save_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+          paths: 
+            - ~/node_modules
+      - run:
+          name: Build stage
+          command: ./deploy prd
+      - run:
+          name: Move extension manifest
+          command: mv production_manifest.json extension/manifest.json
+      - run:
+          name: Zip extension 
+          command: cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
+
+workflows:
+  version: 2
+  test_and_deploy:
+    - lint
+    - test
+
