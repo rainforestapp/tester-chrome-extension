@@ -45,9 +45,6 @@ jobs:
       - run:
           name: Run tests
           command: npm run test:ci
-      - run:
-          name: Upload coveralls
-          command: npm run coveralls
   deploy_staging:
     docker:
       - image: circleci/node:6.14
