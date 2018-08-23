@@ -61,13 +61,7 @@ jobs:
       - checkout
       - run:
           name: Install awscli
-          working_directory: /
-          command: |
-            apt-get -y -qq update
-            apt-get -y -qq install python3.4-dev
-            curl -O https://bootstrap.pypa.io/get-pip.py
-            python3.4 get-pip.py --user
-            pip install awscli --upgrade --use
+          command: sudo apt-get -y -qq install awscli
       - restore_cache:
           key: v1-tester-chrome-{{ checksum "package.json" }}
       - run:
@@ -103,13 +97,7 @@ jobs:
       - checkout
       - run:
           name: Install awscli
-          working_directory: /
-          command: |
-            apt-get -y -qq update
-            apt-get -y -qq install python3.4-dev
-            curl -O https://bootstrap.pypa.io/get-pip.py
-            python3.4 get-pip.py --user
-            pip install awscli --upgrade --use
+          command: sudo apt-get -y -qq install awscli
       - restore_cache:
           key: v1-tester-chrome-{{ checksum "package.json" }}
       - run:
