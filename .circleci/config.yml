@@ -59,6 +59,9 @@ jobs:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
     steps:
       - checkout
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli 
       - restore_cache:
           key: v1-tester-chrome-{{ checksum "package.json" }}
       - run:
@@ -92,6 +95,9 @@ jobs:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
     steps:
       - checkout
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli 
       - restore_cache:
           key: v1-tester-chrome-{{ checksum "package.json" }}
       - run:
