@@ -167,7 +167,6 @@ workflows:
             branches:
               only:
                 - develop
-                - RF-5311-circle-2.0
       - update_staging_sha:
           requires:
             - upload_staging
@@ -175,7 +174,6 @@ workflows:
             branches:
               only:
                 - develop
-                - RF-5311-circle-2.0
       - run_rainforest:
           requires:
             - update_staging_sha
