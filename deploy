@@ -22,4 +22,3 @@ BUCKET="static.$DOMAIN"
 
 npm run build
 aws s3 sync build "s3://$BUCKET/$CIRCLE_SHA1/" --acl public-read
-heroku config:set "PLUGIN_VERSION=$CIRCLE_SHA1" -a "schrute-$ENV"
