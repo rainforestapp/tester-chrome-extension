@@ -63,12 +63,12 @@ jobs:
           name: Install awscli
           command: sudo apt-get -y -qq install awscli
       - restore_cache:
-          key: v1-tester-chrome-{{ checksum "package.json" }}
+          key: v1-tester-chrome-extension-{{ checksum "package.json" }}
       - run:
           name: NPM install
           command: npm install
       - save_cache:
-          key: v1-tester-chrome-{{ checksum "package.json" }}
+          key: v1-tester-chrome-extension-{{ checksum "package.json" }}
           paths: 
             - ~/node_modules
       - run:
@@ -113,12 +113,12 @@ jobs:
           name: Install awscli
           command: sudo apt-get -y -qq install awscli
       - restore_cache:
-          key: v1-tester-chrome-{{ checksum "package.json" }}
+          key: v1-tester-chrome-extension-{{ checksum "package.json" }}
       - run:
           name: NPM install
           command: npm install
       - save_cache:
-          key: v1-tester-chrome-{{ checksum "package.json" }}
+          key: v1-tester-chrome-extension-{{ checksum "package.json" }}
           paths: 
             - ~/node_modules
       - run:
