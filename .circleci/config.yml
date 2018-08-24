@@ -52,7 +52,7 @@ jobs:
       - run:
           name: Merge to master
           command: circlemator self-merge --base-branch=master --compare-branch=develop
-  deploy_staging:
+  upload_staging:
     docker:
       - image: circleci/node:6.14
         environment:
@@ -80,6 +80,18 @@ jobs:
       - run:
           name: Zip extension 
           command: cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
+  update_staging_sha:
+    docker:
+      - image: rainforestapp/heroku-deploy:latest
+    steps:
+      - checkout
+      - run:
+          name: Setup Heroku
+          command: .circleci/setup-heroku.sh
+      - run:
+          name: Update staging SHA
+          command: |
+            heroku config:set PLUGIN_VERSION=$CIRCLE_SHA1 -a schrute-stg
   run_rainforest:
     docker:
       - image: rainforestapp/rainforest-cli:latest
@@ -88,7 +100,7 @@ jobs:
           name: Run Rainforest
           command: 
             rainforest-cli run --token "$rainforest_token" --environment-id 356 --folder 3982 --fg --conflict abort --description "$circle_project_reponame - $circle_branch $circle_build_num"
-  deploy_prod:
+  upload_prod:
     docker:
       - image: circleci/node:6.14
         environment:
@@ -116,6 +128,18 @@ jobs:
       - run:
           name: Zip extension 
           command: cd extension && zip -r $CIRCLE_ARTIFACTS/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
+  update_production_sha:
+    docker:
+      - image: rainforestapp/heroku-deploy:latest
+    steps:
+      - checkout
+      - run:
+          name: Setup Heroku
+          command: .circleci/setup-heroku.sh
+      - run:
+          name: Update production SHA
+          command: |
+            heroku config:set PLUGIN_VERSION=$CIRCLE_SHA1 -a schrute-prd
 
 workflows:
   version: 2
@@ -132,7 +156,7 @@ workflows:
             branches:
               ignore:
                 - master
-      - deploy_staging:
+      - upload_staging:
           requires:
             - test
           filters:
@@ -140,9 +164,17 @@ workflows:
               only:
                 - develop
                 - RF-5311-circle-2.0
+      - update_staging_sha:
+          requires:
+            - upload_staging
+          filters:
+            branches:
+              only:
+                - develop
+                - RF-5311-circle-2.0
       - run_rainforest:
           requires:
-            - deploy_staging
+            - update_staging_sha
           filters:
             branches:
               only:
@@ -154,7 +186,14 @@ workflows:
             branches:
               only:
                 - develop
-      - deploy_production:
+      - upload_production:
+          filters:
+            branches:
+              only:
+                - master
+      - update_production_sha:
+          requires:
+            - upload_production
           filters:
             branches:
               only:
