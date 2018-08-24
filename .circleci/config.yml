@@ -71,9 +71,9 @@ jobs:
           key: v1-tester-chrome-{{ checksum "package.json" }}
           paths: 
             - ~/node_modules
-     #- run:
-     #    name: Build stage
-     #    command: ./deploy stg
+      - run:
+          name: Build stage
+          command: ./deploy stg
       - run:
           name: Move extension manifest
           command: mv staging_manifest.json extension/manifest.json
@@ -87,9 +87,6 @@ jobs:
       - image: rainforestapp/heroku-deploy:latest
     steps:
       - checkout
-      - run:
-          name: Setup Heroku
-          command: .circleci/setup-heroku.sh
       - run:
           name: Update staging SHA
           command: |
