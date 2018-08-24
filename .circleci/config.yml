@@ -89,7 +89,7 @@ jobs:
       - checkout
       - run:
           name: Setup Heroku
-          command: .circleci/setup-heroku.sh
+          command: /scripts/setup.sh
       - run:
           name: Update staging SHA
           command: |
@@ -139,7 +139,7 @@ jobs:
       - checkout
       - run:
           name: Setup Heroku
-          command: .circleci/setup-heroku.sh
+          command: /scripts/setup.sh
       - run:
           name: Update production SHA
           command: |
