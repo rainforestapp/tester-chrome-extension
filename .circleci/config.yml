@@ -88,6 +88,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Setup Heroku
+          command: .circleci/setup-heroku.sh
+      - run:
           name: Update staging SHA
           command: |
             heroku config:set PLUGIN_VERSION=$CIRCLE_SHA1 -a schrute-stg
