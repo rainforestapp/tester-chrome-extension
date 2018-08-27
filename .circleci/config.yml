@@ -102,7 +102,7 @@ jobs:
           name: Run Rainforest
           command: 
             rainforest-cli run --token "$RAINFOREST_TOKEN" --environment-id 356 --folder 3982 --conflict abort --description "tester-chrome-extension - $CIRCLE_BRANCH $CIRCLE_BUILD_NUM"
-  upload_prod:
+  upload_production:
     docker:
       - image: circleci/node:6.14
         environment:
