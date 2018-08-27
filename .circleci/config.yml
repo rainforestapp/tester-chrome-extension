@@ -1,0 +1,202 @@
+version: 2
+
+experimental:
+  notify:
+    branches:
+      only:
+        - master
+
+jobs:
+  lint:
+    docker:
+      - image: circleci/node:6.14
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+      - run:
+          name: NPM install
+          command: npm install
+      - save_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+          paths: 
+            - ~/node_modules
+      - run:
+          name: Lint source
+          command: npm run lint
+  test:
+    docker:
+      - image: circleci/node:6.14
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+      - run:
+          name: NPM install
+          command: npm install
+      - save_cache:
+          key: v1-tester-chrome-{{ checksum "package.json" }}
+          paths: 
+            - ~/node_modules
+      - run:
+          name: Run tests
+          command: npm run test:ci
+  merge_to_master:
+    docker:
+      - image: rainforestapp/circlemator:latest
+    steps:
+      - run:
+          name: Merge to master
+          command: circlemator self-merge --base-branch=master --compare-branch=develop
+  upload_staging:
+    docker:
+      - image: circleci/node:6.14
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    steps:
+      - checkout
+      - run:
+          name: Install awscli
+          command: sudo apt-get -y -qq install awscli
+      - restore_cache:
+          key: v1-tester-chrome-extension-{{ checksum "package.json" }}
+      - run:
+          name: NPM install
+          command: npm install
+      - save_cache:
+          key: v1-tester-chrome-extension-{{ checksum "package.json" }}
+          paths: 
+            - ~/node_modules
+      - run:
+          name: Build stage
+          command: ./deploy stg
+      - run:
+          name: Move extension manifest
+          command: mv staging_manifest.json extension/manifest.json
+      - run:
+          name: Zip extension 
+          command: cd extension && mkdir /tmp/extension && zip -r /tmp/extension/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
+      - store_artifacts:
+          path: /tmp/extension
+  update_staging_sha:
+    docker:
+      - image: rainforestapp/heroku-deploy:latest
+    steps:
+      - checkout
+      - run:
+          name: Setup Heroku
+          command: /scripts/setup.sh
+      - run:
+          name: Update staging SHA
+          command: |
+            heroku config:set PLUGIN_VERSION=$CIRCLE_SHA1 -a schrute-stg
+  run_rainforest:
+    docker:
+      - image: rainforestapp/rainforest-cli:latest
+    steps:
+      - run:
+          name: Run Rainforest
+          command: 
+            rainforest-cli run --token "$RAINFOREST_TOKEN" --environment-id 356 --folder 3982 --conflict abort --description "tester-chrome-extension - $CIRCLE_BRANCH $CIRCLE_BUILD_NUM"
+  upload_prod:
+    docker:
+      - image: circleci/node:6.14
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    steps:
+      - checkout
+      - run:
+          name: Install awscli
+          command: sudo apt-get -y -qq install awscli
+      - restore_cache:
+          key: v1-tester-chrome-extension-{{ checksum "package.json" }}
+      - run:
+          name: NPM install
+          command: npm install
+      - save_cache:
+          key: v1-tester-chrome-extension-{{ checksum "package.json" }}
+          paths: 
+            - ~/node_modules
+      - run:
+          name: Build stage
+          command: ./deploy prd
+      - run:
+          name: Move extension manifest
+          command: mv production_manifest.json extension/manifest.json
+      - run:
+          name: Zip extension 
+          command: cd extension && mkdir /tmp/extension && zip -r extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
+      - store_artifacts:
+          path: /tmp/extension
+  update_production_sha:
+    docker:
+      - image: rainforestapp/heroku-deploy:latest
+    steps:
+      - checkout
+      - run:
+          name: Setup Heroku
+          command: /scripts/setup.sh
+      - run:
+          name: Update production SHA
+          command: |
+            heroku config:set PLUGIN_VERSION=$CIRCLE_SHA1 -a schrute-prd
+
+workflows:
+  version: 2
+  test_and_deploy:
+    jobs:
+      - lint:
+          filters:
+            branches:
+              ignore:
+                - master
+                - develop
+      - test:
+          filters:
+            branches:
+              ignore:
+                - master
+      - upload_staging:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - develop
+      - update_staging_sha:
+          requires:
+            - upload_staging
+          filters:
+            branches:
+              only:
+                - develop
+      - run_rainforest:
+          requires:
+            - update_staging_sha
+          filters:
+            branches:
+              only:
+                - develop
+      - merge_to_master:
+          requires:
+            - run_rainforest
+          filters:
+            branches:
+              only:
+                - develop
+      - upload_production:
+          filters:
+            branches:
+              only:
+                - master
+      - update_production_sha:
+          requires:
+            - upload_production
+          filters:
+            branches:
+              only:
+                - master
