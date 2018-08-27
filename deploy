@@ -20,20 +20,5 @@ fi
 
 BUCKET="static.$DOMAIN"
 
-function clear_cloudflare_cache {
-    until $(curl https://www.cloudflare.com/api_json.html \
-                 -d "a=fpurge_ts" \
-                 -d "tkn=$CLOUDFLARE_TOKEN" \
-                 -d "email=accounts@rainforestqa.com" \
-                 -d "z=$DOMAIN" \
-                 -d "v=1" |
-                grep -q '"result":"success"'); do
-        sleep 30
-        echo "retrying cloudflare call"
-    done
-}
-
 npm run build
 aws s3 sync build "s3://$BUCKET/$CIRCLE_SHA1/" --acl public-read
-clear_cloudflare_cache
-heroku config:set "PLUGIN_VERSION=$CIRCLE_SHA1" -a "schrute-$ENV"
