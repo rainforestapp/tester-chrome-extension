@@ -187,11 +187,7 @@ workflows:
               ignore:
                 - master
                 - develop
-      - test:
-          filters:
-            branches:
-              ignore:
-                - master
+      - test
       - upload_staging:
           requires:
             - test
