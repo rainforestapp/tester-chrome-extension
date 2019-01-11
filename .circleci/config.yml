@@ -115,6 +115,8 @@ jobs:
   update_staging_sha_gke:
     docker:
       - image: rainforestapp/helm-deploy:latest
+        environment:
+          HELM_TLS_VERIFY: "true"
     steps:
       - checkout
       - run:
