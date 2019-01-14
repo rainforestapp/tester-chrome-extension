@@ -111,6 +111,9 @@ jobs:
           name: Login to gcp
           command: gcp-login
       - run:
+          name: Set up Helm TLS
+          command: helm-tls-setup
+      - run:
           name: Login to staging cluster
           command: gcloud container clusters get-credentials staging --project rf-stg --zone us-east1-b
       - run:
@@ -130,6 +133,9 @@ jobs:
       - run:
           name: Login to gcp
           command: gcp-login
+      - run:
+          name: Set up Helm TLS
+          command: helm-tls-setup
       - run:
           name: Login to production cluster
           command: gcloud container clusters get-credentials production --project rf-prd --zone us-east1
