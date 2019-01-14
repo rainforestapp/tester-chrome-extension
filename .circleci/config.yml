@@ -100,18 +100,6 @@ jobs:
             gsutil cp -r build "gs://static.rnfrst-stg.biz/$CIRCLE_SHA1"
             gsutil cp -r build "gs://static.rainforestqa.biz/$CIRCLE_SHA1"
             gsutil cp -r build "gs://static.rainforestqa.com/$CIRCLE_SHA1"
-  update_staging_sha:
-    docker:
-      - image: rainforestapp/heroku-deploy:latest
-    steps:
-      - checkout
-      - run:
-          name: Setup Heroku
-          command: /scripts/setup.sh
-      - run:
-          name: Update staging SHA
-          command: |
-            heroku config:set PLUGIN_VERSION=$CIRCLE_SHA1 -a schrute-stg
   update_staging_sha_gke:
     docker:
       - image: rainforestapp/helm-deploy:latest
@@ -123,6 +111,9 @@ jobs:
           name: Login to gcp
           command: gcp-login
       - run:
+          name: Set up Helm TLS
+          command: helm-tls-setup
+      - run:
           name: Login to staging cluster
           command: gcloud container clusters get-credentials staging --project rf-stg --zone us-east1-b
       - run:
@@ -131,6 +122,29 @@ jobs:
             if [ "$(kubectl get configmap schrute-config -n staging -o json | jq -r '.data.PLUGIN_VERSION')" != "$CIRCLE_SHA1" ]; then
                 kubectl patch configmap schrute-config -n staging -p "{\"data\":{\"PLUGIN_VERSION\":\"$CIRCLE_SHA1\"}}"
                 restart schrute-staging
+            fi
+  update_production_sha_gke:
+    docker:
+      - image: rainforestapp/helm-deploy:latest
+        environment:
+          HELM_TLS_VERIFY: "true"
+    steps:
+      - checkout
+      - run:
+          name: Login to gcp
+          command: gcp-login
+      - run:
+          name: Set up Helm TLS
+          command: helm-tls-setup
+      - run:
+          name: Login to production cluster
+          command: gcloud container clusters get-credentials production --project rf-prd --zone us-east1
+      - run:
+          name: Update production SHA
+          command: |
+            if [ "$(kubectl get configmap schrute-config -n production -o json | jq -r '.data.PLUGIN_VERSION')" != "$CIRCLE_SHA1" ]; then
+                kubectl patch configmap schrute-config -n production -p "{\"data\":{\"PLUGIN_VERSION\":\"$CIRCLE_SHA1\"}}"
+                restart schrute-production
             fi
   run_rainforest:
     docker:
@@ -166,18 +180,6 @@ jobs:
           command: cd extension && mkdir /tmp/extension && zip -r extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
       - store_artifacts:
           path: /tmp/extension
-  update_production_sha:
-    docker:
-      - image: rainforestapp/heroku-deploy:latest
-    steps:
-      - checkout
-      - run:
-          name: Setup Heroku
-          command: /scripts/setup.sh
-      - run:
-          name: Update production SHA
-          command: |
-            heroku config:set PLUGIN_VERSION=$CIRCLE_SHA1 -a schrute-prd
 
 workflows:
   version: 2
@@ -197,7 +199,7 @@ workflows:
             branches:
               only:
                 - develop
-      - update_staging_sha:
+      - update_staging_sha_gke:
           requires:
             - upload_staging
           filters:
@@ -206,7 +208,7 @@ workflows:
                 - develop
       - run_rainforest:
           requires:
-            - update_staging_sha
+            - update_staging_sha_gke
           filters:
             branches:
               only:
@@ -223,7 +225,7 @@ workflows:
             branches:
               only:
                 - master
-      - update_production_sha:
+      - update_production_sha_gke:
           requires:
             - upload_production
           filters:
@@ -234,10 +236,3 @@ workflows:
       - upload_release_gcs:
           requires:
             - test
-      - update_staging_sha_gke:
-          requires:
-            - upload_release_gcs
-          filters:
-            branches:
-              only:
-                - master
