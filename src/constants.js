@@ -59,7 +59,7 @@ const getConfig = () => {
         profileUrl: 'https://portal.rnfrst.com/profile',
         workAvailableEndpoint: 'https://portal.rainforestqa.com/api/1/testers',
         chrome: getChromeConfig(),
-        ravenURL: 'https://7f2a3dc2e6644d98a2411c6883724589@sentry.io/68477',
+        ravenURL: process.env.SENTRY_DSN,
       };
     case 'prod':
       return {
@@ -68,7 +68,7 @@ const getConfig = () => {
         profileUrl: 'https://portal.rainforestqa.com/profile',
         workAvailableEndpoint: 'https://bouncer.rainforestqa.com/1/testers',
         chrome: getChromeConfig(),
-        ravenURL: 'https://a7b0c76390cc47208e38b884fd60ff3d@sentry.io/68477',
+        ravenURL: process.env.SENTRY_DSN,
       };
     default:
       return {
