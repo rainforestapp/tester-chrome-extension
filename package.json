@@ -9,7 +9,7 @@
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint src",
     "lint:fix": "eslint --fix src",
-    "build:browser": "mkdir -p build && browserify src/bootstrap.js -d -o build/main.js -t [ babelify --presets [ es2015 ] ] -p [ minifyify --map main.js.map --output build/main.js.map ]",
+    "build:browser": "mkdir -p build && browserify src/bootstrap.js -d -o build/main.js -t [ babelify --presets [ es2015 ] ] -t [ envify --SENTRY_DSN $SENTRY_DSN ] -p [ minifyify --map main.js.map --output build/main.js.map ]",
     "build": "npm run build:browser",
     "watch": "mkdir -p build && watchify src/bootstrap.js -d -o build/main.js -t [ babelify ]",
     "devServer": "cd build && ws -p 8123 -r '/DEV/* -> /$1'"
@@ -37,6 +37,7 @@
     "chai": "3.5.0",
     "chai-immutable": "1.6.0",
     "coveralls": "2.11.12",
+    "envify": "^4.1.0",
     "eslint": "3.1.1",
     "eslint-config-rainforest": "0.1.2",
     "eslint-plugin-babel": "2.2.0",

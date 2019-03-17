@@ -7,7 +7,7 @@ const startErrorHandling = (store, raven = Raven, testing = false) => {
     return;
   }
 
-  raven.config(CONFIG.ravenURL).install();
+  raven.config(CONFIG.ravenURL, { environment: CONFIG.env }).install();
 
   const addExtensionInfo = () => {
     if (!window.chrome || !window.chrome.management || !window.chrome.management.getSelf) {
