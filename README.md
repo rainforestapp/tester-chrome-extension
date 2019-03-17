@@ -1,6 +1,6 @@
 # tester-chrome-extension [![Build Status](https://travis-ci.org/rainforestapp/tester-chrome-extension.svg?branch=develop)](https://travis-ci.org/rainforestapp/tester-chrome-extension)[![Coverage Status](https://coveralls.io/repos/github/rainforestapp/tester-chrome-extension/badge.svg)](https://coveralls.io/github/rainforestapp/tester-chrome-extension)
 
-This is a Chrome extention for testers of the Rainforest [QA Testing Platform](https://www.rainforestqa.com/), it notifies testers there is new work to be done.
+This is a Chrome extension for testers of the Rainforest [QA Testing Platform](https://www.rainforestqa.com/), it notifies testers there is new work to be done.
 
 ## Important!!!
 
@@ -8,7 +8,7 @@ This repo is only for technical discussion of the extension, not for general Rai
 
 ## Installing from the portal
 
-Note: to use this extension you MUST have done at least one job for us before. This is as we pay you via either Mechancial Turk, or Crowd Flower as normal, against an older job you did.
+Note: to use this extension you MUST have done at least one job for us before. This is as we pay you via either Mechanical Turk, or Crowd Flower as normal, against an older job you did.
 
 1. Go to https://portal.rainforestqa.com/login (register from any email from us)
 2. Login
@@ -64,4 +64,4 @@ The following situations require new versioned plugin releases:
 
 ## Internal
 
-``password.txt.gpg`` contains the password for ``key.pem.gpg``, it's encrypted using Russ's public key, incase we ever loose it from Circle.
+``password.txt.gpg`` contains the password for ``key.pem.gpg``, it's encrypted using Russ's public key, in case we ever loose it from Circle.
