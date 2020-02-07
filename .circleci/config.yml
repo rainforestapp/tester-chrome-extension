@@ -10,7 +10,7 @@ jobs:
   lint:
     working_directory: ~/rainforestapp/tester-chrome-extension
     docker:
-      - image: circleci/node:6.14
+      - image: circleci/node:12.14.1
         environment:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
     steps:
@@ -26,7 +26,7 @@ jobs:
   test:
     working_directory: ~/rainforestapp/tester-chrome-extension
     docker:
-      - image: circleci/node:6.14
+      - image: circleci/node:12.14.1
         environment:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
     steps:
@@ -59,7 +59,7 @@ jobs:
   upload_staging:
     working_directory: ~/rainforestapp/tester-chrome-extension
     docker:
-      - image: circleci/node:6.14
+      - image: circleci/node:12.14.1
         environment:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
     steps:
@@ -148,15 +148,15 @@ jobs:
             fi
   run_rainforest:
     docker:
-      - image: rainforestapp/rainforest-cli:latest
+      - image: gcr.io/rf-public-images/rainforest-cli:latest
     steps:
       - run:
           name: Run Rainforest
           command:
-            rainforest-cli run --token "$RAINFOREST_TOKEN" --environment-id 356 --folder 3982 --conflict abort --description "tester-chrome-extension - $CIRCLE_BRANCH $CIRCLE_BUILD_NUM"
+            rainforest-cli run --token "$RAINFOREST_TOKEN" --environment-id 356 --run-group 6940 --crowd automation --conflict abort --description "tester-chrome-extension - $CIRCLE_BRANCH $CIRCLE_BUILD_NUM"
   upload_production:
     docker:
-      - image: circleci/node:6.14
+      - image: circleci/node:12.14.1
         environment:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
     steps:

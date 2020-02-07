@@ -1,18 +1,14 @@
 # tester-chrome-extension [![Build Status](https://travis-ci.org/rainforestapp/tester-chrome-extension.svg?branch=develop)](https://travis-ci.org/rainforestapp/tester-chrome-extension)[![Coverage Status](https://coveralls.io/repos/github/rainforestapp/tester-chrome-extension/badge.svg)](https://coveralls.io/github/rainforestapp/tester-chrome-extension)
 
-This is a Chrome extention which notifies the tester there is new work to be done.
+This is a Chrome extension for testers of the Rainforest [QA Testing Platform](https://www.rainforestqa.com/), it notifies testers there is new work to be done.
 
 ## Important!!!
 
-This repo is only for technical discussion of the extension, not for general
-Rainforest-related discussion. Please use the
-[tester forum](https://forum.rainforestqa.com/) for general discussion (if
-you're not sure, the forum is likely the right place to go). If you want to open
-an issue or contribute, please see the [CONTRIBUTING guide](https://github.com/rainforestapp/tester-chrome-extension/blob/develop/CONTRIBUTING.md).
+This repo is only for technical discussion of the extension, not for general Rainforest-related discussion. Please use the [tester forum](https://forum.rainforestqa.com/) for general discussion (if you're not sure, the forum is likely the right place to go). If you want to open an issue or contribute, please see the [CONTRIBUTING guide](https://github.com/rainforestapp/tester-chrome-extension/blob/develop/CONTRIBUTING.md).
 
 ## Installing from the portal
 
-Note: to use this extension you MUST have done at least one job for us before. This is as we pay you via either Mechancial Turk, or Crowd Flower as normal, against an older job you did.
+Note: to use this extension you MUST have done at least one job for us before. This is as we pay you via either Mechanical Turk, or Crowd Flower as normal, against an older job you did.
 
 1. Go to https://portal.rainforestqa.com/login (register from any email from us)
 2. Login
@@ -27,8 +23,7 @@ Clone this repo
 ### 2. Run the local dev server
 
 1. Run the local dev server with `./dev_server`
-2. (To test websocket interactions) run schrute locally at localhost:4000 (note:
-   this is not open source)
+2. (To test websocket interactions) run schrute locally at localhost:4000 (note: this is not open source)
 
 ### 2. Install the extension
 
@@ -58,18 +53,15 @@ code), do the following:
 4. Upload the new version
 5. Click publish
 
-**Warning: don't open a release PR until you've published the staging version,
-otherwise it will get auto-merged.**
+**Warning: don't open a release PR until you've published the staging version, otherwise it will get auto-merged.**
 
-Changes should be tested with the staging version of the plugin before the code
-is merged to master.
+Changes should be tested with the staging version of the plugin before the code is merged to master.
 
 The following situations require new versioned plugin releases:
 
-- Changes to any files in /extension (`index_prod.html`, `options_prod.html`,
-  ``constants/prod.js``, etc).
+- Changes to any files in /extension (`index_prod.html`, `options_prod.html`, `constants/prod.js`, etc).
 - Changes to manifest files.
 
 ## Internal
 
-``password.txt.gpg`` contains the password for ``key.pem.gpg``, it's encrypted using Russ's public key, incase we ever loose it from Circle.
+``password.txt.gpg`` contains the password for ``key.pem.gpg``, it's encrypted using Russ's public key, in case we ever loose it from Circle.
