@@ -148,12 +148,12 @@ jobs:
             fi
   run_rainforest:
     docker:
-      - image: rainforestapp/rainforest-cli:latest
+      - image: gcr.io/rf-public-images/rainforest-cli:latest
     steps:
       - run:
           name: Run Rainforest
           command:
-            rainforest-cli run --token "$RAINFOREST_TOKEN" --environment-id 356 --folder 3982 --conflict abort --description "tester-chrome-extension - $CIRCLE_BRANCH $CIRCLE_BUILD_NUM"
+            rainforest-cli run --token "$RAINFOREST_TOKEN" --environment-id 356 --run-group 6940 --crowd automation --conflict abort --description "tester-chrome-extension - $CIRCLE_BRANCH $CIRCLE_BUILD_NUM"
   upload_production:
     docker:
       - image: circleci/node:12.14.1
