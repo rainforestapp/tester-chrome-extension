@@ -129,7 +129,7 @@ export const startSocket = (store, socketConstructor = Socket) => {
     lobby.join().receive('ok', resp => {
       logDebug('Joined lobby successfully', resp);
     }).receive('error', resp => {
-      throw new Error(`Error joining lobby: ${resp}`);
+      throw new Error(`Error joining lobby: ${JSON.stringify(resp)}`);
     });
   };
 
