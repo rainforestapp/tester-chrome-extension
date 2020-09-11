@@ -86,7 +86,7 @@ jobs:
   upload_release_gcs:
     working_directory: ~/rainforestapp/tester-chrome-extension
     docker:
-      - image: rainforestapp/helm-deploy:latest
+      - image: gcr.io/rf-public-images/helm-deploy:latest
     steps:
       - attach_workspace:
           at: ~/rainforestapp/tester-chrome-extension
@@ -102,7 +102,7 @@ jobs:
             gsutil cp -r build "gs://static.rainforestqa.com/$CIRCLE_SHA1"
   update_staging_sha_gke:
     docker:
-      - image: rainforestapp/helm-deploy:latest
+      - image: gcr.io/rf-public-images/helm-deploy:latest
         environment:
           HELM_TLS_VERIFY: "true"
     steps:
@@ -125,7 +125,7 @@ jobs:
             fi
   update_production_sha_gke:
     docker:
-      - image: rainforestapp/helm-deploy:latest
+      - image: gcr.io/rf-public-images/helm-deploy:latest
         environment:
           HELM_TLS_VERIFY: "true"
     steps:
