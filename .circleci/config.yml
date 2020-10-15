@@ -6,13 +6,19 @@ experimental:
       only:
         - master
 
+defaults: &defaults
+  docker:
+    - image: circleci/node:12.14.1
+      environment:
+        MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+      auth:
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_TOKEN
+
 jobs:
   lint:
     working_directory: ~/rainforestapp/tester-chrome-extension
-    docker:
-      - image: circleci/node:12.14.1
-        environment:
-          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    <<: *defaults
     steps:
       - checkout
       - restore_cache:
@@ -25,10 +31,7 @@ jobs:
           command: npm run lint
   test:
     working_directory: ~/rainforestapp/tester-chrome-extension
-    docker:
-      - image: circleci/node:12.14.1
-        environment:
-          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    <<: *defaults
     steps:
       - checkout
       - restore_cache:
@@ -51,17 +54,14 @@ jobs:
           paths: build
   merge_to_master:
     docker:
-      - image: rainforestapp/circlemator:latest
+      - image: gcr.io/rf-public-images/circlemator:latest
     steps:
       - run:
           name: Merge to master
           command: circlemator self-merge --base-branch=master --compare-branch=develop
   upload_staging:
     working_directory: ~/rainforestapp/tester-chrome-extension
-    docker:
-      - image: circleci/node:12.14.1
-        environment:
-          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    <<: *defaults
     steps:
       - checkout
       - run:
@@ -159,6 +159,9 @@ jobs:
       - image: circleci/node:12.14.1
         environment:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_TOKEN
     steps:
       - checkout
       - run:
@@ -191,7 +194,11 @@ workflows:
               ignore:
                 - master
                 - develop
-      - test
+          context:
+            - DockerHub
+      - test:
+          context:
+            - DockerHub
       - upload_staging:
           requires:
             - test
@@ -199,6 +206,8 @@ workflows:
             branches:
               only:
                 - develop
+          context:
+            - DockerHub
       - update_staging_sha_gke:
           requires:
             - upload_staging
