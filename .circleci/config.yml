@@ -46,12 +46,6 @@ jobs:
       - run:
           name: Run tests
           command: npm run test:ci
-      - run:
-          name: Build
-          command: npm run build
-      - persist_to_workspace:
-          root: .
-          paths: build
   merge_to_master:
     docker:
       - image: gcr.io/rf-public-images/circlemator:latest
@@ -61,12 +55,23 @@ jobs:
           command: circlemator self-merge --base-branch=master --compare-branch=develop
   upload_staging:
     working_directory: ~/rainforestapp/tester-chrome-extension
-    <<: *defaults
+    docker:
+      - image: cimg/python:3.9.1-node
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_TOKEN
     steps:
       - checkout
       - run:
+          name: Update Node and NPM
+          command: |
+            curl -sSL "https://nodejs.org/dist/v12.14.1/node-v12.14.1-linux-x64.tar.xz" | sudo tar --strip-components=2 -xJ -C /usr/local/bin/ node-v12.14.1-linux-x64/bin/node
+            curl https://www.npmjs.com/install.sh | sudo bash
+      - run:
           name: Install awscli
-          command: sudo apt-get -y -qq install awscli
+          command: pip install awscli==1.11.185
       - restore_cache:
           key: v1-tester-chrome-extension-{{ checksum "package.json" }}
       - run:
@@ -83,23 +88,6 @@ jobs:
           command: cd extension && mkdir /tmp/extension && zip -r /tmp/extension/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
       - store_artifacts:
           path: /tmp/extension
-  upload_release_gcs:
-    working_directory: ~/rainforestapp/tester-chrome-extension
-    docker:
-      - image: gcr.io/rf-public-images/helm-deploy:latest
-    steps:
-      - attach_workspace:
-          at: ~/rainforestapp/tester-chrome-extension
-      - run:
-          name: Log into GCP
-          command: gcp-login
-      - run:
-          name: Upload to GCS
-          command: |
-            gsutil cp -r build "gs://static.rnfrst.com/$CIRCLE_SHA1"
-            gsutil cp -r build "gs://static.rnfrst-stg.biz/$CIRCLE_SHA1"
-            gsutil cp -r build "gs://static.rainforestqa.biz/$CIRCLE_SHA1"
-            gsutil cp -r build "gs://static.rainforestqa.com/$CIRCLE_SHA1"
   update_staging_sha_gke:
     docker:
       - image: gcr.io/rf-public-images/helm-deploy:latest
@@ -202,10 +190,10 @@ workflows:
       - upload_staging:
           requires:
             - test
-          filters:
-            branches:
-              only:
-                - develop
+          # filters:
+          #   branches:
+          #     only:
+          #       - develop
           context:
             - DockerHub
       - update_staging_sha_gke:
@@ -241,7 +229,3 @@ workflows:
             branches:
               only:
                 - master
-
-      - upload_release_gcs:
-          requires:
-            - test

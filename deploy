@@ -21,4 +21,5 @@ fi
 BUCKET="static.$DOMAIN"
 
 npm run build
-aws s3 sync build "s3://$BUCKET/$CIRCLE_SHA1/" --acl public-read
+# aws s3 sync build "s3://$BUCKET/$CIRCLE_SHA1/" --acl public-read
+aws --version
