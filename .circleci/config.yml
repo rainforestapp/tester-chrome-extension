@@ -1,10 +1,13 @@
-version: 2
+version: 2.1
 
 experimental:
   notify:
     branches:
       only:
         - master
+
+orbs:
+  rainforest: rainforest-qa/rainforest@2
 
 defaults: &defaults
   docker:
@@ -146,14 +149,6 @@ jobs:
                 kubectl patch configmap schrute-config -n production -p "{\"data\":{\"PLUGIN_VERSION\":\"$CIRCLE_SHA1\"}}"
                 restart schrute-production
             fi
-  run_rainforest:
-    docker:
-      - image: gcr.io/rf-public-images/rainforest-cli:latest
-    steps:
-      - run:
-          name: Run Rainforest
-          command:
-            rainforest-cli run --token "$RAINFOREST_TOKEN" --environment-id 356 --run-group 6940 --crowd automation --conflict abort --description "tester-chrome-extension - $CIRCLE_BRANCH $CIRCLE_BUILD_NUM"
   upload_production:
     docker:
       - image: circleci/node:12.14.1
@@ -215,13 +210,19 @@ workflows:
             branches:
               only:
                 - develop
-      - run_rainforest:
+      - rainforest/run:
+          name: run_rainforest
           requires:
             - update_staging_sha_gke
           filters:
             branches:
               only:
                 - develop
+          run_group_id: "6940"
+          environment_id: "356"
+          crowd: automation
+          conflict: abort
+          pipeline_id: << pipeline.id >>
       - merge_to_master:
           requires:
             - run_rainforest
