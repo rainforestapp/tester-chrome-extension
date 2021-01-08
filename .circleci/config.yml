@@ -66,7 +66,7 @@ jobs:
       - checkout
       - run:
           name: Install awscli
-          command: sudo apt-get -y -qq install awscli
+          command: sudo apt-get update && sudo apt-get -y -qq install awscli
       - restore_cache:
           key: v1-tester-chrome-extension-{{ checksum "package.json" }}
       - run:
@@ -166,7 +166,7 @@ jobs:
       - checkout
       - run:
           name: Install awscli
-          command: sudo apt-get -y -qq install awscli
+          command: sudo apt-get update && sudo apt-get -y -qq install awscli
       - restore_cache:
           key: v1-tester-chrome-extension-{{ checksum "package.json" }}
       - run:
