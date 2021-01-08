@@ -61,7 +61,7 @@
     "deep-freeze": "0.0.1",
     "immutable": "3.8.1",
     "phoenix": "^1.4.0",
-    "raven-js": "3.7.0",
+    "raven-js": "3.27.2",
     "redux": "3.5.2",
     "redux-actions": "0.10.1"
   }
