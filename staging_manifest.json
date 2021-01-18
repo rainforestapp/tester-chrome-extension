@@ -23,17 +23,17 @@
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["https://*.rnfrst.com/*", "https://*.rnfrstqa.com/*"]
+    "matches": [
+      "https://*.rnfrst.com/*",
+      "https://*.rnfrstqa.com/*"
+    ]
   },
   "permissions": [
-    "cookies",
     "idle",
     "notifications",
     "tabs",
     "storage",
     "contextMenus",
-    "identity",
-    "identity.email",
     "*://*.getsentry.com/*",
     "*://*.rnfrst.com/*",
     "*://*.rnfrstqa.com/*"

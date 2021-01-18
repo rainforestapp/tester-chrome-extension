@@ -23,17 +23,16 @@
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["https://*.rainforestqa.com/*"]
+    "matches": [
+      "https://*.rainforestqa.com/*"
+    ]
   },
   "permissions": [
-    "cookies",
     "idle",
     "notifications",
     "tabs",
     "storage",
     "contextMenus",
-    "identity",
-    "identity.email",
     "*://*.getsentry.com/*",
     "*://*.rainforestqa.com/*"
   ],

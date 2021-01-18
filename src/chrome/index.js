@@ -1,6 +1,5 @@
 import { Socket } from 'phoenix';
 import { startPlugin } from '..';
-import { setWorkerProfile } from '../actions';
 import listenMessages from './listenMessages';
 import handleNotifications from './handleNotifications';
 import handleWork from './handleWork';
@@ -24,14 +23,6 @@ export const startChromePlugin = (chrome, socketConstructor = Socket) => {
 
   const getStore = () => store;
 
-  const getUserInfo = () => {
-    if (chrome.identity.getProfileUserInfo) {
-      chrome.identity.getProfileUserInfo(data => {
-        store.dispatch(setWorkerProfile(data));
-      });
-    }
-  };
-
   getSync(store, chrome)
     .then(() => handleStateSaving(store, chrome))
     .then(() => {
@@ -41,7 +32,6 @@ export const startChromePlugin = (chrome, socketConstructor = Socket) => {
       handleWork(store, chrome);
       startIdleChecking(store, chrome);
       buildContextMenus(store, chrome);
-      getUserInfo();
     });
 
   return { getStore };

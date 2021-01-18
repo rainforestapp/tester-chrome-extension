@@ -23,17 +23,18 @@
     "default_icon": "icons/icon19_grey.png"
   },
   "externally_connectable": {
-    "matches": ["*://*.rainforest.dev/*", "*://*.rainforest.test/*", "http://localhost:3000/*"]
+    "matches": [
+      "*://*.rainforest.dev/*",
+      "*://*.rainforest.test/*",
+      "http://localhost:3000/*"
+    ]
   },
   "permissions": [
-    "cookies",
     "idle",
     "notifications",
     "tabs",
     "storage",
     "contextMenus",
-    "identity",
-    "identity.email",
     "*://*.getsentry.com/*",
     "*://*.rainforest.dev/*",
     "*://*.rainforest.test/*",

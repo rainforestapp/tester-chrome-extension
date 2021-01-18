@@ -10,7 +10,6 @@ const initialState = fromJS({
   workStarted: false,
   uuid: null,
   workUrl: null,
-  profileInfo: null,
   error: null,
 });
 
@@ -104,10 +103,6 @@ const authFailed = (state) => (
   state.set('state', 'inactive')
 );
 
-const setWorkerProfile = (state, { payload }) => (
-  state.set('profileInfo', fromJS(payload))
-);
-
 const worker = handleActions({
   [actions.AUTHENTICATE]: authenticate,
   [actions.AUTH_FAILED]: authFailed,
@@ -117,7 +112,6 @@ const worker = handleActions({
   [actions.WORK_FINISHED]: workFinished,
   [actions.CHECK_STATE]: checkState,
   [actions.ICON_CLICKED]: iconClicked,
-  [actions.SET_WORKER_PROFILE]: setWorkerProfile,
 }, initialState);
 
 export default worker;
