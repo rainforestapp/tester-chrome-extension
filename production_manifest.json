@@ -33,8 +33,6 @@
     "tabs",
     "storage",
     "contextMenus",
-    "identity",
-    "identity.email",
     "*://*.getsentry.com/*",
     "*://*.rainforestqa.com/*"
   ],

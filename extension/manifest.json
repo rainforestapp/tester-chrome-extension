@@ -35,8 +35,6 @@
     "tabs",
     "storage",
     "contextMenus",
-    "identity",
-    "identity.email",
     "*://*.getsentry.com/*",
     "*://*.rainforest.dev/*",
     "*://*.rainforest.test/*",

@@ -34,8 +34,6 @@
     "tabs",
     "storage",
     "contextMenus",
-    "identity",
-    "identity.email",
     "*://*.getsentry.com/*",
     "*://*.rnfrst.com/*",
     "*://*.rnfrstqa.com/*"
