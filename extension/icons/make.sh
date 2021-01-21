@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 mogrify original.png -trim +repage -fuzz 1%
+convert original.png -thumbnail 130x130 -background white -alpha remove -alpha off -gravity center -extent 150x150 icon_notification.png
 convert original.png -thumbnail 128x128 icon128.png
 convert original.png -thumbnail 48x48 icon48.png
 convert original.png -thumbnail 38x38 icon38.png

@@ -12,10 +12,6 @@ export const mockChrome = (opts = {}) => {
   let openWindows = [{ tabs: [] }];
   let tabCounter = 42;
   const tabOnRemoveListeners = [];
-  const profileUserInfo = opts.profileUserInfo || {
-    email: '',
-    id: '',
-  };
   let currentIcon;
   let createdMenus = [];
   let checkedMenus = [];
@@ -182,12 +178,6 @@ export const mockChrome = (opts = {}) => {
     },
   };
 
-  const identity = {
-    getProfileUserInfo: (callback) => {
-      setTimeout(() => callback(profileUserInfo));
-    },
-  };
-
   const contextMenus = {
     create: (option, callback) => {
       createdMenus.push(option);
@@ -272,7 +262,6 @@ export const mockChrome = (opts = {}) => {
     windows,
     browserAction,
     idle,
-    identity,
     contextMenus,
 
     // Testing helpers

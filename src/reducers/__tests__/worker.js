@@ -6,7 +6,6 @@
 */
 import chai, { expect } from 'chai';
 import chaiImmutable from 'chai-immutable';
-import { fromJS } from 'immutable';
 import {
   assignWork,
   authenticate,
@@ -16,7 +15,6 @@ import {
   iconClicked,
   workStarted,
   workFinished,
-  setWorkerProfile,
 } from '../../actions';
 import { actions } from '../../constants';
 import worker from '../worker';
@@ -30,7 +28,6 @@ const checkKeys = (state) => {
     'workStarted',
     'uuid',
     'workUrl',
-    'profileInfo',
     'error',
   ]);
 };
@@ -99,15 +96,6 @@ describe('worker reducer', function() {
       expect(state.get('error')).to.be.null;
       expect(state.get('workUrl')).to.be.null;
       expect(state.get('state')).to.equal('working');
-    });
-  });
-
-  describe(actions.SET_WORKER_PROFILE, function() {
-    it('updates the worker profile', function() {
-      const profile = { email: 'bob@example.com', id: 'abc123' };
-      const state = worker(initState, setWorkerProfile(profile));
-
-      expect(state.get('profileInfo')).to.equal(fromJS(profile));
     });
   });
 
