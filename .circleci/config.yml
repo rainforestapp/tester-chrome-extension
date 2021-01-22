@@ -175,7 +175,7 @@ jobs:
           command: mv production_manifest.json extension/manifest.json
       - run:
           name: Zip extension
-          command: cd extension && mkdir /tmp/extension && zip -r extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
+          command: cd extension && mkdir /tmp/extension && zip -r /tmp/extension/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
       - store_artifacts:
           path: /tmp/extension
 
