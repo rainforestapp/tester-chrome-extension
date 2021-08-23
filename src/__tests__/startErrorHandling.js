@@ -14,21 +14,21 @@ import sinonChai from 'sinon-chai';
 
 chai.use(sinonChai);
 
-const mockRaven = ({ captureException, setUserContext }) => (
+const mockSentry = ({ captureException, setUser }) => (
   {
-    config: () => ({ install: () => {} }),
+    init: () => {},
     captureException,
-    setUserContext,
+    setUser,
   }
 );
 
 describe('startErrorHandling', function() {
   it('reports any errors to Raven', function() {
     const captureException = sinon.spy();
-    const raven = mockRaven({ captureException });
+    const sentry = mockSentry({ captureException });
     const store = createStore(pluginApp);
 
-    startErrorHandling(store, raven, true);
+    startErrorHandling(store, sentry, true);
 
     // Bad call to authenticate
     store.dispatch(authenticate());
@@ -37,14 +37,14 @@ describe('startErrorHandling', function() {
   });
 
   it("records the worker UUID when it's set", function() {
-    const setUserContext = sinon.spy();
-    const raven = mockRaven({ setUserContext });
+    const setUser = sinon.spy();
+    const sentry = mockSentry({ setUser });
     const store = createStore(pluginApp);
 
-    startErrorHandling(store, raven, true);
+    startErrorHandling(store, sentry, true);
 
     store.dispatch(authenticate({ workerUUID: 'abc123', socketAuth: { auth: 'foo', sig: 'bar' } }));
 
-    expect(setUserContext).to.have.been.calledWithExactly({ uuid: 'abc123' });
+    expect(setUser).to.have.been.calledWithExactly({ id: 'abc123' });
   });
 });

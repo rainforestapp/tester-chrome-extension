@@ -58,10 +58,10 @@
     "watchify": "^3.11.1"
   },
   "dependencies": {
+    "@sentry/browser": "^6.11.0",
     "deep-freeze": "0.0.1",
     "immutable": "3.8.1",
     "phoenix": "^1.4.0",
-    "raven-js": "3.27.2",
     "redux": "4.0.5",
     "redux-actions": "0.10.1"
   }
