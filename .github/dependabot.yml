@@ -1,0 +1,28 @@
+version: 2
+registries:
+  npm-registry-npm-fontawesome-com:
+    type: npm-registry
+    url: https://npm.fontawesome.com
+    token: "${{secrets.NPM_REGISTRY_NPM_FONTAWESOME_COM_TOKEN}}"
+
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "13:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: jsdom
+    versions:
+    - 16.4.0
+    - 16.5.0
+    - 16.5.1
+    - 16.5.2
+  - dependency-name: mocha
+    versions:
+    - 8.2.1
+    - 8.3.0
+    - 8.3.1
+  registries:
+  - npm-registry-npm-fontawesome-com
