@@ -1,4 +1,4 @@
-# tester-chrome-extension [![Build Status](https://travis-ci.org/rainforestapp/tester-chrome-extension.svg?branch=develop)](https://travis-ci.org/rainforestapp/tester-chrome-extension)[![Coverage Status](https://coveralls.io/repos/github/rainforestapp/tester-chrome-extension/badge.svg)](https://coveralls.io/github/rainforestapp/tester-chrome-extension)
+# tester-chrome-extension [![CircleCI](https://circleci.com/gh/rainforestapp/tester-chrome-extension/tree/develop.svg?style=shield&circle-token=d0778aa4f75fc5985075320174200051a389c6bf)](https://circleci.com/gh/rainforestapp/tester-chrome-extension/tree/develop) [![Coverage Status](https://coveralls.io/repos/github/rainforestapp/tester-chrome-extension/badge.svg)](https://coveralls.io/github/rainforestapp/tester-chrome-extension)
 
 This is a Chrome extension for testers of the Rainforest [QA Testing Platform](https://www.rainforestqa.com/), it notifies testers there is new work to be done.
 
