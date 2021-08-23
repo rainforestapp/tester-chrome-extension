@@ -64,4 +64,4 @@ The following situations require new versioned plugin releases:
 
 ## Internal
 
-``password.txt.gpg`` contains the password for ``key.pem.gpg``, it's encrypted using Russ's public key, in case we ever loose it from Circle.
+``password.txt.gpg`` contains the password for ``key.pem.gpg``, it's encrypted using Russ's public key, in case we ever lose it from Circle.
