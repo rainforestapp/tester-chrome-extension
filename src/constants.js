@@ -49,7 +49,7 @@ const getConfig = () => {
         profileUrl: 'http://portal.rainforest.test/profile',
         workAvailableEndpoint: 'http://portal.rainforest.test/api/1/testers',
         chrome: getChromeConfig(),
-        ravenURL: 'BOGUS',
+        sentryURL: 'BOGUS',
       };
     case 'staging':
       return {
@@ -58,7 +58,7 @@ const getConfig = () => {
         profileUrl: 'https://portal.rnfrst.com/profile',
         workAvailableEndpoint: 'https://portal.rainforestqa.com/api/1/testers',
         chrome: getChromeConfig(),
-        ravenURL: process.env.SENTRY_DSN,
+        sentryURL: process.env.SENTRY_DSN,
       };
     case 'prod':
       return {
@@ -67,7 +67,7 @@ const getConfig = () => {
         profileUrl: 'https://portal.rainforestqa.com/profile',
         workAvailableEndpoint: 'https://bouncer.rainforestqa.com/1/testers',
         chrome: getChromeConfig(),
-        ravenURL: process.env.SENTRY_DSN,
+        sentryURL: process.env.SENTRY_DSN,
       };
     default:
       return {
@@ -80,7 +80,7 @@ const getConfig = () => {
           greyIcon: { path: 'GREY' },
           colorIcon: { path: 'COLOR' },
         },
-        ravenURL: 'BOGUS',
+        sentryURL: 'BOGUS',
       };
   }
 };

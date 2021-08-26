@@ -1,5 +1,5 @@
 import { Socket } from 'phoenix';
-import Raven from 'raven-js';
+import * as Sentry from '@sentry/browser';
 import listenStoreChanges from '../listenStoreChanges';
 import { logDebug } from '../logging';
 import { CONFIG } from '../constants';
@@ -60,9 +60,8 @@ export const startSocket = (store, socketConstructor = Socket) => {
           }
           if (Date.now() - readyRetryStartedAt > READY_RETRY_TIMEOUT) {
             const uuid = store.getState().worker.get('uuid');
-            Raven.captureException(new Error('Worker timed out moving to "ready" state'), {
-              extra: { worker_uuid: uuid },
-            });
+            Sentry.setUser({ id: uuid });
+            Sentry.captureException(new Error('Worker timed out moving to "ready" state'));
             clearReadyRetry();
             store.dispatch(updateWorkerState('inactive'));
           } else {

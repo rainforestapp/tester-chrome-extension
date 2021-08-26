@@ -28,19 +28,17 @@ const buildContextMenus = (store, chrome) => {
     const root = chrome.contextMenus.create({ // Menu
       title: option.title,
       contexts: ['browser_action'],
-    },
-    () => {
-      option.opts.forEach(opt => { // Generating SubMenu
-        chrome.contextMenus.create({
-          type: 'radio',
-          title: opt.name,
-          checked: isChecked(option.name, opt.value),
-          contexts: ['browser_action'],
-          onclick: () => {
-            onMenuClick(option.name, opt.value);
-          },
-          parentId: root,
-        });
+    });
+    option.opts.forEach(opt => { // Generating SubMenu
+      chrome.contextMenus.create({
+        type: 'radio',
+        title: opt.name,
+        checked: isChecked(option.name, opt.value),
+        contexts: ['browser_action'],
+        onclick: () => {
+          onMenuClick(option.name, opt.value);
+        },
+        parentId: root,
       });
     });
   };
