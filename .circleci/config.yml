@@ -11,7 +11,7 @@ orbs:
 
 defaults: &defaults
   docker:
-    - image: circleci/node:12.14.1
+    - image: circleci/node:12.22.5
       environment:
         MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
       auth:
@@ -151,7 +151,7 @@ jobs:
             fi
   upload_production:
     docker:
-      - image: circleci/node:12.14.1
+      - image: circleci/node:12.22.5
         environment:
           MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
         auth:
