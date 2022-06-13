@@ -10,6 +10,7 @@ orbs:
   rainforest: rainforest-qa/rainforest@2
 
 defaults: &defaults
+  working_directory: ~/rainforestapp/tester-chrome-extension
   docker:
     - image: circleci/node:12.22.5
       environment:
@@ -20,7 +21,6 @@ defaults: &defaults
 
 jobs:
   lint:
-    working_directory: ~/rainforestapp/tester-chrome-extension
     <<: *defaults
     steps:
       - checkout
@@ -33,7 +33,6 @@ jobs:
           name: Lint source
           command: npm run lint
   test:
-    working_directory: ~/rainforestapp/tester-chrome-extension
     <<: *defaults
     steps:
       - checkout
@@ -54,22 +53,11 @@ jobs:
           command: npm run build
       - persist_to_workspace:
           root: .
-          paths: build
-  merge_to_master:
-    docker:
-      - image: gcr.io/rf-public-images/circlemator:latest
-    steps:
-      - run:
-          name: Merge to master
-          command: circlemator self-merge --base-branch=master --compare-branch=develop
-  upload_staging:
-    working_directory: ~/rainforestapp/tester-chrome-extension
+          paths: extension/build
+  build_staging:
     <<: *defaults
     steps:
       - checkout
-      - run:
-          name: Install awscli
-          command: sudo apt-get update && sudo apt-get -y -qq install awscli
       - restore_cache:
           key: v1-tester-chrome-extension-{{ checksum "package.json" }}
       - run:
@@ -77,7 +65,7 @@ jobs:
           command: npm install
       - run:
           name: Build stage
-          command: ./deploy stg
+          command: npm run build
       - run:
           name: Move extension manifest
           command: mv staging_manifest.json extension/manifest.json
@@ -86,82 +74,10 @@ jobs:
           command: cd extension && mkdir /tmp/extension && zip -r /tmp/extension/extension-$CIRCLE_SHA1.zip . -x *.git* -x circle.yml -x *.DS_Store*
       - store_artifacts:
           path: /tmp/extension
-  upload_release_gcs:
-    working_directory: ~/rainforestapp/tester-chrome-extension
-    docker:
-      - image: gcr.io/rf-public-images/helm-deploy:latest
-    steps:
-      - attach_workspace:
-          at: ~/rainforestapp/tester-chrome-extension
-      - run:
-          name: Log into GCP
-          command: gcp-login
-      - run:
-          name: Upload to GCS
-          command: |
-            gsutil cp -r build "gs://static.rnfrst.com/$CIRCLE_SHA1"
-            gsutil cp -r build "gs://static.rnfrst-stg.biz/$CIRCLE_SHA1"
-            gsutil cp -r build "gs://static.rainforestqa.biz/$CIRCLE_SHA1"
-            gsutil cp -r build "gs://static.rainforestqa.com/$CIRCLE_SHA1"
-  update_staging_sha_gke:
-    docker:
-      - image: gcr.io/rf-public-images/helm-deploy:latest
-        environment:
-          HELM_TLS_VERIFY: "true"
+  build_production:
+    <<: *defaults
     steps:
       - checkout
-      - run:
-          name: Login to gcp
-          command: gcp-login
-      - run:
-          name: Set up Helm TLS
-          command: helm-tls-setup
-      - run:
-          name: Login to staging cluster
-          command: gcloud container clusters get-credentials staging --project rf-stg --zone us-east1-b
-      - run:
-          name: Update staging SHA
-          command: |
-            if [ "$(kubectl get configmap schrute-config -n staging -o json | jq -r '.data.PLUGIN_VERSION')" != "$CIRCLE_SHA1" ]; then
-                kubectl patch configmap schrute-config -n staging -p "{\"data\":{\"PLUGIN_VERSION\":\"$CIRCLE_SHA1\"}}"
-                restart schrute-staging
-            fi
-  update_production_sha_gke:
-    docker:
-      - image: gcr.io/rf-public-images/helm-deploy:latest
-        environment:
-          HELM_TLS_VERIFY: "true"
-    steps:
-      - checkout
-      - run:
-          name: Login to gcp
-          command: gcp-login
-      - run:
-          name: Set up Helm TLS
-          command: helm-tls-setup
-      - run:
-          name: Login to production cluster
-          command: gcloud container clusters get-credentials production --project rf-prd --zone us-east1
-      - run:
-          name: Update production SHA
-          command: |
-            if [ "$(kubectl get configmap schrute-config -n production -o json | jq -r '.data.PLUGIN_VERSION')" != "$CIRCLE_SHA1" ]; then
-                kubectl patch configmap schrute-config -n production -p "{\"data\":{\"PLUGIN_VERSION\":\"$CIRCLE_SHA1\"}}"
-                restart schrute-production
-            fi
-  upload_production:
-    docker:
-      - image: circleci/node:12.22.5
-        environment:
-          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_TOKEN
-    steps:
-      - checkout
-      - run:
-          name: Install awscli
-          command: sudo apt-get update && sudo apt-get -y -qq install awscli
       - restore_cache:
           key: v1-tester-chrome-extension-{{ checksum "package.json" }}
       - run:
@@ -169,7 +85,7 @@ jobs:
           command: npm install
       - run:
           name: Build stage
-          command: ./deploy prd
+          command: npm run build
       - run:
           name: Move extension manifest
           command: mv production_manifest.json extension/manifest.json
@@ -194,18 +110,22 @@ workflows:
       - test:
           context:
             - DockerHub
-      - upload_staging:
+      - build_staging:
           requires:
             - test
           filters:
             branches:
               only:
                 - develop
-          context:
-            - DockerHub
-      - update_staging_sha_gke:
+      - build_production:
           requires:
-            - upload_staging
+            - test
+          filters:
+            branches:
+              only:
+                - develop
+      - approve_rainforest:
+          type: approval
           filters:
             branches:
               only:
@@ -213,7 +133,8 @@ workflows:
       - rainforest/run:
           name: run_rainforest
           requires:
-            - update_staging_sha_gke
+            - approve_rainforest
+            - build_staging
           filters:
             branches:
               only:
@@ -223,26 +144,3 @@ workflows:
           crowd: automation
           conflict: abort
           pipeline_id: << pipeline.id >>
-      - merge_to_master:
-          requires:
-            - run_rainforest
-          filters:
-            branches:
-              only:
-                - develop
-      - upload_production:
-          filters:
-            branches:
-              only:
-                - master
-      - update_production_sha_gke:
-          requires:
-            - upload_production
-          filters:
-            branches:
-              only:
-                - master
-
-      - upload_release_gcs:
-          requires:
-            - test

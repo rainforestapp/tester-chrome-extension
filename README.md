@@ -20,9 +20,9 @@ Note: to use this extension you MUST have done at least one job for us before. T
 
 Clone this repo
 
-### 2. Run the local dev server
+### 2. Run the watcher
 
-1. Run the local dev server with `./dev_server`
+1. Run the file watcher with `npm run watch` to (re)build on code changes
 2. (To test websocket interactions) run schrute locally at localhost:4000 (note: this is not open source)
 
 ### 2. Install the extension
@@ -40,27 +40,15 @@ Clone this repo
 
 ## Deploying
 
-Most deploys do *not* require a new release of the plugin. If you are only
-changing /src, the code will be deployed as soon as it is merged to master. (Do
-not bump any versions in this case.)
-
-If you are deploying changes to the actual plugin (as opposed to the JS source
-code), do the following:
-
 1. Bump the version in `package.json`, `production_manifest.json`, `staging_manifest.json` and `extension/manifest.json`
-2. Build on circle and download the extension.zip
-3. Go to https://chrome.google.com/webstore/developer/dashboard/u85d2beaae4ec3450eae7ccaa97b3ac82
-4. Upload the new version
-5. Click publish
-
-**Warning: don't open a release PR until you've published the staging version, otherwise it will get auto-merged.**
-
-Changes should be tested with the staging version of the plugin before the code is merged to master.
-
-The following situations require new versioned plugin releases:
-
-- Changes to any files in /extension (`index_prod.html`, `options_prod.html`, `constants/prod.js`, etc).
-- Changes to manifest files.
+2. Build on circle and download the staging extension.zip
+3. Go to https://chrome.google.com/webstore/devconsole/c9b5ecbf-56cb-42cf-8ad6-29bd19a92412
+4. Upload the zip to the staging extension and publish it
+5. Once the new staging version is live, approve the RF run
+6. Wait for RF run to pass
+7. Download the production extension.zip from circle
+8. Go back to the developer dashboard and upload and publish the production zip to the production extension
+9. merge the PR
 
 ## Internal
 

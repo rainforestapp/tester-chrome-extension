@@ -9,10 +9,9 @@
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint src",
     "lint:fix": "eslint --fix src",
-    "build:browser": "mkdir -p build && browserify src/bootstrap.js -d -o build/main.js -t [ babelify --presets [ @babel/preset-env ] ] -t [ envify --SENTRY_DSN $SENTRY_DSN ] -p [ minifyify --map main.js.map --output build/main.js.map ]",
+    "build:browser": "mkdir -p extension/build && browserify src/bootstrap.js -d -o extension/build/main.js -t [ babelify --presets [ @babel/preset-env ] ] -t [ envify --SENTRY_DSN $SENTRY_DSN ] -p [ minifyify --map main.js.map --output extension/build/main.js.map ]",
     "build": "npm run build:browser",
-    "watch": "mkdir -p build && watchify src/bootstrap.js -d -o build/main.js -t [ babelify ]",
-    "devServer": "cd build && ws -p 8123 --rewrite '/DEV/(.*) -> /$1'"
+    "watch": "mkdir -p extension/build && watchify src/bootstrap.js -d -o extension/build/main.js -t [ babelify ]"
   },
   "repository": {
     "type": "git",
