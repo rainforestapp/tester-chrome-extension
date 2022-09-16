@@ -7,7 +7,7 @@ experimental:
         - master
 
 orbs:
-  rainforest: rainforest-qa/rainforest@2
+  rainforest: rainforest-qa/rainforest@3
 
 defaults: &defaults
   working_directory: ~/rainforestapp/tester-chrome-extension
@@ -142,5 +142,5 @@ workflows:
           run_group_id: "6940"
           environment_id: "356"
           crowd: automation
-          conflict: abort
+          conflict: cancel
           pipeline_id: << pipeline.id >>
